@@ -75,6 +75,7 @@ import { toast } from "sonner";
 import {
   Check,
   X,
+  Circle,
   CircleDashed,
   Upload,
   FileText,
@@ -477,57 +478,179 @@ export function EvaluatePanel({ patient, resetVersion = 0, onUpdate, onOpenForm 
 
       {/* ── Quick Check ────────────────────────────────── */}
       <StepSection step={1} title="Quick Check">
-        <SectionCard>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            {showCgm && (
-              <div className="space-y-3">
-                <ToggleField
-                  label="CGM Script Received?"
-                  value={state.cgmScriptReceived}
-                  onChange={(v) => {
-                    update("cgmScriptReceived", v as YesNo);
-                    if (v === "No") update("cgmScriptValid", undefined);
-                  }}
-                />
+        <div className="divide-y divide-border rounded-xl border border-border bg-card overflow-hidden">
+          {/* CGM Script row */}
+          {showCgm && (
+            <div className="flex items-center gap-4 px-5 py-4 hover:bg-muted/30 transition-colors">
+              <div className="shrink-0">
+                {state.cgmScriptReceived === "Yes" && state.cgmScriptValid === "Valid" ? (
+                  <CheckCircle2 className="h-6 w-6 text-emerald-500" />
+                ) : state.cgmScriptReceived === "No" ? (
+                  <XCircle className="h-6 w-6 text-red-400" />
+                ) : (
+                  <Circle className="h-6 w-6 text-muted-foreground/40" />
+                )}
+              </div>
+              <span className="text-sm font-medium text-foreground min-w-[140px]">CGM Script</span>
+              <div className="flex items-center gap-2 ml-auto">
+                <button
+                  onClick={() => { update("cgmScriptReceived", "Yes" as YesNo); }}
+                  className={cn(
+                    "px-3 py-1.5 rounded-full text-xs font-medium border transition-all",
+                    state.cgmScriptReceived === "Yes"
+                      ? "bg-emerald-100 text-emerald-700 border-emerald-300"
+                      : "bg-muted/50 text-muted-foreground border-border hover:border-emerald-300 hover:text-emerald-600"
+                  )}
+                >
+                  Received
+                </button>
+                <button
+                  onClick={() => { update("cgmScriptReceived", "No" as YesNo); update("cgmScriptValid", undefined); }}
+                  className={cn(
+                    "px-3 py-1.5 rounded-full text-xs font-medium border transition-all",
+                    state.cgmScriptReceived === "No"
+                      ? "bg-red-100 text-red-700 border-red-300"
+                      : "bg-muted/50 text-muted-foreground border-border hover:border-red-300 hover:text-red-600"
+                  )}
+                >
+                  Not Received
+                </button>
                 {state.cgmScriptReceived === "Yes" && (
-                  <ToggleField
-                    label="Valid?"
-                    optionA="Valid"
-                    optionB="Invalid"
-                    value={state.cgmScriptValid}
-                    onChange={(v) => update("cgmScriptValid", v as ValidInvalid)}
-                  />
+                  <>
+                    <div className="w-px h-5 bg-border mx-1" />
+                    <button
+                      onClick={() => update("cgmScriptValid", "Valid" as ValidInvalid)}
+                      className={cn(
+                        "px-3 py-1.5 rounded-full text-xs font-medium border transition-all",
+                        state.cgmScriptValid === "Valid"
+                          ? "bg-emerald-100 text-emerald-700 border-emerald-300"
+                          : "bg-muted/50 text-muted-foreground border-border hover:border-emerald-300"
+                      )}
+                    >
+                      Valid
+                    </button>
+                    <button
+                      onClick={() => update("cgmScriptValid", "Invalid" as ValidInvalid)}
+                      className={cn(
+                        "px-3 py-1.5 rounded-full text-xs font-medium border transition-all",
+                        state.cgmScriptValid === "Invalid"
+                          ? "bg-red-100 text-red-700 border-red-300"
+                          : "bg-muted/50 text-muted-foreground border-border hover:border-red-300"
+                      )}
+                    >
+                      Invalid
+                    </button>
+                  </>
                 )}
               </div>
-            )}
-            {showIp && (
-              <div className="space-y-3">
-                <ToggleField
-                  label="IP Script Received?"
-                  value={state.ipScriptReceived}
-                  onChange={(v) => {
-                    update("ipScriptReceived", v as YesNo);
-                    if (v === "No") update("ipScriptValid", undefined);
-                  }}
-                />
+            </div>
+          )}
+
+          {/* IP Script row */}
+          {showIp && (
+            <div className="flex items-center gap-4 px-5 py-4 hover:bg-muted/30 transition-colors">
+              <div className="shrink-0">
+                {state.ipScriptReceived === "Yes" && state.ipScriptValid === "Valid" ? (
+                  <CheckCircle2 className="h-6 w-6 text-emerald-500" />
+                ) : state.ipScriptReceived === "No" ? (
+                  <XCircle className="h-6 w-6 text-red-400" />
+                ) : (
+                  <Circle className="h-6 w-6 text-muted-foreground/40" />
+                )}
+              </div>
+              <span className="text-sm font-medium text-foreground min-w-[140px]">IP Script</span>
+              <div className="flex items-center gap-2 ml-auto">
+                <button
+                  onClick={() => { update("ipScriptReceived", "Yes" as YesNo); }}
+                  className={cn(
+                    "px-3 py-1.5 rounded-full text-xs font-medium border transition-all",
+                    state.ipScriptReceived === "Yes"
+                      ? "bg-emerald-100 text-emerald-700 border-emerald-300"
+                      : "bg-muted/50 text-muted-foreground border-border hover:border-emerald-300 hover:text-emerald-600"
+                  )}
+                >
+                  Received
+                </button>
+                <button
+                  onClick={() => { update("ipScriptReceived", "No" as YesNo); update("ipScriptValid", undefined); }}
+                  className={cn(
+                    "px-3 py-1.5 rounded-full text-xs font-medium border transition-all",
+                    state.ipScriptReceived === "No"
+                      ? "bg-red-100 text-red-700 border-red-300"
+                      : "bg-muted/50 text-muted-foreground border-border hover:border-red-300 hover:text-red-600"
+                  )}
+                >
+                  Not Received
+                </button>
                 {state.ipScriptReceived === "Yes" && (
-                  <ToggleField
-                    label="Valid?"
-                    optionA="Valid"
-                    optionB="Invalid"
-                    value={state.ipScriptValid}
-                    onChange={(v) => update("ipScriptValid", v as ValidInvalid)}
-                  />
+                  <>
+                    <div className="w-px h-5 bg-border mx-1" />
+                    <button
+                      onClick={() => update("ipScriptValid", "Valid" as ValidInvalid)}
+                      className={cn(
+                        "px-3 py-1.5 rounded-full text-xs font-medium border transition-all",
+                        state.ipScriptValid === "Valid"
+                          ? "bg-emerald-100 text-emerald-700 border-emerald-300"
+                          : "bg-muted/50 text-muted-foreground border-border hover:border-emerald-300"
+                      )}
+                    >
+                      Valid
+                    </button>
+                    <button
+                      onClick={() => update("ipScriptValid", "Invalid" as ValidInvalid)}
+                      className={cn(
+                        "px-3 py-1.5 rounded-full text-xs font-medium border transition-all",
+                        state.ipScriptValid === "Invalid"
+                          ? "bg-red-100 text-red-700 border-red-300"
+                          : "bg-muted/50 text-muted-foreground border-border hover:border-red-300"
+                      )}
+                    >
+                      Invalid
+                    </button>
+                  </>
                 )}
               </div>
-            )}
-            <ToggleField
-              label="Clinicals Received?"
-              value={state.mrReceived}
-              onChange={(v) => setMrReceived(v as YesNo)}
-            />
+            </div>
+          )}
+
+          {/* Clinicals row */}
+          <div className="flex items-center gap-4 px-5 py-4 hover:bg-muted/30 transition-colors">
+            <div className="shrink-0">
+              {state.mrReceived === "Yes" ? (
+                <CheckCircle2 className="h-6 w-6 text-emerald-500" />
+              ) : state.mrReceived === "No" ? (
+                <XCircle className="h-6 w-6 text-red-400" />
+              ) : (
+                <Circle className="h-6 w-6 text-muted-foreground/40" />
+              )}
+            </div>
+            <span className="text-sm font-medium text-foreground min-w-[140px]">Clinicals</span>
+            <div className="flex items-center gap-2 ml-auto">
+              <button
+                onClick={() => setMrReceived("Yes" as YesNo)}
+                className={cn(
+                  "px-3 py-1.5 rounded-full text-xs font-medium border transition-all",
+                  state.mrReceived === "Yes"
+                    ? "bg-emerald-100 text-emerald-700 border-emerald-300"
+                    : "bg-muted/50 text-muted-foreground border-border hover:border-emerald-300 hover:text-emerald-600"
+                )}
+              >
+                Received
+              </button>
+              <button
+                onClick={() => setMrReceived("No" as YesNo)}
+                className={cn(
+                  "px-3 py-1.5 rounded-full text-xs font-medium border transition-all",
+                  state.mrReceived === "No"
+                    ? "bg-red-100 text-red-700 border-red-300"
+                    : "bg-muted/50 text-muted-foreground border-border hover:border-red-300 hover:text-red-600"
+                )}
+              >
+                Not Received
+              </button>
+            </div>
           </div>
-        </SectionCard>
+        </div>
       </StepSection>
 
       {/* ── Diagnosis & Clinicals ───────────────────────── */}
