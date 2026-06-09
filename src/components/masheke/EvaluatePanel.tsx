@@ -19,6 +19,7 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
+import { StepSection } from "@/components/shared/StepSection";
 import { NotesPanel } from "@/components/masheke/NotesPanel";
 import {
   VALID_INVALID_OPTS,
@@ -89,7 +90,6 @@ import {
   Send,
   ChevronRight,
 } from "lucide-react";
-import { StepSection } from "@/components/shared/StepSection";
 
 interface Props {
   patient: Patient;
@@ -465,7 +465,7 @@ export function EvaluatePanel({ patient, resetVersion = 0, onUpdate, onOpenForm 
   const anyYes = state.cgmScriptReceived === "Yes" || state.ipScriptReceived === "Yes" || state.mrReceived === "Yes";
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Banner: Serving forces a path */}
       {!showCgm && !showIp && (
         <div className="rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
@@ -473,8 +473,11 @@ export function EvaluatePanel({ patient, resetVersion = 0, onUpdate, onOpenForm 
         </div>
       )}
 
-      <StepSection accent="teal" step={1} title="Quick Check" hint="Verify received documents">
-        <SectionCard title="Quick Check">
+
+
+      {/* ── Quick Check ────────────────────────────────── */}
+      <StepSection step={1} title="Quick Check">
+        <SectionCard>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             {showCgm && (
               <div className="space-y-3">
@@ -527,8 +530,17 @@ export function EvaluatePanel({ patient, resetVersion = 0, onUpdate, onOpenForm 
         </SectionCard>
       </StepSection>
 
-      <StepSection accent="teal" step={2} title="Diagnosis & Medical Necessity" hint="Diagnosis, last visit date, MR expiry">
-        <SectionCard title="Diagnosis & Clinicals" status={validity.sections.diagnosis.valid && validity.sections.mr.valid}>
+      {/* ── Diagnosis & Clinicals ───────────────────────── */}
+      <StepSection
+        step={2}
+        title="Diagnosis & Clinicals"
+        rightAccessory={validity.sections.diagnosis.valid && validity.sections.mr.valid ? (
+          <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-2 py-0.5"><Check className="h-3 w-3" /> Complete</span>
+        ) : validity.sections.diagnosis.valid === false || validity.sections.mr.valid === false ? (
+          <span className="inline-flex items-center gap-1 text-xs font-medium text-red-700 bg-red-50 border border-red-200 rounded-full px-2 py-0.5"><X className="h-3 w-3" /> Incomplete</span>
+        ) : null}
+      >
+        <SectionCard>
           <DiagnosisField
             value={state.diagnosis}
             onChange={(v) => setDiagnosis(v)}
@@ -546,122 +558,134 @@ export function EvaluatePanel({ patient, resetVersion = 0, onUpdate, onOpenForm 
         </SectionCard>
       </StepSection>
 
-      <StepSection accent="teal" step={3} title="Coverage" hint="Coverage paths, CGM/IP blocks, OOW fields">
-        {anyYes && (<>
-          {/* CGM block */}
-          {showCgm && (
-            <SectionCard
-              title="CGM"
-              status={validity.sections.cgm.shown ? validity.sections.cgm.valid : null}
-            >
+      {anyYes && (<>
+
+      {/* CGM block */}
+      {showCgm && (
+        <StepSection
+          step={3}
+          title="CGM"
+          rightAccessory={validity.sections.cgm.shown ? (
+            validity.sections.cgm.valid ? (
+              <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-2 py-0.5"><Check className="h-3 w-3" /> Complete</span>
+            ) : validity.sections.cgm.valid === false ? (
+              <span className="inline-flex items-center gap-1 text-xs font-medium text-red-700 bg-red-50 border border-red-200 rounded-full px-2 py-0.5"><X className="h-3 w-3" /> Incomplete</span>
+            ) : null
+          ) : null}
+        >
+          <SectionCard>
+            <StatusSelect
+              label="CGM Coverage Path"
+              value={state.cgmCoveragePath}
+              options={CGM_COVERAGE_OPTS}
+              onChange={(v) => setCgmCoveragePath(v as CgmCoveragePath)}
+            />
+          </SectionCard>
+        </StepSection>
+      )}
+
+      {/* IP block */}
+      {showIp && (
+        <StepSection
+          step={showCgm ? 4 : 3}
+          title="Insulin Pump"
+          rightAccessory={validity.sections.ip.shown ? (
+            validity.sections.ip.valid ? (
+              <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-2 py-0.5"><Check className="h-3 w-3" /> Complete</span>
+            ) : validity.sections.ip.valid === false ? (
+              <span className="inline-flex items-center gap-1 text-xs font-medium text-red-700 bg-red-50 border border-red-200 rounded-full px-2 py-0.5"><X className="h-3 w-3" /> Incomplete</span>
+            ) : null
+          ) : null}
+        >
+          <SectionCard>
+            <div className="space-y-4">
               <StatusSelect
-                label="CGM Coverage Path"
-                value={state.cgmCoveragePath}
-                options={CGM_COVERAGE_OPTS}
-                onChange={(v) => setCgmCoveragePath(v as CgmCoveragePath)}
+                label="Insulin Pump Coverage Path"
+                value={state.ipCoveragePath}
+                options={IP_PATH_OPTS}
+                onChange={(v) => setIpCoveragePath(v as IpPath)}
               />
-            </SectionCard>
-          )}
-
-          {/* IP block */}
-          {showIp && (
-            <SectionCard
-              title="Insulin Pump"
-              status={validity.sections.ip.shown ? validity.sections.ip.valid : null}
-            >
-              <div className="space-y-6">
-                <StatusSelect
-                  label="Insulin Pump Coverage Path"
-                  value={state.ipCoveragePath}
-                  options={IP_PATH_OPTS}
-                  onChange={(v) => setIpCoveragePath(v as IpPath)}
-                />
-                {state.ipCoveragePath && (
-                  <IpCriteria state={state} patient={patient} update={update} />
-                )}
-              </div>
-            </SectionCard>
-          )}
-        </>)}
-      </StepSection>
-
-      <StepSection accent="teal" step={4} title="LMN & Files" hint="LMN status and file upload zones">
-        {anyYes && (
-          <SectionCard title="Clinical Files">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              <FileUploadCard
-                label="Clinical Files"
-                files={state.clinicalFiles ?? []}
-                mondayFiles={mondayFiles.clinicalFiles}
-                mondayLoading={mondayFiles.loading}
-                trackedFiles={clinicalUpload.files}
-                itemId={patient.id}
-                columnId={COL.clinicalFiles}
-                onRefetch={mondayFiles.refetch}
-                onAdd={(files) => update("clinicalFiles", [...(state.clinicalFiles ?? []), ...files])}
-                onAddRaw={(rawFiles) => {
-                  // Upload immediately to Monday instead of batching
-                  clinicalUpload.upload(patient.id, COL.clinicalFiles, rawFiles);
-                }}
-                onRemove={(idx) => {
-                  const next = [...(state.clinicalFiles ?? [])];
-                  next.splice(idx, 1);
-                  update("clinicalFiles", next);
-                }}
-              />
-              <FileUploadCard
-                label="Final Clinical Files"
-                files={state.finalClinicalFiles ?? []}
-                mondayFiles={mondayFiles.finalClinicals}
-                mondayLoading={mondayFiles.loading}
-                trackedFiles={finalClinicalUpload.files}
-                itemId={patient.id}
-                columnId={COL.finalClinicals}
-                onRefetch={mondayFiles.refetch}
-                onAdd={(files) =>
-                  update("finalClinicalFiles", [...(state.finalClinicalFiles ?? []), ...files])
-                }
-                onAddRaw={(rawFiles) => {
-                  // Upload immediately to Monday instead of batching
-                  finalClinicalUpload.upload(patient.id, COL.finalClinicals, rawFiles);
-                }}
-                onRemove={(idx) => {
-                  const next = [...(state.finalClinicalFiles ?? [])];
-                  next.splice(idx, 1);
-                  update("finalClinicalFiles", next);
-                }}
-              />
+              {state.ipCoveragePath && (
+                <IpCriteria state={state} patient={patient} update={update} />
+              )}
             </div>
           </SectionCard>
-        )}
-      </StepSection>
+        </StepSection>
+      )}
 
-      <StepSection accent="teal" step={5} title="Review & Send" hint="Monday preview and send to Monday">
-        <div className="space-y-6">
-          {/* Notes */}
-          <NotesPanel
-            notes={patient.mnEvalNotes ?? ""}
-            onNotesChange={(v) => onUpdate({ mnEvalNotes: v })}
-            onSaveToMonday={(v) => writeLongText(patient.id, COL.mnEvalNotes, v)}
-          />
-
-          {/* Sticky validity / preview footer */}
-          <ValiditySummary
-            validity={validity}
-            preview={preview}
-            onSendToMonday={handleSendToMonday}
-            sending={sending}
-            state={state}
-            showCgm={showCgm}
-            showIp={showIp}
-            patient={patient}
-            escalated={escalated}
-            onToggleEscalate={() => setEscalated((v) => { const nv = !v; escalatedRef.current = nv; return nv; })}
-            onOpenForm={onOpenForm}
-            filesUploading={filesUploading}
-          />
-        </div>
+      {/* Clinical files (uploads) */}
+      <StepSection step={4} title="Clinical Files">
+        <SectionCard>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <FileUploadCard
+              label="Clinical Files"
+              files={state.clinicalFiles ?? []}
+              mondayFiles={mondayFiles.clinicalFiles}
+              mondayLoading={mondayFiles.loading}
+              trackedFiles={clinicalUpload.files}
+              itemId={patient.id}
+              columnId={COL.clinicalFiles}
+              onRefetch={mondayFiles.refetch}
+              onAdd={(files) => update("clinicalFiles", [...(state.clinicalFiles ?? []), ...files])}
+              onAddRaw={(rawFiles) => {
+                // Upload immediately to Monday instead of batching
+                clinicalUpload.upload(patient.id, COL.clinicalFiles, rawFiles);
+              }}
+              onRemove={(idx) => {
+                const next = [...(state.clinicalFiles ?? [])];
+                next.splice(idx, 1);
+                update("clinicalFiles", next);
+              }}
+            />
+            <FileUploadCard
+              label="Final Clinical Files"
+              files={state.finalClinicalFiles ?? []}
+              mondayFiles={mondayFiles.finalClinicals}
+              mondayLoading={mondayFiles.loading}
+              trackedFiles={finalClinicalUpload.files}
+              itemId={patient.id}
+              columnId={COL.finalClinicals}
+              onRefetch={mondayFiles.refetch}
+              onAdd={(files) =>
+                update("finalClinicalFiles", [...(state.finalClinicalFiles ?? []), ...files])
+              }
+              onAddRaw={(rawFiles) => {
+                // Upload immediately to Monday instead of batching
+                finalClinicalUpload.upload(patient.id, COL.finalClinicals, rawFiles);
+              }}
+              onRemove={(idx) => {
+                const next = [...(state.finalClinicalFiles ?? [])];
+                next.splice(idx, 1);
+                update("finalClinicalFiles", next);
+              }}
+            />
+          </div>
+        </SectionCard>
       </StepSection>
+      </>)}
+
+      {/* Notes */}
+      <NotesPanel
+        notes={patient.mnEvalNotes ?? ""}
+        onNotesChange={(v) => onUpdate({ mnEvalNotes: v })}
+        onSaveToMonday={(v) => writeLongText(patient.id, COL.mnEvalNotes, v)}
+      />
+
+      {/* Sticky validity / preview footer */}
+      <ValiditySummary
+        validity={validity}
+        preview={preview}
+        onSendToMonday={handleSendToMonday}
+        sending={sending}
+        state={state}
+        showCgm={showCgm}
+        showIp={showIp}
+        patient={patient}
+        escalated={escalated}
+        onToggleEscalate={() => setEscalated((v) => { const nv = !v; escalatedRef.current = nv; return nv; })}
+        onOpenForm={onOpenForm}
+        filesUploading={filesUploading}
+      />
     </div>
   );
 }
@@ -671,7 +695,7 @@ export function EvaluatePanel({ patient, resetVersion = 0, onUpdate, onOpenForm 
 // =====================================================================
 
 interface SectionCardProps {
-  title: string;
+  title?: string;
   status?: boolean | null; // true=valid, false=invalid, null=N/A, undefined=no badge
   children: React.ReactNode;
 }
@@ -679,19 +703,21 @@ interface SectionCardProps {
 function SectionCard({ title, status, children }: SectionCardProps) {
   return (
     <div className="rounded-xl bg-card border shadow-card p-6">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="font-heading text-base font-semibold text-foreground">{title}</h3>
-        {status === true && (
-          <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-2 py-0.5">
-            <Check className="h-3 w-3" /> Complete
-          </span>
-        )}
-        {status === false && (
-          <span className="inline-flex items-center gap-1 text-xs font-medium text-red-700 bg-red-50 border border-red-200 rounded-full px-2 py-0.5">
-            <X className="h-3 w-3" /> Incomplete
-          </span>
-        )}
-      </div>
+      {(title || status === true || status === false) && (
+        <div className="flex items-center justify-between mb-4">
+          {title && <h3 className="font-heading text-base font-semibold text-foreground">{title}</h3>}
+          {status === true && (
+            <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-2 py-0.5">
+              <Check className="h-3 w-3" /> Complete
+            </span>
+          )}
+          {status === false && (
+            <span className="inline-flex items-center gap-1 text-xs font-medium text-red-700 bg-red-50 border border-red-200 rounded-full px-2 py-0.5">
+              <X className="h-3 w-3" /> Incomplete
+            </span>
+          )}
+        </div>
+      )}
       {children}
     </div>
   );
@@ -1562,7 +1588,7 @@ function ValiditySummary({
   const missingFields = getMissingRequiredFields(state, showCgm, showIp);
   const blocked = missingFields.length > 0;
   return (
-    <section className="rounded-xl bg-card border shadow-card p-5 space-y-6">
+    <section className="rounded-xl bg-card border shadow-card p-5 space-y-4">
 
       {/* Section pills + MN status */}
       <div className="flex items-center gap-2 flex-wrap">
