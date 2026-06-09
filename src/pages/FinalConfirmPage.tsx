@@ -25,7 +25,6 @@ import { toast } from "sonner";
 import { sendPatientToMonday } from "@/lib/finalConfirm/mondayWrite";
 import { duplicateItem, writeStatusIndex, writeDate, writeLongText, COL } from "@/lib/finalConfirm/mondayApi";
 import { EscalationFormModal } from "@/components/shared/EscalationFormModal";
-import { CollapsiblePanel } from "@/components/shared/CollapsiblePanel";
 
 // Stage Advancer label index 0 = "Review Profile" — the stage that lands an
 // item in the Final Profile Confirmation group on Monday.
@@ -244,7 +243,7 @@ const FinalConfirmPage = () => {
                   <ShieldCheck className="h-5 w-5 text-primary-foreground" />
                 </div>
                 <div>
-                  <p className="text-xs uppercase tracking-[0.2em] opacity-70">Medically Modern</p>
+                  <p className="text-[10px] uppercase tracking-[0.2em] opacity-70">Medically Modern</p>
                   <h1 className="text-2xl font-bold">Final Profile Confirmation</h1>
                   {selected && <p className="text-sm opacity-80 mt-0.5">{selected.name}</p>}
                 </div>
@@ -302,17 +301,13 @@ const FinalConfirmPage = () => {
 
               {selected && (
                 <>
-                  <CollapsiblePanel title="Patient Profile" defaultOpen={false}>
-                    <PatientInfoCard patient={selected} onFieldChange={handleFieldChange} />
-                  </CollapsiblePanel>
+                  <PatientInfoCard patient={selected} onFieldChange={handleFieldChange} />
                   <SplitOrderButton patient={selected} onSplit={handleSplit} />
-                  <CollapsiblePanel title="Notes" defaultOpen={false}>
-                    <NotesPanel
-                      notes={selected.notes}
-                      onNotesChange={(v) => update(selected.id, { notes: v })}
-                      onSaveToMonday={(v) => writeLongText(selected.id, COL.notes, v)}
-                    />
-                  </CollapsiblePanel>
+                  <NotesPanel
+                    notes={selected.notes}
+                    onNotesChange={(v) => update(selected.id, { notes: v })}
+                    onSaveToMonday={(v) => writeLongText(selected.id, COL.notes, v)}
+                  />
                   <EscalateButton
                     escalated={selected.escalated}
                     onToggle={toggleEscalate}

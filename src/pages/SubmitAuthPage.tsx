@@ -26,7 +26,6 @@ import { ESCALATION_INDEX } from "@/lib/samantha/mondayMapping";
 import { FollowUpModal } from "@/components/samantha/FollowUpModal";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useBackNavigation } from "@/hooks/useBackNavigation";
-import { CollapsiblePanel } from "@/components/shared/CollapsiblePanel";
 
 const CARECENTRIX_MODIFIERS: { hcpc: string; modifiers: string }[] = [
   { hcpc: "A4230", modifiers: "NU SC" },
@@ -154,7 +153,7 @@ const SubmitAuthPage = () => {
                   <Stethoscope className="h-5 w-5 text-primary-foreground" />
                 </div>
                 <div>
-                  <p className="text-xs uppercase tracking-[0.2em] opacity-70">Medically Modern</p>
+                  <p className="text-[10px] uppercase tracking-[0.2em] opacity-70">Medically Modern</p>
                   <h1 className="text-2xl font-bold">Submit Auth</h1>{selected && <p className="text-sm opacity-80 mt-0.5">{selected.name}</p>}
                 </div>
               </div>
@@ -189,9 +188,7 @@ const SubmitAuthPage = () => {
               )}
               {selected && (
                 <>
-                  <CollapsiblePanel title="Patient Profile" defaultOpen={false}>
-                    <PatientProfileCard patient={selected} onUpdate={(p) => update(selected.id, p)} />
-                  </CollapsiblePanel>
+                  <PatientProfileCard patient={selected} onUpdate={(p) => update(selected.id, p)} />
                   {(selected.referralSource || "").toLowerCase().includes("carecentrix") && (
                     <CarecentrixModifierNote />
                   )}

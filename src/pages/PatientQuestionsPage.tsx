@@ -10,7 +10,6 @@ import { PatientsSidebar } from "@/components/patientQuestions/PatientsSidebar";
 import { PatientDetailCard } from "@/components/patientQuestions/PatientDetailCard";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { ArrowLeft, MessageCircleQuestion } from "lucide-react";
-import { CollapsiblePanel } from "@/components/shared/CollapsiblePanel";
 import { useNavigate } from "react-router-dom";
 
 const PatientQuestionsPage = () => {
@@ -70,7 +69,7 @@ const PatientQuestionsPage = () => {
                   <MessageCircleQuestion className="h-5 w-5 text-primary-foreground" />
                 </div>
                 <div>
-                  <p className="text-xs uppercase tracking-[0.2em] opacity-70">Medically Modern</p>
+                  <p className="text-[10px] uppercase tracking-[0.2em] opacity-70">Medically Modern</p>
                   <h1 className="text-2xl font-bold">Patient Questions</h1>
                   {selected && <p className="text-sm opacity-80 mt-0.5">{selected.name}</p>}
                 </div>
@@ -98,11 +97,7 @@ const PatientQuestionsPage = () => {
                 </div>
               )}
 
-              {selected && (
-                <CollapsiblePanel title="Patient Profile" defaultOpen={false}>
-                  <PatientDetailCard patient={selected} />
-                </CollapsiblePanel>
-              )}
+              {selected && <PatientDetailCard patient={selected} />}
             </section>
           </main>
         </div>

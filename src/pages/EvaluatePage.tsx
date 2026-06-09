@@ -19,7 +19,6 @@ import { EscalationFormModal } from "@/components/shared/EscalationFormModal";
 import { writeStatusIndex, writeLongText, COL } from "@/lib/masheke/mondayApi";
 import { ESCALATION_INDEX } from "@/lib/masheke/mondayMapping";
 import { useBackNavigation } from "@/hooks/useBackNavigation";
-import { CollapsiblePanel } from "@/components/shared/CollapsiblePanel";
 
 const EvaluatePage = () => {
   const navigate = useNavigate();
@@ -69,8 +68,8 @@ const EvaluatePage = () => {
                   <Stethoscope className="h-5 w-5 text-primary-foreground" />
                 </div>
                 <div>
-                  <p className="text-xs uppercase tracking-[0.2em] opacity-70">Medically Modern · Evaluate</p>
-                  <h1 className="text-2xl font-semibold">{selected ? `${selected.name} · Evaluate` : "Evaluate"}</h1>
+                  <p className="text-[10px] uppercase tracking-[0.2em] opacity-70">Medically Modern · Evaluate</p>
+                  <h1 className="text-xl font-semibold">{selected ? `${selected.name} · Evaluate` : "Evaluate"}</h1>
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -120,9 +119,7 @@ const EvaluatePage = () => {
               )}
               {selected && (
                 <>
-                  <CollapsiblePanel title="Patient Profile" defaultOpen={false}>
                   <PatientProfileCard patient={selected} onDoctorEdit={(patch) => update(selected.id, patch)} />
-                  </CollapsiblePanel>
                   <EvaluatePanel patient={selected} resetVersion={resetVersion} onUpdate={(patch) => update(selected.id, patch)} onOpenForm={() => setEscalationModalOpen(true)} />
                 </>
               )}

@@ -36,7 +36,6 @@ import { EscalationFormModal } from "@/components/shared/EscalationFormModal";
 import { validatePatientForSend } from "@/lib/welcomeCall/workflow";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useBackNavigation } from "@/hooks/useBackNavigation";
-import { CollapsiblePanel } from "@/components/shared/CollapsiblePanel";
 
 const WelcomeCallPage = () => {
   const navigate = useNavigate();
@@ -193,7 +192,7 @@ const WelcomeCallPage = () => {
                   <ClipboardCheck className="h-5 w-5 text-primary-foreground" />
                 </div>
                 <div>
-                  <p className="text-xs uppercase tracking-[0.2em] opacity-70">Medically Modern</p>
+                  <p className="text-[10px] uppercase tracking-[0.2em] opacity-70">Medically Modern</p>
                   <h1 className="text-2xl font-bold">Welcome Call</h1>{selected && <p className="text-sm opacity-80 mt-0.5">{selected.name}</p>}
                 </div>
               </div>
@@ -243,29 +242,21 @@ const WelcomeCallPage = () => {
 
               {selected && (
                 <>
-                  <CollapsiblePanel title="Patient Profile" defaultOpen={false}>
-                    <PatientInfoCard
-                      patient={selected}
-                      onFieldChange={handleFieldChange}
-                      onSavePhone={(phone) => sendPhoneToMonday(selected.id, phone)}
-                      onSaveSecondaryInsurance={(_label, index) => sendSecondaryInsuranceToMonday(selected.id, index)}
-                    />
-                  </CollapsiblePanel>
-                  <CollapsiblePanel title="OOP Estimate" defaultOpen={false}>
-                    <OopEstimateCard patient={selected} />
-                  </CollapsiblePanel>
+                  <PatientInfoCard
+                    patient={selected}
+                    onFieldChange={handleFieldChange}
+                    onSavePhone={(phone) => sendPhoneToMonday(selected.id, phone)}
+                    onSaveSecondaryInsurance={(_label, index) => sendSecondaryInsuranceToMonday(selected.id, index)}
+                  />
+                  <OopEstimateCard patient={selected} />
                   <WelcomeCallForm patient={selected} onFieldChange={handleFieldChange} onSendWelcomeCallText={handleSendWelcomeCallText} />
                   <NextOrderDatesCard patient={selected} onFieldChange={handleFieldChange} />
-                  <CollapsiblePanel title="Notes" defaultOpen={false}>
-                    <NotesPanel
-                      notes={selected.notes}
-                      onNotesChange={(v) => update(selected.id, { notes: v })}
-                      onSaveToMonday={(v) => sendNotesToMonday(selected.id, v)}
-                    />
-                  </CollapsiblePanel>
-                  <CollapsiblePanel title="Review" defaultOpen={false}>
-                    <ReviewPanel patient={selected} />
-                  </CollapsiblePanel>
+                  <NotesPanel
+                    notes={selected.notes}
+                    onNotesChange={(v) => update(selected.id, { notes: v })}
+                    onSaveToMonday={(v) => sendNotesToMonday(selected.id, v)}
+                  />
+                  <ReviewPanel patient={selected} />
                   <EscalateButton escalated={selected.escalated} onToggle={toggleEscalate} disabled={!selected} onOpenForm={() => setEscalationModalOpen(true)} />
                   <SendToMondayButton onSend={handleSend} disabled={!selected || !validation.valid} validationErrors={validation.errors} />
                 </>

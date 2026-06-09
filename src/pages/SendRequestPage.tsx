@@ -18,7 +18,6 @@ import { EscalationFormModal } from "@/components/shared/EscalationFormModal";
 import { writeStatusIndex, writeLongText, COL } from "@/lib/masheke/mondayApi";
 import { ESCALATION_INDEX } from "@/lib/masheke/mondayMapping";
 import { useBackNavigation } from "@/hooks/useBackNavigation";
-import { CollapsiblePanel } from "@/components/shared/CollapsiblePanel";
 
 const SendRequestPage = () => {
   const navigate = useNavigate();
@@ -67,7 +66,7 @@ const SendRequestPage = () => {
                   <Stethoscope className="h-5 w-5 text-primary-foreground" />
                 </div>
                 <div>
-                  <p className="text-xs uppercase tracking-[0.2em] opacity-70">Medically Modern</p>
+                  <p className="text-[10px] uppercase tracking-[0.2em] opacity-70">Medically Modern</p>
                   <h1 className="text-2xl font-bold">Send Request</h1>{selected && <p className="text-sm opacity-80 mt-0.5">{selected.name}</p>}
                 </div>
               </div>
@@ -106,9 +105,7 @@ const SendRequestPage = () => {
               )}
               {selected && (
                 <>
-                  <CollapsiblePanel title="Patient Profile" defaultOpen={false}>
                   <PatientProfileCard patient={selected} defaultDoctorOpen />
-                  </CollapsiblePanel>
                   <SendRequestPanel patient={selected} resetVersion={resetVersion} onUpdate={(patch) => update(selected.id, patch)} onOpenForm={() => setEscalationModalOpen(true)} />
                 </>
               )}
