@@ -264,7 +264,7 @@ export function PatientProfileCard({ patient, onUpdate }: Props) {
       </div>
 
       {/* Collapsible details */}
-      <CollapsiblePanel title="More Details" defaultOpen={false}>
+      <CollapsiblePanel accent="violet" title="More Details" defaultOpen={false}>
         <div className="space-y-4">
           {/* Address + Pump Type */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

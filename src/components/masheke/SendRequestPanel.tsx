@@ -344,7 +344,7 @@ export function SendRequestPanel({ patient, resetVersion = 0, onUpdate, onOpenFo
 
   return (
     <div className="space-y-6">
-      <StepSection step={1} title="Review Documents" hint="Method, what's needed, and clinical files">
+      <StepSection accent="teal" step={1} title="Review Documents" hint="Method, what's needed, and clinical files">
         <div className="space-y-6">
           <MethodBanner patient={patient} />
 
@@ -357,7 +357,7 @@ export function SendRequestPanel({ patient, resetVersion = 0, onUpdate, onOpenFo
         </div>
       </StepSection>
 
-      <StepSection step={2} title="Generate Scripts" hint="Trigger DocExport and MN Request Letter">
+      <StepSection accent="teal" step={2} title="Generate Scripts" hint="Trigger DocExport and MN Request Letter">
         <div className="space-y-6">
           {/* Parachute: the GenerateScripts / RequestLetter / OptionalFax cards
              live behind a chevron. Mark every card in the group with a left
@@ -416,7 +416,7 @@ export function SendRequestPanel({ patient, resetVersion = 0, onUpdate, onOpenFo
         </div>
       </StepSection>
 
-      <StepSection step={3} title="Send Request" hint="Send via fax/email/parachute, then mark complete">
+      <StepSection accent="teal" step={3} title="Send Request" hint="Send via fax/email/parachute, then mark complete">
         <div className="space-y-6">
           <NotesPanel
             notes={patient.mnEvalNotes ?? ""}

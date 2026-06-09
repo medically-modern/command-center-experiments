@@ -63,7 +63,7 @@ const ChaseClinicalsPage = () => {
       <div className="min-h-screen flex w-full bg-gradient-subtle">
         <PatientsSidebar patients={patients} selectedId={selectedId} onSelect={setSelectedId} loading={loading} error={error} onRefresh={refetch} activeTab="chase" />
         <div className="flex-1 flex flex-col min-w-0">
-          <header className={`${isEscalated ? "bg-red-700" : "bg-gradient-navy"} text-navy-foreground border-b border-sidebar-border`}>
+          <header className={`${isEscalated ? "bg-red-700" : "bg-gradient-navy"} text-navy-foreground border-b-4 border-b-teal-400`}>
             <div className="px-4 sm:px-8 py-6 flex items-center justify-between gap-4 flex-wrap">
               <div className="flex items-center gap-3">
                 <SidebarTrigger className="text-navy-foreground hover:bg-white/10" />

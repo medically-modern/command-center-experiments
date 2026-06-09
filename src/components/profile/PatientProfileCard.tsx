@@ -119,7 +119,7 @@ export function PatientProfileCard({
         </div>
       </div>
 
-      <CollapsiblePanel title="More Details" defaultOpen={false}>
+      <CollapsiblePanel accent="emerald" title="More Details" defaultOpen={false}>
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">

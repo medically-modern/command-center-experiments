@@ -327,7 +327,7 @@ export function StediPanel({ patient, onRefresh, onUpdate, onNext, onRemoveOverl
 
   return (
     <div className="space-y-8">
-      <StepSection step={1} title="Insurance Inputs" hint="Set insurance, member IDs, then run Stedi" rightAccessory={<ClinicalsDownloadButton itemId={patient.id} />}>
+      <StepSection accent="emerald" step={1} title="Insurance Inputs" hint="Set insurance, member IDs, then run Stedi" rightAccessory={<ClinicalsDownloadButton itemId={patient.id} />}>
         <div className="space-y-8">
           {/* General Insurance + Member IDs + Stedi button */}
           <div className="grid grid-cols-1 md:grid-cols-[1fr_140px_140px_auto] gap-4 items-end">
@@ -547,7 +547,7 @@ export function StediPanel({ patient, onRefresh, onUpdate, onNext, onRemoveOverl
         </Card>
       )}
 
-      <StepSection step={2} title="Eligibility Results" complete={hasStediData}>
+      <StepSection accent="emerald" step={2} title="Eligibility Results" complete={hasStediData}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
           {ALWAYS_FIELDS.map(({ key, label }) => (
             <ResultRow
@@ -593,7 +593,7 @@ export function StediPanel({ patient, onRefresh, onUpdate, onNext, onRemoveOverl
         </Card>
       )}
 
-      <StepSection step={3} title="Cost Sharing" hint="Editable deductible, copay & coinsurance" rightAccessory={
+      <StepSection accent="emerald" step={3} title="Cost Sharing" hint="Editable deductible, copay & coinsurance" rightAccessory={
           <ToggleGroup
             type="single"
             value={costSharingMode}

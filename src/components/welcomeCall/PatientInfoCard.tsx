@@ -561,7 +561,7 @@ export function PatientInfoCard({ patient, onFieldChange, onSavePhone, onSaveSec
       </Card>
 
       {/* Collapsible: everything else */}
-      <CollapsiblePanel title="More Details" defaultOpen={false}>
+      <CollapsiblePanel accent="blue" title="More Details" defaultOpen={false}>
         <div className="space-y-4">
           {/* Referral/Product + Last Bill Dates + Insurance Details */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">

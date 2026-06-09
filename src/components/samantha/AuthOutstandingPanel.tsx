@@ -76,7 +76,7 @@ export function AuthOutstandingPanel({ patient, onCodeChange, onNotesChange, onS
       </div>
 
       {/* STEP 1 — Review Submissions */}
-      <StepSection
+      <StepSection accent="violet"
         step={1}
         title="Review Submissions"
         hint="Auth matrix and submitted info from the Monday board (read-only)."
@@ -99,7 +99,7 @@ export function AuthOutstandingPanel({ patient, onCodeChange, onNotesChange, onS
       </StepSection>
 
       {/* STEP 2 — Update Outstanding */}
-      <StepSection
+      <StepSection accent="violet"
         step={2}
         title="Update Outstanding"
         hint="Enter approval details for each required product — auth result, ID, dates, units."
@@ -143,7 +143,7 @@ export function AuthOutstandingPanel({ patient, onCodeChange, onNotesChange, onS
       </StepSection>
 
       {/* STEP 3 — Notes & Status */}
-      <StepSection
+      <StepSection accent="violet"
         step={3}
         title="Notes & Status"
         hint="Carries over from Benefits + Submit Auth. Add anything from approval / denial follow-up."

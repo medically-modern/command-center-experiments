@@ -164,7 +164,7 @@ export function ServingPanel({ patient, onUpdate, onNext, hideReferral, referral
 
   return (
     <div className="space-y-8">
-      <StepSection step={1} title="Insurance Summary" hint="Read-only — set on Stedi tab">
+      <StepSection accent="emerald" step={1} title="Insurance Summary" hint="Read-only — set on Stedi tab">
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
           <Shield className="h-4 w-4 text-blue-600 shrink-0" />
           <span className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Primary</span>
@@ -183,7 +183,7 @@ export function ServingPanel({ patient, onUpdate, onNext, hideReferral, referral
         )}
       </StepSection>
 
-      <StepSection step={2} title="Referral & Request" hint="Referral backdrop, request type, cross-sell & serving">
+      <StepSection accent="emerald" step={2} title="Referral & Request" hint="Referral backdrop, request type, cross-sell & serving">
         {/* Referral — hidden when rendered separately in ProfilePage */}
         {!hideReferral && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
@@ -267,7 +267,7 @@ export function ServingPanel({ patient, onUpdate, onNext, hideReferral, referral
         </div>
       </StepSection>
 
-      <StepSection step={3} title="Coverage Paths" hint="IP and CGM coverage path selects">
+      <StepSection accent="emerald" step={3} title="Coverage Paths" hint="IP and CGM coverage path selects">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <StatusSelect
             value={patient.insulinPumpCoveragePath}

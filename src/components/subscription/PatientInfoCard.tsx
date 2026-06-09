@@ -293,7 +293,7 @@ export function PatientInfoCard({ patient, onFieldChange }: Props) {
       </Card>
 
       {/* Subscription Details */}
-      <CollapsiblePanel title="Subscription Details" defaultOpen={false}>
+      <CollapsiblePanel accent="rose" title="Subscription Details" defaultOpen={false}>
         <div className="space-y-4">
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
             <Field label="Ordering Cycle" value={patient.orderingCycle} />
@@ -383,7 +383,7 @@ export function PatientInfoCard({ patient, onFieldChange }: Props) {
       </CollapsiblePanel>
 
       {/* Medical Necessity */}
-      <CollapsiblePanel title="Medical Necessity" defaultOpen={false}>
+      <CollapsiblePanel accent="rose" title="Medical Necessity" defaultOpen={false}>
         <div className="grid grid-cols-2 gap-3">
           <MrField mr={patient.mr} expiry={patient.mnExpiry} visitDate={patient.visitDate} onFieldChange={onFieldChange} />
           <Field label="Diagnosis" value={patient.diagnosis} />
@@ -410,7 +410,7 @@ export function PatientInfoCard({ patient, onFieldChange }: Props) {
       </CollapsiblePanel>
 
       {/* Doctor Info */}
-      <CollapsiblePanel title="Doctor Info" defaultOpen={false}>
+      <CollapsiblePanel accent="rose" title="Doctor Info" defaultOpen={false}>
         <div className="grid grid-cols-2 gap-3">
           <EditableField
             label="Doctor"
@@ -479,7 +479,7 @@ export function PatientInfoCard({ patient, onFieldChange }: Props) {
       </CollapsiblePanel>
 
       {/* Financials */}
-      <CollapsiblePanel title="Financials" defaultOpen={false}>
+      <CollapsiblePanel accent="rose" title="Financials" defaultOpen={false}>
         <div className="space-y-3">
           {(patient.sensorsRevenue || patient.sensorsCost) && (
             <div>

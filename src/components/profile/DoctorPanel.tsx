@@ -61,7 +61,7 @@ export function DoctorPanel({ patient, onUpdate, clinicLabels, onClinicSelect, o
 
   return (
     <div className="space-y-8">
-      <StepSection step={1} title="Doctor Information" hint="Doctor status, contact details & clinicals method">
+      <StepSection accent="emerald" step={1} title="Doctor Information" hint="Doctor status, contact details & clinicals method">
         {patient.prescriberRequirements?.trim() && (
           <div className="rounded-md border border-amber-300 bg-amber-50 px-4 py-3 mb-4">
             <p className="text-sm font-semibold text-amber-800 mb-1 flex items-center gap-1.5">
@@ -175,7 +175,7 @@ export function DoctorPanel({ patient, onUpdate, clinicLabels, onClinicSelect, o
         </div>
       </StepSection>
 
-      <StepSection step={2} title="Clinic" hint="Clinic name and address">
+      <StepSection accent="emerald" step={2} title="Clinic" hint="Clinic name and address">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {/* Clinic Name — searchable combobox */}
           <div className="space-y-1.5 relative" ref={dropdownRef}>

@@ -608,7 +608,7 @@ export function PatientInfoCard({ patient, onFieldChange }: Props) {
       </Card>
 
       {/* Insurance Details */}
-      <CollapsiblePanel title="Insurance Details" defaultOpen={false}>
+      <CollapsiblePanel accent="amber" title="Insurance Details" defaultOpen={false}>
         <div className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <EditableTextField
@@ -770,7 +770,7 @@ export function PatientInfoCard({ patient, onFieldChange }: Props) {
       </CollapsiblePanel>
 
       {/* Doctor Info */}
-      <CollapsiblePanel title="Doctor Info" defaultOpen={false}>
+      <CollapsiblePanel accent="amber" title="Doctor Info" defaultOpen={false}>
         <div className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <EditableTextField
@@ -856,7 +856,7 @@ export function PatientInfoCard({ patient, onFieldChange }: Props) {
       </CollapsiblePanel>
 
       {/* Diagnosis & Coverage */}
-      <CollapsiblePanel title="Diagnosis & Coverage" defaultOpen={false}>
+      <CollapsiblePanel accent="amber" title="Diagnosis & Coverage" defaultOpen={false}>
         <div className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <DiagnosisCombobox
@@ -1041,7 +1041,7 @@ export function PatientInfoCard({ patient, onFieldChange }: Props) {
       </CollapsiblePanel>
 
       {/* Authorization Results */}
-      <CollapsiblePanel title="Authorization Results" defaultOpen={false}>
+      <CollapsiblePanel accent="amber" title="Authorization Results" defaultOpen={false}>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-4">
             <div>
@@ -1071,7 +1071,7 @@ export function PatientInfoCard({ patient, onFieldChange }: Props) {
       </CollapsiblePanel>
 
       {/* Claims & Billing */}
-      <CollapsiblePanel title="Claims & Billing" defaultOpen={false}>
+      <CollapsiblePanel accent="amber" title="Claims & Billing" defaultOpen={false}>
         <div className="space-y-4">
           {(patient.a4230Claim || patient.a4232Claim) && (
             <div>

@@ -115,7 +115,7 @@ export function InsurancePanel({
 
       {/* STEP 1 — Phone call universal checks
          (Serving + Primary Insurance now live in the Patient Profile card above.) */}
-      <StepSection
+      <StepSection accent="violet"
         step={1}
         title="Universal Checks"
         hint="Fill these from a phone call to the insurance payer. All three required."
@@ -179,7 +179,7 @@ export function InsurancePanel({
       </StepSection>
 
       {/* STEP 2 — Product cards */}
-      <StepSection
+      <StepSection accent="violet"
         step={2}
         title="Product Authorization & Status"
         hint="For each product, select Auth Requirements and Same or Similar status."
@@ -236,7 +236,7 @@ export function InsurancePanel({
         )}
       </StepSection>
 
-      <StepSection
+      <StepSection accent="violet"
         step={3}
         title="Review & Notes"
         hint="Never billed checkboxes, notes, and Monday output preview."

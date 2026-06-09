@@ -166,7 +166,7 @@ export function ConfirmReceiptPanel({ patient, onUpdate, onOpenForm }: Props) {
 
   return (
     <div className="space-y-6">
-      <StepSection step={1} title="Review Status" hint="Banners, files, and attempt history">
+      <StepSection accent="teal" step={1} title="Review Status" hint="Banners, files, and attempt history">
         <div className="space-y-6">
           <MethodBanner patient={patient} />
           <RequestSentBanner patient={patient} />
@@ -176,7 +176,7 @@ export function ConfirmReceiptPanel({ patient, onUpdate, onOpenForm }: Props) {
         </div>
       </StepSection>
 
-      <StepSection step={2} title="Log Attempt" hint="Record the call outcome">
+      <StepSection accent="teal" step={2} title="Log Attempt" hint="Record the call outcome">
         {isEscalated ? (
           <EscalatedCard />
         ) : (
@@ -193,7 +193,7 @@ export function ConfirmReceiptPanel({ patient, onUpdate, onOpenForm }: Props) {
         )}
       </StepSection>
 
-      <StepSection step={3} title="Notes & Save" hint="Add notes and submit">
+      <StepSection accent="teal" step={3} title="Notes & Save" hint="Add notes and submit">
         <div className="space-y-6">
           <NotesPanel
             notes={patient.mnEvalNotes ?? ""}

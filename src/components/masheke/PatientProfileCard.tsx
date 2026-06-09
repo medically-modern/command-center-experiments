@@ -178,7 +178,7 @@ export function PatientProfileCard({
       </div>
 
       {/* Collapsible details */}
-      <CollapsiblePanel title="More Details" defaultOpen={false}>
+      <CollapsiblePanel accent="teal" title="More Details" defaultOpen={false}>
         <div className="space-y-4">
           {/* Address + Member ID 2 */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

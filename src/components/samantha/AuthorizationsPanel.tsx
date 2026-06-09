@@ -72,7 +72,7 @@ export function AuthorizationsPanel({ patient, onCodeChange, onNotesChange, onSa
       </div>
 
       {/* STEP 1 — Review Auth Matrix */}
-      <StepSection
+      <StepSection accent="violet"
         step={1}
         title="Review Auth Matrix"
         hint="Read-only auth status pulled from the Monday board."
@@ -95,7 +95,7 @@ export function AuthorizationsPanel({ patient, onCodeChange, onNotesChange, onSa
       </StepSection>
 
       {/* STEP 2 — Submit Authorizations */}
-      <StepSection
+      <StepSection accent="violet"
         step={2}
         title="Submit Authorizations"
         hint="For each required product, enter submission method, dates, and IDs."
@@ -158,7 +158,7 @@ export function AuthorizationsPanel({ patient, onCodeChange, onNotesChange, onSa
       </StepSection>
 
       {/* STEP 3 — Notes */}
-      <StepSection
+      <StepSection accent="violet"
         step={3}
         title="Notes"
         hint="Carries over from the Benefits tab. Add anything new from the auth submission step."

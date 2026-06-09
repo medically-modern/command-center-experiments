@@ -473,7 +473,7 @@ export function EvaluatePanel({ patient, resetVersion = 0, onUpdate, onOpenForm 
         </div>
       )}
 
-      <StepSection step={1} title="Quick Check" hint="Verify received documents">
+      <StepSection accent="teal" step={1} title="Quick Check" hint="Verify received documents">
         <SectionCard title="Quick Check">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             {showCgm && (
@@ -527,7 +527,7 @@ export function EvaluatePanel({ patient, resetVersion = 0, onUpdate, onOpenForm 
         </SectionCard>
       </StepSection>
 
-      <StepSection step={2} title="Diagnosis & Medical Necessity" hint="Diagnosis, last visit date, MR expiry">
+      <StepSection accent="teal" step={2} title="Diagnosis & Medical Necessity" hint="Diagnosis, last visit date, MR expiry">
         <SectionCard title="Diagnosis & Clinicals" status={validity.sections.diagnosis.valid && validity.sections.mr.valid}>
           <DiagnosisField
             value={state.diagnosis}
@@ -546,7 +546,7 @@ export function EvaluatePanel({ patient, resetVersion = 0, onUpdate, onOpenForm 
         </SectionCard>
       </StepSection>
 
-      <StepSection step={3} title="Coverage" hint="Coverage paths, CGM/IP blocks, OOW fields">
+      <StepSection accent="teal" step={3} title="Coverage" hint="Coverage paths, CGM/IP blocks, OOW fields">
         {anyYes && (<>
           {/* CGM block */}
           {showCgm && (
@@ -585,7 +585,7 @@ export function EvaluatePanel({ patient, resetVersion = 0, onUpdate, onOpenForm 
         </>)}
       </StepSection>
 
-      <StepSection step={4} title="LMN & Files" hint="LMN status and file upload zones">
+      <StepSection accent="teal" step={4} title="LMN & Files" hint="LMN status and file upload zones">
         {anyYes && (
           <SectionCard title="Clinical Files">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -636,7 +636,7 @@ export function EvaluatePanel({ patient, resetVersion = 0, onUpdate, onOpenForm 
         )}
       </StepSection>
 
-      <StepSection step={5} title="Review & Send" hint="Monday preview and send to Monday">
+      <StepSection accent="teal" step={5} title="Review & Send" hint="Monday preview and send to Monday">
         <div className="space-y-6">
           {/* Notes */}
           <NotesPanel

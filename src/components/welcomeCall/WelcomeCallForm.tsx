@@ -174,7 +174,7 @@ export function WelcomeCallForm({ patient, onFieldChange, onSendWelcomeCallText 
       </div>
 
       {/* ─── Step 1: CGM Setup ─── */}
-      <StepSection step={1} title="CGM Setup" hint="Select CGM type and monitor quantity.">
+      <StepSection accent="blue" step={1} title="CGM Setup" hint="Select CGM type and monitor quantity.">
         {showCgm ? (
           <Card className="p-6">
             <div className="flex items-center justify-end mb-4">
@@ -265,7 +265,7 @@ export function WelcomeCallForm({ patient, onFieldChange, onSendWelcomeCallText 
       </StepSection>
 
       {/* ─── Step 2: Pump & Infusion Sets ─── */}
-      <StepSection step={2} title="Pump & Infusion Sets" hint="Select pump type/qty and infusion set options (conditional on serving).">
+      <StepSection accent="blue" step={2} title="Pump & Infusion Sets" hint="Select pump type/qty and infusion set options (conditional on serving).">
         {showPump ? (
           <Card className="p-6">
             <div className="flex items-center justify-end mb-4">
@@ -416,7 +416,7 @@ export function WelcomeCallForm({ patient, onFieldChange, onSendWelcomeCallText 
       </StepSection>
 
       {/* ─── Step 3: Subscription & Shipping ─── */}
-      <StepSection step={3} title="Subscription & Shipping" hint="Subscription type, address, and welcome call text.">
+      <StepSection accent="blue" step={3} title="Subscription & Shipping" hint="Subscription type, address, and welcome call text.">
         <Card className="p-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             {/* Subscription Type */}
@@ -544,7 +544,7 @@ export function WelcomeCallForm({ patient, onFieldChange, onSendWelcomeCallText 
       </StepSection>
 
       {/* ─── Step 4: Complete Call ─── */}
-      <StepSection step={4} title="Complete Call" hint="Decide whether to advance or hold this patient.">
+      <StepSection accent="blue" step={4} title="Complete Call" hint="Decide whether to advance or hold this patient.">
         <Card className="p-6">
           <p className="text-sm text-muted-foreground mb-4">
             After wrapping up the welcome call, decide whether this patient should

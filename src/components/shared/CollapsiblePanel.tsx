@@ -7,19 +7,33 @@ interface CollapsiblePanelProps {
   defaultOpen?: boolean;
   children: ReactNode;
   badge?: string | number;
+  /** Accent color for the left border. Defaults to slate/neutral. */
+  accent?: "blue" | "teal" | "violet" | "amber" | "emerald" | "slate";
 }
+
+const accentBorder: Record<string, string> = {
+  blue:    "border-l-blue-400",
+  teal:    "border-l-teal-400",
+  violet:  "border-l-violet-400",
+  amber:   "border-l-amber-400",
+  emerald: "border-l-emerald-400",
+  slate:   "border-l-slate-300",
+};
 
 export function CollapsiblePanel({
   title,
   defaultOpen = true,
   children,
   badge,
+  accent = "slate",
 }: CollapsiblePanelProps) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   return (
-    <div className="rounded-xl border border-sidebar-border bg-card shadow-card overflow-hidden">
-      {/* ── Clickable header ── */}
+    <div className={cn(
+      "rounded-xl border border-sidebar-border bg-card shadow-card overflow-hidden",
+      "border-l-4", accentBorder[accent],
+    )}>
       <button
         type="button"
         onClick={() => setIsOpen((v) => !v)}
