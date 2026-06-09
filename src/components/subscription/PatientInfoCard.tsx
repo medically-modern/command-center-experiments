@@ -13,6 +13,7 @@ import { Pencil } from "lucide-react";
 import { AddressAutocomplete } from "@/components/welcomeCall/AddressAutocomplete";
 import type { AddressResult } from "@/components/welcomeCall/AddressAutocomplete";
 import { MnDocsPanel } from "@/components/subscription/MnDocsPanel";
+import { CollapsiblePanel } from "@/components/shared/CollapsiblePanel";
 
 interface Props {
   patient: Patient;
@@ -263,9 +264,8 @@ export function PatientInfoCard({ patient, onFieldChange }: Props) {
         <PhoneField phone={patient.phone} phoneEdited={patient.phoneEdited} onFieldChange={onFieldChange} />
       </Card>
 
-      {/* Subscription Status Row */}
+      {/* Always-visible: Status, Days To Order, Primary Insurance */}
       <Card className="p-4 border-l-4 border-l-blue-500">
-        <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-3">Subscription Overview</p>
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
           <div>
             <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Status</p>
@@ -281,18 +281,30 @@ export function PatientInfoCard({ patient, onFieldChange }: Props) {
             {patient.deadReason && <p className="text-[10px] text-red-600 mt-0.5">Reason: {patient.deadReason}</p>}
           </div>
           <DaysToOrderField value={patient.daysToOrder} />
-          <Field label="Ordering Cycle" value={patient.orderingCycle} />
-          <Field label="Next Order" value={patient.nextOrder ? formatDateMDY(patient.nextOrder) : ""} />
-          <Field label="Subscription" value={patient.subscription} />
-          <Field label="Order Type" value={patient.orderType} />
+          <EditableStatusSelect
+            label="Primary Insurance"
+            options={PRIMARY_INSURANCE_OPTIONS}
+            currentLabel={patient.primaryInsurance}
+            editedIndex={patient.primaryInsuranceEdited}
+            editedField="primaryInsuranceEdited"
+            onFieldChange={onFieldChange}
+          />
         </div>
       </Card>
 
-      {/* Demographics + Insurance + Address */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* Demographics */}
-        <Card className="p-4">
-          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-3">Demographics</p>
+      {/* Subscription Details */}
+      <CollapsiblePanel title="Subscription Details" defaultOpen={false}>
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            <Field label="Ordering Cycle" value={patient.orderingCycle} />
+            <Field label="Next Order" value={patient.nextOrder ? formatDateMDY(patient.nextOrder) : ""} />
+            <Field label="Subscription" value={patient.subscription} />
+            <Field label="Order Type" value={patient.orderType} />
+          </div>
+
+          {/* Demographics */}
+          <div className="h-px bg-border" />
+          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Demographics</p>
           <div className="grid grid-cols-2 gap-3">
             <Field label="Gender" value={patient.gender} />
             <div className="col-span-2">
@@ -315,20 +327,11 @@ export function PatientInfoCard({ patient, onFieldChange }: Props) {
             )}
             <Field label="Order Count" value={patient.orderCount} />
           </div>
-        </Card>
 
-        {/* Insurance */}
-        <Card className="p-4">
-          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-3">Insurance</p>
+          {/* Insurance */}
+          <div className="h-px bg-border" />
+          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Insurance</p>
           <div className="grid grid-cols-2 gap-3">
-            <EditableStatusSelect
-              label="Primary Insurance"
-              options={PRIMARY_INSURANCE_OPTIONS}
-              currentLabel={patient.primaryInsurance}
-              editedIndex={patient.primaryInsuranceEdited}
-              editedField="primaryInsuranceEdited"
-              onFieldChange={onFieldChange}
-            />
             <EditableField
               label="Member ID 1"
               value={patient.memberId1}
@@ -364,42 +367,10 @@ export function PatientInfoCard({ patient, onFieldChange }: Props) {
               </div>
             </div>
           )}
-        </Card>
 
-        {/* Medical Necessity + Auth */}
-        <Card className="p-4">
-          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-3">Medical Necessity & Auth</p>
-          <div className="grid grid-cols-2 gap-3">
-            <MrField mr={patient.mr} expiry={patient.mnExpiry} visitDate={patient.visitDate} onFieldChange={onFieldChange} />
-            <Field label="Diagnosis" value={patient.diagnosis} />
-            <Field label="CGM Coverage" value={patient.cgmCoverage} />
-            <AuthStatusField label="Sensors Auth" status={patient.sensorsAuthStatus} />
-            <AuthStatusField label="Supplies Auth" status={patient.suppliesAuthStatus} />
-          </div>
-          {/* Auth detail (IDs + dates) */}
-          {(patient.sensorsAuthId || patient.sensorsStartAuth || patient.suppliesStartAuth || patient.infusionSetAuthId) && (
-            <div className="mt-3 pt-3 border-t grid grid-cols-2 gap-2">
-              {patient.sensorsAuthId && <Field label="Sensors Auth ID" value={patient.sensorsAuthId} />}
-              {patient.sensorsUnits && <Field label="Sensors Units" value={patient.sensorsUnits} />}
-              {patient.sensorsStartAuth && <Field label="Sensors Auth Start" value={formatDateMDY(patient.sensorsStartAuth)} />}
-              {patient.sensorsEndAuth && <Field label="Sensors Auth End" value={formatDateMDY(patient.sensorsEndAuth)} />}
-              {patient.sensorsId2 && <Field label="Sensors ID 2" value={patient.sensorsId2} />}
-              {patient.infusionSetAuthId && <Field label="Infusion Set Auth ID" value={patient.infusionSetAuthId} />}
-              {patient.cartridgeAuthId && <Field label="Cartridge Auth ID" value={patient.cartridgeAuthId} />}
-              {patient.suppliesUnits && <Field label="Supplies Units" value={patient.suppliesUnits} />}
-              {patient.suppliesStartAuth && <Field label="Supplies Auth Start" value={formatDateMDY(patient.suppliesStartAuth)} />}
-              {patient.suppliesEndAuth && <Field label="Supplies Auth End" value={formatDateMDY(patient.suppliesEndAuth)} />}
-            </div>
-          )}
-          <MnDocsPanel itemId={patient.id} />
-        </Card>
-      </div>
-
-      {/* Order Details + Doctor + Financials */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* Order Details */}
-        <Card className="p-4">
-          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-3">Order Details</p>
+          {/* Order Details */}
+          <div className="h-px bg-border" />
+          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Order Details</p>
           <div className="grid grid-cols-2 gap-3">
             <Field label="Sensors Type" value={patient.sensorsType} />
             <Field label="Supplies Type (Pump)" value={patient.suppliesType} />
@@ -408,132 +379,158 @@ export function PatientInfoCard({ patient, onFieldChange }: Props) {
             <Field label="Infusion Set 2" value={patient.infusionSet2} />
             <Field label="Inf. Qty 2" value={patient.infQty2} />
           </div>
-        </Card>
+        </div>
+      </CollapsiblePanel>
 
-        {/* Doctor Info */}
-        <Card className="p-4">
-          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-3">Doctor Info</p>
-          <div className="grid grid-cols-2 gap-3">
-            <EditableField
-              label="Doctor"
-              value={patient.doctor}
-              editedValue={patient.doctorEdited}
-              editedField="doctorEdited"
-              onFieldChange={onFieldChange}
+      {/* Medical Necessity */}
+      <CollapsiblePanel title="Medical Necessity" defaultOpen={false}>
+        <div className="grid grid-cols-2 gap-3">
+          <MrField mr={patient.mr} expiry={patient.mnExpiry} visitDate={patient.visitDate} onFieldChange={onFieldChange} />
+          <Field label="Diagnosis" value={patient.diagnosis} />
+          <Field label="CGM Coverage" value={patient.cgmCoverage} />
+          <AuthStatusField label="Sensors Auth" status={patient.sensorsAuthStatus} />
+          <AuthStatusField label="Supplies Auth" status={patient.suppliesAuthStatus} />
+        </div>
+        {/* Auth detail (IDs + dates) */}
+        {(patient.sensorsAuthId || patient.sensorsStartAuth || patient.suppliesStartAuth || patient.infusionSetAuthId) && (
+          <div className="mt-3 pt-3 border-t grid grid-cols-2 gap-2">
+            {patient.sensorsAuthId && <Field label="Sensors Auth ID" value={patient.sensorsAuthId} />}
+            {patient.sensorsUnits && <Field label="Sensors Units" value={patient.sensorsUnits} />}
+            {patient.sensorsStartAuth && <Field label="Sensors Auth Start" value={formatDateMDY(patient.sensorsStartAuth)} />}
+            {patient.sensorsEndAuth && <Field label="Sensors Auth End" value={formatDateMDY(patient.sensorsEndAuth)} />}
+            {patient.sensorsId2 && <Field label="Sensors ID 2" value={patient.sensorsId2} />}
+            {patient.infusionSetAuthId && <Field label="Infusion Set Auth ID" value={patient.infusionSetAuthId} />}
+            {patient.cartridgeAuthId && <Field label="Cartridge Auth ID" value={patient.cartridgeAuthId} />}
+            {patient.suppliesUnits && <Field label="Supplies Units" value={patient.suppliesUnits} />}
+            {patient.suppliesStartAuth && <Field label="Supplies Auth Start" value={formatDateMDY(patient.suppliesStartAuth)} />}
+            {patient.suppliesEndAuth && <Field label="Supplies Auth End" value={formatDateMDY(patient.suppliesEndAuth)} />}
+          </div>
+        )}
+        <MnDocsPanel itemId={patient.id} />
+      </CollapsiblePanel>
+
+      {/* Doctor Info */}
+      <CollapsiblePanel title="Doctor Info" defaultOpen={false}>
+        <div className="grid grid-cols-2 gap-3">
+          <EditableField
+            label="Doctor"
+            value={patient.doctor}
+            editedValue={patient.doctorEdited}
+            editedField="doctorEdited"
+            onFieldChange={onFieldChange}
+          />
+          <EditableField
+            label="NPI"
+            value={patient.npi}
+            editedValue={patient.npiEdited}
+            editedField="npiEdited"
+            onFieldChange={onFieldChange}
+          />
+          <div className="col-span-2">
+            <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">Doctor Address</p>
+            <AddressAutocomplete
+              key={`docaddr-${patient.id}`}
+              value={patient.doctorAddressEdited ?? patient.doctorAddress}
+              onChange={(result: AddressResult) => {
+                onFieldChange?.("doctorAddressEdited", result.address);
+                onFieldChange?.("doctorAddressLat" as keyof Patient, result.lat);
+                onFieldChange?.("doctorAddressLng" as keyof Patient, result.lng);
+              }}
+              placeholder="Search for doctor address..."
             />
-            <EditableField
-              label="NPI"
-              value={patient.npi}
-              editedValue={patient.npiEdited}
-              editedField="npiEdited"
-              onFieldChange={onFieldChange}
-            />
-            <div className="col-span-2">
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">Doctor Address</p>
-              <AddressAutocomplete
-                key={`docaddr-${patient.id}`}
-                value={patient.doctorAddressEdited ?? patient.doctorAddress}
-                onChange={(result: AddressResult) => {
-                  onFieldChange?.("doctorAddressEdited", result.address);
-                  onFieldChange?.("doctorAddressLat" as keyof Patient, result.lat);
-                  onFieldChange?.("doctorAddressLng" as keyof Patient, result.lng);
+            {patient.doctorAddressEdited !== null && patient.doctorAddressEdited !== patient.doctorAddress && <p className="text-[10px] text-amber-600 mt-0.5">edited</p>}
+          </div>
+          <EditableField
+            label="Doctor Phone"
+            value={patient.doctorPhone ? formatPhone(patient.doctorPhone) : ""}
+            editedValue={patient.doctorPhoneEdited}
+            editedField="doctorPhoneEdited"
+            onFieldChange={onFieldChange}
+            placeholder="(555) 555-5555"
+          />
+          <EditableField
+            label="Doctor Fax"
+            value={patient.doctorFax}
+            editedValue={patient.doctorFaxEdited}
+            editedField="doctorFaxEdited"
+            onFieldChange={onFieldChange}
+            placeholder="(555) 555-5555"
+          />
+          {(() => {
+            const faxDisplay = patient.faxParachuteEdited ?? patient.faxParachute;
+            const faxEditedIdx = patient.faxParachuteEdited !== null
+              ? FAX_PARACHUTE_OPTIONS.find((o) => o.label === patient.faxParachuteEdited)?.index ?? null
+              : null;
+            return (
+              <EditableStatusSelect
+                label="Fax / Parachute"
+                options={FAX_PARACHUTE_OPTIONS}
+                currentLabel={faxDisplay || "—"}
+                editedIndex={faxEditedIdx}
+                editedField="faxParachuteEdited"
+                onFieldChange={(field, value) => {
+                  const label = FAX_PARACHUTE_OPTIONS.find((o) => o.index === Number(value))?.label ?? "";
+                  onFieldChange?.(field, label);
                 }}
-                placeholder="Search for doctor address..."
               />
-              {patient.doctorAddressEdited !== null && patient.doctorAddressEdited !== patient.doctorAddress && <p className="text-[10px] text-amber-600 mt-0.5">edited</p>}
-            </div>
-            <EditableField
-              label="Doctor Phone"
-              value={patient.doctorPhone ? formatPhone(patient.doctorPhone) : ""}
-              editedValue={patient.doctorPhoneEdited}
-              editedField="doctorPhoneEdited"
-              onFieldChange={onFieldChange}
-              placeholder="(555) 555-5555"
-            />
-            <EditableField
-              label="Doctor Fax"
-              value={patient.doctorFax}
-              editedValue={patient.doctorFaxEdited}
-              editedField="doctorFaxEdited"
-              onFieldChange={onFieldChange}
-              placeholder="(555) 555-5555"
-            />
-            {(() => {
-              const faxDisplay = patient.faxParachuteEdited ?? patient.faxParachute;
-              const faxEditedIdx = patient.faxParachuteEdited !== null
-                ? FAX_PARACHUTE_OPTIONS.find((o) => o.label === patient.faxParachuteEdited)?.index ?? null
-                : null;
-              return (
-                <EditableStatusSelect
-                  label="Fax / Parachute"
-                  options={FAX_PARACHUTE_OPTIONS}
-                  currentLabel={faxDisplay || "—"}
-                  editedIndex={faxEditedIdx}
-                  editedField="faxParachuteEdited"
-                  onFieldChange={(field, value) => {
-                    const label = FAX_PARACHUTE_OPTIONS.find((o) => o.index === Number(value))?.label ?? "";
-                    onFieldChange?.(field, label);
-                  }}
-                />
-              );
-            })()}
-          </div>
-        </Card>
+            );
+          })()}
+        </div>
+      </CollapsiblePanel>
 
-        {/* Financials */}
-        <Card className="p-4">
-          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-3">Financials</p>
-          <div className="space-y-3">
-            {(patient.sensorsRevenue || patient.sensorsCost) && (
-              <div>
-                <p className="text-[10px] uppercase tracking-wider text-blue-500 font-semibold mb-1">Sensors</p>
-                <div className="grid grid-cols-3 gap-2">
-                  <Field label="Revenue" value={patient.sensorsRevenue ? `$${patient.sensorsRevenue}` : ""} />
-                  <Field label="Cost" value={patient.sensorsCost ? `$${patient.sensorsCost}` : ""} />
-                  <Field label="GP" value={patient.sensorsGP ? `$${patient.sensorsGP}` : ""} />
-                </div>
-              </div>
-            )}
-            {(patient.suppliesRevenue || patient.suppliesCost) && (
-              <div>
-                <p className="text-[10px] uppercase tracking-wider text-blue-500 font-semibold mb-1">Supplies</p>
-                <div className="grid grid-cols-3 gap-2">
-                  <Field label="Revenue" value={patient.suppliesRevenue ? `$${patient.suppliesRevenue}` : ""} />
-                  <Field label="Cost" value={patient.suppliesCost ? `$${patient.suppliesCost}` : ""} />
-                  <Field label="GP" value={patient.suppliesGP ? `$${patient.suppliesGP}` : ""} />
-                </div>
-              </div>
-            )}
-            <div className="pt-2 border-t">
+      {/* Financials */}
+      <CollapsiblePanel title="Financials" defaultOpen={false}>
+        <div className="space-y-3">
+          {(patient.sensorsRevenue || patient.sensorsCost) && (
+            <div>
+              <p className="text-[10px] uppercase tracking-wider text-blue-500 font-semibold mb-1">Sensors</p>
               <div className="grid grid-cols-3 gap-2">
-                <Field label="Total Revenue" value={patient.totalRevenue ? `$${patient.totalRevenue}` : ""} />
-                <Field label="Total Cost" value={patient.totalCost ? `$${patient.totalCost}` : ""} />
-                <Field label="Total GP" value={patient.totalGP ? `$${patient.totalGP}` : ""} />
-              </div>
-              <div className="grid grid-cols-3 gap-2 mt-2">
-                <Field label="Shipping" value={patient.shippingCost ? `$${patient.shippingCost}` : ""} />
-                <Field label="ARR" value={patient.arr ? `$${patient.arr}` : ""} />
-                <Field label="ARP" value={patient.arp ? `$${patient.arp}` : ""} />
+                <Field label="Revenue" value={patient.sensorsRevenue ? `$${patient.sensorsRevenue}` : ""} />
+                <Field label="Cost" value={patient.sensorsCost ? `$${patient.sensorsCost}` : ""} />
+                <Field label="GP" value={patient.sensorsGP ? `$${patient.sensorsGP}` : ""} />
               </div>
             </div>
+          )}
+          {(patient.suppliesRevenue || patient.suppliesCost) && (
+            <div>
+              <p className="text-[10px] uppercase tracking-wider text-blue-500 font-semibold mb-1">Supplies</p>
+              <div className="grid grid-cols-3 gap-2">
+                <Field label="Revenue" value={patient.suppliesRevenue ? `$${patient.suppliesRevenue}` : ""} />
+                <Field label="Cost" value={patient.suppliesCost ? `$${patient.suppliesCost}` : ""} />
+                <Field label="GP" value={patient.suppliesGP ? `$${patient.suppliesGP}` : ""} />
+              </div>
+            </div>
+          )}
+          <div className="pt-2 border-t">
+            <div className="grid grid-cols-3 gap-2">
+              <Field label="Total Revenue" value={patient.totalRevenue ? `$${patient.totalRevenue}` : ""} />
+              <Field label="Total Cost" value={patient.totalCost ? `$${patient.totalCost}` : ""} />
+              <Field label="Total GP" value={patient.totalGP ? `$${patient.totalGP}` : ""} />
+            </div>
+            <div className="grid grid-cols-3 gap-2 mt-2">
+              <Field label="Shipping" value={patient.shippingCost ? `$${patient.shippingCost}` : ""} />
+              <Field label="ARR" value={patient.arr ? `$${patient.arr}` : ""} />
+              <Field label="ARP" value={patient.arp ? `$${patient.arp}` : ""} />
+            </div>
           </div>
-        </Card>
-      </div>
 
-      {/* Claims + Denial */}
-      {(patient.claimsStatus || patient.denialReason) && (
-        <Card className="p-4">
-          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-3">Claims & Denial Info</p>
-          <div className="grid grid-cols-2 gap-3">
-            <Field label="Claims Status" value={patient.claimsStatus} className={
-              patient.claimsStatus === "Claims Paid" ? "text-green-600" :
-              patient.claimsStatus === "Claims Denied" || patient.claimsStatus === "Claims Error" ? "text-red-600" :
-              patient.claimsStatus === "Claims Running" || patient.claimsStatus === "Submit Claims" ? "text-amber-600" : ""
-            } />
-            {patient.denialReason && <Field label="Denial Reason" value={patient.denialReason} />}
-          </div>
-        </Card>
-      )}
+          {/* Claims + Denial */}
+          {(patient.claimsStatus || patient.denialReason) && (
+            <>
+              <div className="h-px bg-border" />
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Claims & Denial Info</p>
+              <div className="grid grid-cols-2 gap-3">
+                <Field label="Claims Status" value={patient.claimsStatus} className={
+                  patient.claimsStatus === "Claims Paid" ? "text-green-600" :
+                  patient.claimsStatus === "Claims Denied" || patient.claimsStatus === "Claims Error" ? "text-red-600" :
+                  patient.claimsStatus === "Claims Running" || patient.claimsStatus === "Submit Claims" ? "text-amber-600" : ""
+                } />
+                {patient.denialReason && <Field label="Denial Reason" value={patient.denialReason} />}
+              </div>
+            </>
+          )}
+        </div>
+      </CollapsiblePanel>
     </div>
   );
 }

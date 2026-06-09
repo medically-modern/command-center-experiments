@@ -36,6 +36,7 @@ import {
   Send,
   XCircle,
 } from "lucide-react";
+import { StepSection } from "@/components/shared/StepSection";
 
 interface Props {
   patient: Patient;
@@ -164,43 +165,55 @@ export function ConfirmReceiptPanel({ patient, onUpdate, onOpenForm }: Props) {
   }
 
   return (
-    <div className="space-y-4">
-      <MethodBanner patient={patient} />
-      <RequestSentBanner patient={patient} />
-      <WhatsNeededCard patient={patient} />
-      <FilesPanel files={mondayFiles} />
-      {history.length > 0 && <HistoryCard history={history} />}
-      {isEscalated ? (
-        <EscalatedCard />
-      ) : (
-        <ActiveAttemptCard
-          attemptNumber={currentAttempt ?? 1}
-          totalAttempts={3}
-          name={name}
-          onNameChange={setName}
-          confirmed={confirmed}
-          onConfirmedChange={setConfirmed}
-          nextAction={nextAction}
-          onNextActionChange={setNextAction}
-        />
-      )}
-      <NotesPanel
-        notes={patient.mnEvalNotes ?? ""}
-        onNotesChange={(v) => onUpdate({ mnEvalNotes: v })}
-        onSaveToMonday={(v) => writeLongText(patient.id, COL.mnEvalNotes, v)}
-      />
-      {!isEscalated && (
-        <SaveBar
-          attemptNumber={currentAttempt ?? 1}
-          confirmed={confirmed}
-          canSave={canSave}
-          saving={saving}
-          onSave={handleSave}
-          escalated={escalated}
-          onToggleEscalate={() => setEscalated((v) => { const nv = !v; escalatedRef.current = nv; return nv; })}
-          onOpenForm={onOpenForm}
-        />
-      )}
+    <div className="space-y-6">
+      <StepSection step={1} title="Review Status" hint="Banners, files, and attempt history">
+        <div className="space-y-4">
+          <MethodBanner patient={patient} />
+          <RequestSentBanner patient={patient} />
+          <WhatsNeededCard patient={patient} />
+          <FilesPanel files={mondayFiles} />
+          {history.length > 0 && <HistoryCard history={history} />}
+        </div>
+      </StepSection>
+
+      <StepSection step={2} title="Log Attempt" hint="Record the call outcome">
+        {isEscalated ? (
+          <EscalatedCard />
+        ) : (
+          <ActiveAttemptCard
+            attemptNumber={currentAttempt ?? 1}
+            totalAttempts={3}
+            name={name}
+            onNameChange={setName}
+            confirmed={confirmed}
+            onConfirmedChange={setConfirmed}
+            nextAction={nextAction}
+            onNextActionChange={setNextAction}
+          />
+        )}
+      </StepSection>
+
+      <StepSection step={3} title="Notes & Save" hint="Add notes and submit">
+        <div className="space-y-4">
+          <NotesPanel
+            notes={patient.mnEvalNotes ?? ""}
+            onNotesChange={(v) => onUpdate({ mnEvalNotes: v })}
+            onSaveToMonday={(v) => writeLongText(patient.id, COL.mnEvalNotes, v)}
+          />
+          {!isEscalated && (
+            <SaveBar
+              attemptNumber={currentAttempt ?? 1}
+              confirmed={confirmed}
+              canSave={canSave}
+              saving={saving}
+              onSave={handleSave}
+              escalated={escalated}
+              onToggleEscalate={() => setEscalated((v) => { const nv = !v; escalatedRef.current = nv; return nv; })}
+              onOpenForm={onOpenForm}
+            />
+          )}
+        </div>
+      </StepSection>
     </div>
   );
 }

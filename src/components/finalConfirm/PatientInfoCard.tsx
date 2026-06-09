@@ -73,6 +73,7 @@ import {
   DollarSign,
 } from "lucide-react";
 import { DoctorNotesPanel } from "@/components/shared/DoctorNotesPanel";
+import { CollapsiblePanel } from "@/components/shared/CollapsiblePanel";
 
 interface Props {
   patient: Patient;
@@ -561,32 +562,14 @@ export function PatientInfoCard({ patient, onFieldChange }: Props) {
         )}
       </Card>
 
-      {/* Demographics */}
+      {/* Always-visible: DOB, Gender, Primary Insurance, Serving */}
       <Card className="p-4 space-y-4">
-        <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold flex items-center gap-2">
-          <User className="h-3.5 w-3.5" /> Demographics
-        </p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <EditableTextField
             icon={<Stethoscope className="h-4 w-4" />}
             label="DOB"
             value={patient.dob}
             onChange={(v) => onFieldChange("dob", v)}
-          />
-          <EditableTextField
-            icon={<Phone className="h-4 w-4" />}
-            label="Phone"
-            value={patient.phone}
-            editedValue={patient.phoneEdited}
-            onChange={(v) => onFieldChange("phoneEdited", v)}
-          />
-          <EditableTextField
-            icon={<Mail className="h-4 w-4" />}
-            label="Email"
-            value={patient.email}
-            editedValue={patient.emailEdited}
-            onChange={(v) => onFieldChange("emailEdited", v)}
-            suppressWarning
           />
           <SelectField
             label="Gender"
@@ -599,66 +582,6 @@ export function PatientInfoCard({ patient, onFieldChange }: Props) {
               if (opt) onFieldChange("gender", opt.label);
             }}
           />
-          {/* Referral fields — read-only display */}
-          <div className="flex items-start gap-2 min-w-0 rounded-lg p-1.5 -m-1.5">
-            <div className="h-8 w-8 rounded-md flex items-center justify-center shrink-0 bg-muted text-muted-foreground">
-              <UserRound className="h-4 w-4" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">Referral Type</p>
-              <p className="text-sm h-8 flex items-center">{patient.referralType || <span className="text-muted-foreground italic">—</span>}</p>
-            </div>
-          </div>
-          <div className="flex items-start gap-2 min-w-0 rounded-lg p-1.5 -m-1.5">
-            <div className="h-8 w-8 rounded-md flex items-center justify-center shrink-0 bg-muted text-muted-foreground">
-              <UserRound className="h-4 w-4" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">Referral Source</p>
-              <p className="text-sm h-8 flex items-center">{patient.referralSource || <span className="text-muted-foreground italic">—</span>}</p>
-            </div>
-          </div>
-        </div>
-        {/* Address — full width with Google autocomplete */}
-        {(() => {
-          const addr = patient.addressEdited ?? patient.address;
-          const zipPattern = new RegExp("[0-9]{5}");
-          const hasZip = zipPattern.test(addr);
-          const isAllCaps = addr.length > 3 && addr === addr.toUpperCase() && addr.match(new RegExp("[A-Z]"));
-          const hasError = addr ? (!hasZip || isAllCaps) : !addr;
-          return (
-            <div className={cn("flex items-start gap-2 min-w-0 rounded-lg p-1.5 -m-1.5 transition-colors", hasError && "bg-red-50 dark:bg-red-950/20 ring-1 ring-red-200 dark:ring-red-800/40")}>
-              <div className={cn("h-8 w-8 rounded-md flex items-center justify-center shrink-0", hasError ? "bg-red-100 dark:bg-red-900/30 text-red-500" : "bg-muted text-muted-foreground")}>
-                <MapPin className="h-4 w-4" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">Address</p>
-                <AddressAutocomplete
-                  value={addr}
-                  onChange={handleAddressChange}
-                  placeholder="Start typing address\u2026"
-                />
-                {addr && isAllCaps && (
-                  <div className="mt-1.5 rounded-md bg-red-600 text-white px-3 py-1.5 text-xs font-bold flex items-center gap-2">
-                    <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
-                    Address is in ALL CAPS \u2014 must be re-entered with correct formatting
-                  </div>
-                )}
-                {addr && !isAllCaps && !hasZip && (
-                  <p className="text-[11px] text-red-500 font-medium mt-1">Zip code is missing</p>
-                )}
-              </div>
-            </div>
-          );
-        })()}
-      </Card>
-
-      {/* Insurance */}
-      <Card className="p-4 space-y-4">
-        <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold flex items-center gap-2">
-          <Shield className="h-3.5 w-3.5" /> Insurance
-        </p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <SelectField
             label="Primary Insurance"
             icon={<Shield className="h-4 w-4" />}
@@ -670,95 +593,185 @@ export function PatientInfoCard({ patient, onFieldChange }: Props) {
               if (opt) onFieldChange("primaryInsurance", opt.label);
             }}
           />
-          <EditableTextField
-            icon={<IdCard className="h-4 w-4" />}
-            label="Member ID 1"
-            value={patient.memberId1}
-            onChange={(v) => onFieldChange("memberId1", v)}
-          />
           <SelectField
-            label="Secondary Insurance"
-            icon={<Shield className="h-4 w-4" />}
-            options={SECONDARY_INSURANCE_OPTIONS}
-            value={patient.secondaryInsuranceEdited ?? patient.secondaryInsurance}
-            onChange={(index, label) => {
-              onFieldChange("secondaryInsuranceIndex", index);
-              onFieldChange("secondaryInsuranceEdited", label);
+            label="Serving"
+            icon={<Package className="h-4 w-4" />}
+            options={SERVING_OPTIONS}
+            value={patient.serving}
+            onChange={(index) => {
+              onFieldChange("servingIndex", index);
+              const opt = SERVING_OPTIONS.find((o) => o.index === index);
+              if (opt) onFieldChange("serving", opt.label);
             }}
           />
-          <EditableTextField
-            icon={<IdCard className="h-4 w-4" />}
-            label="Member ID 2"
-            value={patient.memberId2}
-            editedValue={patient.memberId2Edited}
-            placeholder="Enter member ID"
-            onChange={(v) => onFieldChange("memberId2Edited", v)}
-            suppressWarning={(patient.secondaryInsuranceEdited ?? patient.secondaryInsurance) === "None" || !(patient.secondaryInsuranceEdited ?? patient.secondaryInsurance)}
-          />
         </div>
-        {/* Plan Name — read-only from Monday dropdown */}
-        {patient.planName && (
-          <div className="flex items-start gap-2 min-w-0 rounded-lg p-1.5 -m-1.5">
-            <div className="h-8 w-8 rounded-md flex items-center justify-center shrink-0 bg-muted text-muted-foreground">
-              <Shield className="h-4 w-4" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">Plan Name</p>
-              <p className="text-sm h-8 flex items-center font-medium">{patient.planName}</p>
-            </div>
-          </div>
-        )}
-        <div className="h-px bg-border" />
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
-          <EditableTextField
-            icon={<Activity className="h-4 w-4" />}
-            label="Deductible"
-            value={patient.deductible}
-            onChange={(v) => onFieldChange("deductible", v)}
-          />
-          <EditableTextField
-            icon={<Activity className="h-4 w-4" />}
-            label="Ded. Remaining"
-            value={patient.deductibleRemaining}
-            onChange={(v) => onFieldChange("deductibleRemaining", v)}
-          />
-          <EditableTextField
-            icon={<Activity className="h-4 w-4" />}
-            label="Co-Ins %"
-            value={patient.coInsurance}
-            onChange={(v) => onFieldChange("coInsurance", v)}
-            suppressWarning
-          />
-          <EditableTextField
-            icon={<Activity className="h-4 w-4" />}
-            label="OOP Max"
-            value={patient.oopMax}
-            onChange={(v) => onFieldChange("oopMax", v)}
-          />
-          <EditableTextField
-            icon={<Activity className="h-4 w-4" />}
-            label="OOP Remaining"
-            value={patient.oopMaxRemaining}
-            onChange={(v) => onFieldChange("oopMaxRemaining", v)}
-          />
-        </div>
-        {patient.referralSource === "CareCentrix" && (
-          <>
-            <div className="h-px bg-border" />
-            <EditableTextField
-              icon={<IdCard className="h-4 w-4" />}
-              label="Carecentrix Intake I.D."
-              value={patient.carecentrixIntakeId}
-              onChange={(v) => onFieldChange("carecentrixIntakeId", v)}
-              suppressWarning
-            />
-          </>
-        )}
       </Card>
 
+      {/* Insurance Details */}
+      <CollapsiblePanel title="Insurance Details" defaultOpen={false}>
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <EditableTextField
+              icon={<IdCard className="h-4 w-4" />}
+              label="Member ID 1"
+              value={patient.memberId1}
+              onChange={(v) => onFieldChange("memberId1", v)}
+            />
+            <SelectField
+              label="Secondary Insurance"
+              icon={<Shield className="h-4 w-4" />}
+              options={SECONDARY_INSURANCE_OPTIONS}
+              value={patient.secondaryInsuranceEdited ?? patient.secondaryInsurance}
+              onChange={(index, label) => {
+                onFieldChange("secondaryInsuranceIndex", index);
+                onFieldChange("secondaryInsuranceEdited", label);
+              }}
+            />
+            <EditableTextField
+              icon={<IdCard className="h-4 w-4" />}
+              label="Member ID 2"
+              value={patient.memberId2}
+              editedValue={patient.memberId2Edited}
+              placeholder="Enter member ID"
+              onChange={(v) => onFieldChange("memberId2Edited", v)}
+              suppressWarning={(patient.secondaryInsuranceEdited ?? patient.secondaryInsurance) === "None" || !(patient.secondaryInsuranceEdited ?? patient.secondaryInsurance)}
+            />
+          </div>
+          {/* Plan Name — read-only from Monday dropdown */}
+          {patient.planName && (
+            <div className="flex items-start gap-2 min-w-0 rounded-lg p-1.5 -m-1.5">
+              <div className="h-8 w-8 rounded-md flex items-center justify-center shrink-0 bg-muted text-muted-foreground">
+                <Shield className="h-4 w-4" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">Plan Name</p>
+                <p className="text-sm h-8 flex items-center font-medium">{patient.planName}</p>
+              </div>
+            </div>
+          )}
+          <div className="h-px bg-border" />
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
+            <EditableTextField
+              icon={<Activity className="h-4 w-4" />}
+              label="Deductible"
+              value={patient.deductible}
+              onChange={(v) => onFieldChange("deductible", v)}
+            />
+            <EditableTextField
+              icon={<Activity className="h-4 w-4" />}
+              label="Ded. Remaining"
+              value={patient.deductibleRemaining}
+              onChange={(v) => onFieldChange("deductibleRemaining", v)}
+            />
+            <EditableTextField
+              icon={<Activity className="h-4 w-4" />}
+              label="Co-Ins %"
+              value={patient.coInsurance}
+              onChange={(v) => onFieldChange("coInsurance", v)}
+              suppressWarning
+            />
+            <EditableTextField
+              icon={<Activity className="h-4 w-4" />}
+              label="OOP Max"
+              value={patient.oopMax}
+              onChange={(v) => onFieldChange("oopMax", v)}
+            />
+            <EditableTextField
+              icon={<Activity className="h-4 w-4" />}
+              label="OOP Remaining"
+              value={patient.oopMaxRemaining}
+              onChange={(v) => onFieldChange("oopMaxRemaining", v)}
+            />
+          </div>
+          {patient.referralSource === "CareCentrix" && (
+            <>
+              <div className="h-px bg-border" />
+              <EditableTextField
+                icon={<IdCard className="h-4 w-4" />}
+                label="Carecentrix Intake I.D."
+                value={patient.carecentrixIntakeId}
+                onChange={(v) => onFieldChange("carecentrixIntakeId", v)}
+                suppressWarning
+              />
+            </>
+          )}
+
+          {/* Demographics detail: phone, email, referral, address */}
+          <div className="h-px bg-border" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <EditableTextField
+              icon={<Phone className="h-4 w-4" />}
+              label="Phone"
+              value={patient.phone}
+              editedValue={patient.phoneEdited}
+              onChange={(v) => onFieldChange("phoneEdited", v)}
+            />
+            <EditableTextField
+              icon={<Mail className="h-4 w-4" />}
+              label="Email"
+              value={patient.email}
+              editedValue={patient.emailEdited}
+              onChange={(v) => onFieldChange("emailEdited", v)}
+              suppressWarning
+            />
+            {/* Referral fields — read-only display */}
+            <div className="flex items-start gap-2 min-w-0 rounded-lg p-1.5 -m-1.5">
+              <div className="h-8 w-8 rounded-md flex items-center justify-center shrink-0 bg-muted text-muted-foreground">
+                <UserRound className="h-4 w-4" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">Referral Type</p>
+                <p className="text-sm h-8 flex items-center">{patient.referralType || <span className="text-muted-foreground italic">—</span>}</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-2 min-w-0 rounded-lg p-1.5 -m-1.5">
+              <div className="h-8 w-8 rounded-md flex items-center justify-center shrink-0 bg-muted text-muted-foreground">
+                <UserRound className="h-4 w-4" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">Referral Source</p>
+                <p className="text-sm h-8 flex items-center">{patient.referralSource || <span className="text-muted-foreground italic">—</span>}</p>
+              </div>
+            </div>
+          </div>
+          {/* Address — full width with Google autocomplete */}
+          {(() => {
+            const addr = patient.addressEdited ?? patient.address;
+            const zipPattern = new RegExp("[0-9]{5}");
+            const hasZip = zipPattern.test(addr);
+            const isAllCaps = addr.length > 3 && addr === addr.toUpperCase() && addr.match(new RegExp("[A-Z]"));
+            const hasError = addr ? (!hasZip || isAllCaps) : !addr;
+            return (
+              <div className={cn("flex items-start gap-2 min-w-0 rounded-lg p-1.5 -m-1.5 transition-colors", hasError && "bg-red-50 dark:bg-red-950/20 ring-1 ring-red-200 dark:ring-red-800/40")}>
+                <div className={cn("h-8 w-8 rounded-md flex items-center justify-center shrink-0", hasError ? "bg-red-100 dark:bg-red-900/30 text-red-500" : "bg-muted text-muted-foreground")}>
+                  <MapPin className="h-4 w-4" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">Address</p>
+                  <AddressAutocomplete
+                    value={addr}
+                    onChange={handleAddressChange}
+                    placeholder="Start typing address…"
+                  />
+                  {addr && isAllCaps && (
+                    <div className="mt-1.5 rounded-md bg-red-600 text-white px-3 py-1.5 text-xs font-bold flex items-center gap-2">
+                      <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
+                      Address is in ALL CAPS — must be re-entered with correct formatting
+                    </div>
+                  )}
+                  {addr && !isAllCaps && !hasZip && (
+                    <p className="text-[11px] text-red-500 font-medium mt-1">Zip code is missing</p>
+                  )}
+                </div>
+              </div>
+            );
+          })()}
+        </div>
+      </CollapsiblePanel>
+
       {/* Doctor Info */}
-      <Card className="p-4 space-y-4">
-        <CollapsibleSection title="Doctor Info" defaultOpen>
+      <CollapsiblePanel title="Doctor Info" defaultOpen={false}>
+        <div className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <EditableTextField
               icon={<UserRound className="h-4 w-4" />}
@@ -834,17 +847,17 @@ export function PatientInfoCard({ patient, onFieldChange }: Props) {
               </div>
             );
           })()}
-        </CollapsibleSection>
 
-        {/* Doctor-level notes from the Doctor Database */}
-        {patient.doctorNpi && (
-          <DoctorNotesPanel doctorNpi={patient.doctorNpi} doctorName={patient.doctorName} compact />
-        )}
-      </Card>
+          {/* Doctor-level notes from the Doctor Database */}
+          {patient.doctorNpi && (
+            <DoctorNotesPanel doctorNpi={patient.doctorNpi} doctorName={patient.doctorName} compact />
+          )}
+        </div>
+      </CollapsiblePanel>
 
-      {/* Medical Necessity */}
-      <Card className="p-4 space-y-4">
-        <CollapsibleSection title="Medical Necessity" defaultOpen>
+      {/* Diagnosis & Coverage */}
+      <CollapsiblePanel title="Diagnosis & Coverage" defaultOpen={false}>
+        <div className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <DiagnosisCombobox
               value={patient.diagnosis}
@@ -883,328 +896,234 @@ export function PatientInfoCard({ patient, onFieldChange }: Props) {
               }}
             />
           </div>
-        </CollapsibleSection>
-      </Card>
 
-      {/* Product / Order Info */}
-      <Card className="p-4 space-y-4">
-        <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold flex items-center gap-2">
-          <Package className="h-3.5 w-3.5" /> Product & Order Info
-        </p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <SelectField
-            label="Serving"
-            icon={<Package className="h-4 w-4" />}
-            options={SERVING_OPTIONS}
-            value={patient.serving}
-            onChange={(index) => {
-              onFieldChange("servingIndex", index);
-              const opt = SERVING_OPTIONS.find((o) => o.index === index);
-              if (opt) onFieldChange("serving", opt.label);
-            }}
-          />
-          <SelectField
-            label="Request Type"
-            icon={<Package className="h-4 w-4" />}
-            options={REQUEST_TYPE_OPTIONS}
-            value={patient.requestType}
-            onChange={(index) => {
-              onFieldChange("requestTypeIndex", index);
-              const opt = REQUEST_TYPE_OPTIONS.find((o) => o.index === index);
-              if (opt) onFieldChange("requestType", opt.label);
-            }}
-          />
-          <SelectField
-            label="CGM Type"
-            icon={<Package className="h-4 w-4" />}
-            options={CGM_TYPE_OPTIONS}
-            value={patient.cgmType}
-            onChange={(index) => {
-              onFieldChange("cgmTypeIndex", index);
-              const opt = CGM_TYPE_OPTIONS.find((o) => o.index === index);
-              if (opt) onFieldChange("cgmType", opt.label);
-            }}
-          />
-          <SelectField
-            label="Pump Type"
-            icon={<Package className="h-4 w-4" />}
-            options={PUMP_TYPE_OPTIONS}
-            value={patient.pumpType}
-            onChange={(index) => {
-              onFieldChange("pumpTypeIndex", index);
-              const opt = PUMP_TYPE_OPTIONS.find((o) => o.index === index);
-              if (opt) onFieldChange("pumpType", opt.label);
-            }}
-            disabled={patient.serving === "CGM"}
-            suppressWarning={patient.serving === "CGM"}
-          />
-        </div>
-
-        <div className="h-px bg-border" />
-
-        {/* Monitor Qty (left) + Pump Qty (right) — always visible */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="flex items-start gap-2 min-w-0 rounded-lg p-1.5 -m-1.5">
-            <div className="h-8 w-8 rounded-md flex items-center justify-center shrink-0 bg-muted text-muted-foreground">
-              <Package className="h-4 w-4" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">Monitor Qty</p>
-              <Input
-                className="h-8 text-sm"
-                type="number"
-                value={patient.monitorQty}
-                onChange={(e) => onFieldChange("monitorQty", e.target.value)}
-                placeholder="0"
-              />
-            </div>
-          </div>
-          <div className="flex items-start gap-2 min-w-0 rounded-lg p-1.5 -m-1.5">
-            <div className="h-8 w-8 rounded-md flex items-center justify-center shrink-0 bg-muted text-muted-foreground">
-              <Package className="h-4 w-4" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">Pump Qty</p>
-              <Input
-                className="h-8 text-sm"
-                type="number"
-                value={patient.pumpQty}
-                onChange={(e) => onFieldChange("pumpQty", e.target.value)}
-                placeholder="0"
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="h-px bg-border" />
-
-        {/* Subscription Type — centered */}
-        <div className="max-w-md mx-auto">
-          <SelectField
-            label="Subscription Type"
-            options={SUBSCRIPTION_TYPE_OPTIONS}
-            value={patient.subscriptionType}
-            onChange={(index) => {
-              onFieldChange("subscriptionTypeIndex", index);
-              const opt = SUBSCRIPTION_TYPE_OPTIONS.find((o) => o.index === index);
-              if (opt) onFieldChange("subscriptionType", opt.label);
-              // When "Sensors" is selected, auto-set infusion sets to "Not Serving"
-              if (opt && opt.label === "Sensors") {
-                onFieldChange("infusionSet1Index", 101);
-                onFieldChange("infusionSet1", "Not Serving");
-                onFieldChange("infusionSet2Index", 101);
-                onFieldChange("infusionSet2", "Not Serving");
-              }
-            }}
-          />
-        </div>
-
-        {!isCgmOnly && (
-          <>
-            <div className="h-px bg-border" />
-
-            {/* Infusion Sets — visually paired with their quantities */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <InfusionSetPair
-                  setLabel="Infusion Set 1"
-                  setOptions={INFUSION_SET_1_OPTIONS}
-                  setVal={patient.infusionSet1}
-                  qtyVal={patient.qtyInf1}
-                  onSetChange={(index) => {
-                    onFieldChange("infusionSet1Index", index);
-                    const opt = INFUSION_SET_1_OPTIONS.find((o) => o.index === index);
-                    if (opt) onFieldChange("infusionSet1", opt.label);
-                  }}
-                  onQtyChange={(v) => onFieldChange("qtyInf1", v)}
-                  hasError={infSet1Missing || infQty1Missing}
-                />
-                {servingRequiresInfusion && (infSet1Missing || infQty1Missing) && (
-                  <p className="text-[11px] text-red-500 font-medium">
-                    {infSet1Missing ? "Infusion set required for this serving type" : "Quantity required"}
-                  </p>
-                )}
-              </div>
-              <InfusionSetPair
-                setLabel="Infusion Set 2"
-                setOptions={INFUSION_SET_2_OPTIONS}
-                setVal={patient.infusionSet2}
-                qtyVal={patient.qtyInf2}
-                onSetChange={(index) => {
-                  onFieldChange("infusionSet2Index", index);
-                  const opt = INFUSION_SET_2_OPTIONS.find((o) => o.index === index);
-                  if (opt) onFieldChange("infusionSet2", opt.label);
-                }}
-                onQtyChange={(v) => onFieldChange("qtyInf2", v)}
-              />
-            </div>
-          </>
-        )}
-      </Card>
-      {/* Auth Results + Details */}
-      <Card className="p-4 space-y-4">
-        <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold flex items-center gap-2">
-          <ShieldCheck className="h-3.5 w-3.5" /> Auth Results
-        </p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {/* Left column — CGM side */}
-          <div className="space-y-4">
-            <div>
-              <SelectField
-                label="CGM Auth"
-                icon={<ShieldCheck className="h-4 w-4" />}
-                options={AUTH_RESULT_OPTIONS}
-                value={patient.cgmAuthResult}
-                onChange={(index) => {
-                  onFieldChange("cgmAuthResultIndex", index);
-                  const opt = AUTH_RESULT_OPTIONS.find((o) => o.index === index);
-                  if (opt) onFieldChange("cgmAuthResult", opt.label);
-                }}
-              />
-              <AuthDetailBlock
-                authId={patient.monitorAuthId}
-                authStart={patient.monitorAuthStart}
-                authEnd={patient.monitorAuthEnd}
-                authUnits={patient.monitorAuthUnits}
-              />
-            </div>
-            <div>
-              <SelectField
-                label="Sensors Auth"
-                icon={<ShieldCheck className="h-4 w-4" />}
-                options={AUTH_RESULT_OPTIONS}
-                value={patient.sensorsAuthResult}
-                onChange={(index) => {
-                  onFieldChange("sensorsAuthResultIndex", index);
-                  const opt = AUTH_RESULT_OPTIONS.find((o) => o.index === index);
-                  if (opt) onFieldChange("sensorsAuthResult", opt.label);
-                }}
-              />
-              <AuthDetailBlock
-                authId={patient.sensorsAuthId}
-                authStart={patient.sensorsAuthStart}
-                authEnd={patient.sensorsAuthEnd}
-                authUnits={patient.sensorsAuthUnits}
-              />
-            </div>
-          </div>
-          {/* Right column — Pump side */}
-          <div className="space-y-4">
-            <div>
-              <SelectField
-                label="IP Auth"
-                icon={<ShieldCheck className="h-4 w-4" />}
-                options={AUTH_RESULT_OPTIONS}
-                value={patient.ipAuthResult}
-                onChange={(index) => {
-                  onFieldChange("ipAuthResultIndex", index);
-                  const opt = AUTH_RESULT_OPTIONS.find((o) => o.index === index);
-                  if (opt) onFieldChange("ipAuthResult", opt.label);
-                }}
-              />
-              <AuthDetailBlock
-                authId={patient.ipAuthId}
-                authStart={patient.ipAuthStart}
-                authEnd={patient.ipAuthEnd}
-                authUnits={patient.ipAuthUnits}
-              />
-            </div>
-            <div>
-              <SelectField
-                label="Infusion Set Auth"
-                icon={<ShieldCheck className="h-4 w-4" />}
-                options={AUTH_RESULT_OPTIONS}
-                value={patient.infusionSetAuthResult}
-                onChange={(index) => {
-                  onFieldChange("infusionSetAuthResultIndex", index);
-                  const opt = AUTH_RESULT_OPTIONS.find((o) => o.index === index);
-                  if (opt) onFieldChange("infusionSetAuthResult", opt.label);
-                }}
-              />
-              <AuthDetailBlock
-                authId={patient.infusionSetAuthId}
-                authStart={patient.infusionSetAuthStart}
-                authEnd={patient.infusionSetAuthEnd}
-                authUnits={patient.infusionSetAuthUnits}
-              />
-            </div>
-            <div>
-              <SelectField
-                label="Cartridge Auth"
-                icon={<ShieldCheck className="h-4 w-4" />}
-                options={AUTH_RESULT_OPTIONS}
-                value={patient.cartridgeAuthResult}
-                onChange={(index) => {
-                  onFieldChange("cartridgeAuthResultIndex", index);
-                  const opt = AUTH_RESULT_OPTIONS.find((o) => o.index === index);
-                  if (opt) onFieldChange("cartridgeAuthResult", opt.label);
-                }}
-              />
-              <AuthDetailBlock
-                authId={patient.cartridgeAuthId}
-                authStart={patient.cartridgeAuthStart}
-                authEnd={patient.cartridgeAuthEnd}
-                authUnits={patient.cartridgeAuthUnits}
-              />
-            </div>
-          </div>
-        </div>
-      </Card>
-
-      {/* Claim Paid Amounts (read-only — shown when values exist) */}
-      {(patient.a4230Claim || patient.a4232Claim) && (
-        <Card className="p-4 space-y-4">
+          {/* Product / Order Info */}
+          <div className="h-px bg-border" />
           <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold flex items-center gap-2">
-            <DollarSign className="h-3.5 w-3.5" /> Claim Paid Amounts
+            <Package className="h-3.5 w-3.5" /> Product & Order Info
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {patient.a4230Claim && (
-              <div className="flex items-center gap-3 rounded-lg border px-4 py-3 bg-muted/30">
-                <span className="text-xs font-medium text-muted-foreground w-28">A4230 Claim</span>
-                <span className="text-sm font-semibold">{patient.a4230Claim}</span>
-              </div>
-            )}
-            {patient.a4232Claim && (
-              <div className="flex items-center gap-3 rounded-lg border px-4 py-3 bg-muted/30">
-                <span className="text-xs font-medium text-muted-foreground w-28">A4232 Claim</span>
-                <span className="text-sm font-semibold">{patient.a4232Claim}</span>
-              </div>
-            )}
+            <SelectField
+              label="Request Type"
+              icon={<Package className="h-4 w-4" />}
+              options={REQUEST_TYPE_OPTIONS}
+              value={patient.requestType}
+              onChange={(index) => {
+                onFieldChange("requestTypeIndex", index);
+                const opt = REQUEST_TYPE_OPTIONS.find((o) => o.index === index);
+                if (opt) onFieldChange("requestType", opt.label);
+              }}
+            />
+            <SelectField
+              label="CGM Type"
+              icon={<Package className="h-4 w-4" />}
+              options={CGM_TYPE_OPTIONS}
+              value={patient.cgmType}
+              onChange={(index) => {
+                onFieldChange("cgmTypeIndex", index);
+                const opt = CGM_TYPE_OPTIONS.find((o) => o.index === index);
+                if (opt) onFieldChange("cgmType", opt.label);
+              }}
+            />
+            <SelectField
+              label="Pump Type"
+              icon={<Package className="h-4 w-4" />}
+              options={PUMP_TYPE_OPTIONS}
+              value={patient.pumpType}
+              onChange={(index) => {
+                onFieldChange("pumpTypeIndex", index);
+                const opt = PUMP_TYPE_OPTIONS.find((o) => o.index === index);
+                if (opt) onFieldChange("pumpType", opt.label);
+              }}
+              disabled={patient.serving === "CGM"}
+              suppressWarning={patient.serving === "CGM"}
+            />
           </div>
-        </Card>
-      )}
 
-      {/* Last Bill Dates — always visible so user knows what needs filling */}
-      <Card className="p-4 space-y-4">
-        <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold flex items-center gap-2">
-          <CalendarDays className="h-3.5 w-3.5" /> Last Bill Dates
-        </p>
+          <div className="h-px bg-border" />
+
+          {/* Monitor Qty + Pump Qty */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="flex items-start gap-2 min-w-0 rounded-lg p-1.5 -m-1.5">
+              <div className="h-8 w-8 rounded-md flex items-center justify-center shrink-0 bg-muted text-muted-foreground">
+                <Package className="h-4 w-4" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">Monitor Qty</p>
+                <Input
+                  className="h-8 text-sm"
+                  type="number"
+                  value={patient.monitorQty}
+                  onChange={(e) => onFieldChange("monitorQty", e.target.value)}
+                  placeholder="0"
+                />
+              </div>
+            </div>
+            <div className="flex items-start gap-2 min-w-0 rounded-lg p-1.5 -m-1.5">
+              <div className="h-8 w-8 rounded-md flex items-center justify-center shrink-0 bg-muted text-muted-foreground">
+                <Package className="h-4 w-4" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">Pump Qty</p>
+                <Input
+                  className="h-8 text-sm"
+                  type="number"
+                  value={patient.pumpQty}
+                  onChange={(e) => onFieldChange("pumpQty", e.target.value)}
+                  placeholder="0"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="h-px bg-border" />
+
+          {/* Subscription Type */}
+          <div className="max-w-md mx-auto">
+            <SelectField
+              label="Subscription Type"
+              options={SUBSCRIPTION_TYPE_OPTIONS}
+              value={patient.subscriptionType}
+              onChange={(index) => {
+                onFieldChange("subscriptionTypeIndex", index);
+                const opt = SUBSCRIPTION_TYPE_OPTIONS.find((o) => o.index === index);
+                if (opt) onFieldChange("subscriptionType", opt.label);
+                if (opt && opt.label === "Sensors") {
+                  onFieldChange("infusionSet1Index", 101);
+                  onFieldChange("infusionSet1", "Not Serving");
+                  onFieldChange("infusionSet2Index", 101);
+                  onFieldChange("infusionSet2", "Not Serving");
+                }
+              }}
+            />
+          </div>
+
+          {!isCgmOnly && (
+            <>
+              <div className="h-px bg-border" />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <InfusionSetPair
+                    setLabel="Infusion Set 1"
+                    setOptions={INFUSION_SET_1_OPTIONS}
+                    setVal={patient.infusionSet1}
+                    qtyVal={patient.qtyInf1}
+                    onSetChange={(index) => {
+                      onFieldChange("infusionSet1Index", index);
+                      const opt = INFUSION_SET_1_OPTIONS.find((o) => o.index === index);
+                      if (opt) onFieldChange("infusionSet1", opt.label);
+                    }}
+                    onQtyChange={(v) => onFieldChange("qtyInf1", v)}
+                    hasError={infSet1Missing || infQty1Missing}
+                  />
+                  {servingRequiresInfusion && (infSet1Missing || infQty1Missing) && (
+                    <p className="text-[11px] text-red-500 font-medium">
+                      {infSet1Missing ? "Infusion set required for this serving type" : "Quantity required"}
+                    </p>
+                  )}
+                </div>
+                <InfusionSetPair
+                  setLabel="Infusion Set 2"
+                  setOptions={INFUSION_SET_2_OPTIONS}
+                  setVal={patient.infusionSet2}
+                  qtyVal={patient.qtyInf2}
+                  onSetChange={(index) => {
+                    onFieldChange("infusionSet2Index", index);
+                    const opt = INFUSION_SET_2_OPTIONS.find((o) => o.index === index);
+                    if (opt) onFieldChange("infusionSet2", opt.label);
+                  }}
+                  onQtyChange={(v) => onFieldChange("qtyInf2", v)}
+                />
+              </div>
+            </>
+          )}
+        </div>
+      </CollapsiblePanel>
+
+      {/* Authorization Results */}
+      <CollapsiblePanel title="Authorization Results" defaultOpen={false}>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {/* Left column — CGM side */}
           <div className="space-y-4">
-            <EditableDateField label="CGM Last Bill Date" dateStr={patient.lastBillDateMonitor} onChange={(v) => onFieldChange("lastBillDateMonitor", v)} />
-            <EditableDateField label="Sensors Last Bill Date" dateStr={patient.lastBillDateSensors} onChange={(v) => onFieldChange("lastBillDateSensors", v)} />
+            <div>
+              <SelectField label="CGM Auth" icon={<ShieldCheck className="h-4 w-4" />} options={AUTH_RESULT_OPTIONS} value={patient.cgmAuthResult} onChange={(index) => { onFieldChange("cgmAuthResultIndex", index); const opt = AUTH_RESULT_OPTIONS.find((o) => o.index === index); if (opt) onFieldChange("cgmAuthResult", opt.label); }} />
+              <AuthDetailBlock authId={patient.monitorAuthId} authStart={patient.monitorAuthStart} authEnd={patient.monitorAuthEnd} authUnits={patient.monitorAuthUnits} />
+            </div>
+            <div>
+              <SelectField label="Sensors Auth" icon={<ShieldCheck className="h-4 w-4" />} options={AUTH_RESULT_OPTIONS} value={patient.sensorsAuthResult} onChange={(index) => { onFieldChange("sensorsAuthResultIndex", index); const opt = AUTH_RESULT_OPTIONS.find((o) => o.index === index); if (opt) onFieldChange("sensorsAuthResult", opt.label); }} />
+              <AuthDetailBlock authId={patient.sensorsAuthId} authStart={patient.sensorsAuthStart} authEnd={patient.sensorsAuthEnd} authUnits={patient.sensorsAuthUnits} />
+            </div>
           </div>
-          {/* Right column — Pump side */}
           <div className="space-y-4">
-            <EditableDateField label="IP Last Bill Date" dateStr={patient.lastBillDateIp} onChange={(v) => onFieldChange("lastBillDateIp", v)} />
-            <EditableDateField label="Infusion Set Last Bill Date" dateStr={patient.lastBillDateInfusionSet} onChange={(v) => onFieldChange("lastBillDateInfusionSet", v)} />
-            <EditableDateField label="Cartridge Last Bill Date" dateStr={patient.lastBillDateCartridge} onChange={(v) => onFieldChange("lastBillDateCartridge", v)} />
+            <div>
+              <SelectField label="IP Auth" icon={<ShieldCheck className="h-4 w-4" />} options={AUTH_RESULT_OPTIONS} value={patient.ipAuthResult} onChange={(index) => { onFieldChange("ipAuthResultIndex", index); const opt = AUTH_RESULT_OPTIONS.find((o) => o.index === index); if (opt) onFieldChange("ipAuthResult", opt.label); }} />
+              <AuthDetailBlock authId={patient.ipAuthId} authStart={patient.ipAuthStart} authEnd={patient.ipAuthEnd} authUnits={patient.ipAuthUnits} />
+            </div>
+            <div>
+              <SelectField label="Infusion Set Auth" icon={<ShieldCheck className="h-4 w-4" />} options={AUTH_RESULT_OPTIONS} value={patient.infusionSetAuthResult} onChange={(index) => { onFieldChange("infusionSetAuthResultIndex", index); const opt = AUTH_RESULT_OPTIONS.find((o) => o.index === index); if (opt) onFieldChange("infusionSetAuthResult", opt.label); }} />
+              <AuthDetailBlock authId={patient.infusionSetAuthId} authStart={patient.infusionSetAuthStart} authEnd={patient.infusionSetAuthEnd} authUnits={patient.infusionSetAuthUnits} />
+            </div>
+            <div>
+              <SelectField label="Cartridge Auth" icon={<ShieldCheck className="h-4 w-4" />} options={AUTH_RESULT_OPTIONS} value={patient.cartridgeAuthResult} onChange={(index) => { onFieldChange("cartridgeAuthResultIndex", index); const opt = AUTH_RESULT_OPTIONS.find((o) => o.index === index); if (opt) onFieldChange("cartridgeAuthResult", opt.label); }} />
+              <AuthDetailBlock authId={patient.cartridgeAuthId} authStart={patient.cartridgeAuthStart} authEnd={patient.cartridgeAuthEnd} authUnits={patient.cartridgeAuthUnits} />
+            </div>
           </div>
         </div>
-      </Card>
+      </CollapsiblePanel>
 
-      {/* Next Order Dates — always visible, editable, green=ready red=future */}
-      <Card className="p-4 space-y-4">
-        <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold flex items-center gap-2">
-          <CalendarDays className="h-3.5 w-3.5" /> Next Order Dates
-        </p>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <EditableNextOrderDateField label="Sensors Next Order Date" dateStr={patient.nextOrderDateSensors} onChange={(v) => onFieldChange("nextOrderDateSensors", v)} active={sensorsActive} />
-          <EditableNextOrderDateField label="IP Next Order Date" dateStr={patient.nextOrderDateIp} onChange={(v) => onFieldChange("nextOrderDateIp", v)} active={patient.pumpQty === "1"} />
-          <EditableNextOrderDateField label="Supplies Next Order Date" dateStr={patient.nextOrderDateSupplies} onChange={(v) => onFieldChange("nextOrderDateSupplies", v)} active={suppliesActive} />
+      {/* Claims & Billing */}
+      <CollapsiblePanel title="Claims & Billing" defaultOpen={false}>
+        <div className="space-y-4">
+          {(patient.a4230Claim || patient.a4232Claim) && (
+            <div>
+              <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold flex items-center gap-2 mb-3">
+                <DollarSign className="h-3.5 w-3.5" /> Claim Paid Amounts
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {patient.a4230Claim && (
+                  <div className="flex items-center gap-3 rounded-lg border px-4 py-3 bg-muted/30">
+                    <span className="text-xs font-medium text-muted-foreground w-28">A4230 Claim</span>
+                    <span className="text-sm font-semibold">{patient.a4230Claim}</span>
+                  </div>
+                )}
+                {patient.a4232Claim && (
+                  <div className="flex items-center gap-3 rounded-lg border px-4 py-3 bg-muted/30">
+                    <span className="text-xs font-medium text-muted-foreground w-28">A4232 Claim</span>
+                    <span className="text-sm font-semibold">{patient.a4232Claim}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          <div>
+            <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold flex items-center gap-2 mb-3">
+              <CalendarDays className="h-3.5 w-3.5" /> Last Bill Dates
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-4">
+                <EditableDateField label="CGM Last Bill Date" dateStr={patient.lastBillDateMonitor} onChange={(v) => onFieldChange("lastBillDateMonitor", v)} />
+                <EditableDateField label="Sensors Last Bill Date" dateStr={patient.lastBillDateSensors} onChange={(v) => onFieldChange("lastBillDateSensors", v)} />
+              </div>
+              <div className="space-y-4">
+                <EditableDateField label="IP Last Bill Date" dateStr={patient.lastBillDateIp} onChange={(v) => onFieldChange("lastBillDateIp", v)} />
+                <EditableDateField label="Infusion Set Last Bill Date" dateStr={patient.lastBillDateInfusionSet} onChange={(v) => onFieldChange("lastBillDateInfusionSet", v)} />
+                <EditableDateField label="Cartridge Last Bill Date" dateStr={patient.lastBillDateCartridge} onChange={(v) => onFieldChange("lastBillDateCartridge", v)} />
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold flex items-center gap-2 mb-3">
+              <CalendarDays className="h-3.5 w-3.5" /> Next Order Dates
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <EditableNextOrderDateField label="Sensors Next Order Date" dateStr={patient.nextOrderDateSensors} onChange={(v) => onFieldChange("nextOrderDateSensors", v)} active={sensorsActive} />
+              <EditableNextOrderDateField label="IP Next Order Date" dateStr={patient.nextOrderDateIp} onChange={(v) => onFieldChange("nextOrderDateIp", v)} active={patient.pumpQty === "1"} />
+              <EditableNextOrderDateField label="Supplies Next Order Date" dateStr={patient.nextOrderDateSupplies} onChange={(v) => onFieldChange("nextOrderDateSupplies", v)} active={suppliesActive} />
+            </div>
+          </div>
         </div>
-      </Card>
+      </CollapsiblePanel>
     </div>
   );
 }

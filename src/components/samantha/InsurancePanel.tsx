@@ -30,6 +30,7 @@ import { NotesPanel } from "@/components/samantha/NotesPanel";
 import { AlertTriangle, CalendarDays, CheckCircle2, Clock, ShieldCheck, ShieldAlert, Repeat, Package, XCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useEffect, useMemo } from "react";
+import { StepSection } from "@/components/shared/StepSection";
 
 interface Props {
   patient: Patient;
@@ -115,9 +116,9 @@ export function InsurancePanel({
       {/* STEP 1 — Phone call universal checks
          (Serving + Primary Insurance now live in the Patient Profile card above.) */}
       <StepSection
-        number={1}
-        title="Call the payer · confirm universal checks"
-        subtitle="Fill these from a phone call to the insurance payer. All three required."
+        step={1}
+        title="Universal Checks"
+        hint="Fill these from a phone call to the insurance payer. All three required."
         complete={universalDone}
         rightAccessory={
           <span
@@ -179,9 +180,9 @@ export function InsurancePanel({
 
       {/* STEP 2 — Product cards */}
       <StepSection
-        number={2}
-        title="Product-Specific SoS and Auth Requirements"
-        subtitle="For each product, select Auth Requirements and Same or Similar status."
+        step={2}
+        title="Product Authorization & Status"
+        hint="For each product, select Auth Requirements and Same or Similar status."
         complete={
           dropdownsReady &&
           visibleResolved.length > 0 &&
@@ -235,133 +236,100 @@ export function InsurancePanel({
         )}
       </StepSection>
 
-      {/* Medicare A&B · Never Billed attestation boxes */}
-      {primaryInsurance === "Medicare A&B" && (() => {
-        const isState = ins.codes["infusion-sets"];
-        const cartState = ins.codes["cartridges"];
-        const showIsCar = isState?.sos === "clear" && cartState?.sos === "clear";
-        const cgmState = ins.codes["cgm-sensors"];
-        const showCgm = cgmState?.sos === "clear";
-        if (!showIsCar && !showCgm) return null;
-        return (
-          <div className="space-y-3">
-            {showIsCar && (
-              <div className={cn(
-                "rounded-xl border-2 p-4 transition-colors",
-                ins.neverBilledIsCar
-                  ? "border-success/40 bg-success/5"
-                  : "border-amber-400/60 bg-amber-50/50 dark:bg-amber-950/20",
-              )}>
-                <div className="flex items-start gap-3">
-                  <Checkbox
-                    id="never-billed-is-car"
-                    checked={!!ins.neverBilledIsCar}
-                    onCheckedChange={(v) => onNeverBilledChange?.("neverBilledIsCar", !!v)}
-                    className="mt-0.5"
-                  />
-                  <label htmlFor="never-billed-is-car" className="cursor-pointer">
-                    <p className="text-sm font-semibold">E0784, A4224, and A4225 has never been billed for the patient</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      Medicare A&B requires confirmation that infusion sets and cartridges have never been billed.
-                    </p>
-                  </label>
-                </div>
-                {ins.neverBilledIsCar && (
-                  <div className="mt-2 ml-7 flex items-center gap-1.5">
-                    <CheckCircle2 className="h-3.5 w-3.5 text-success" />
-                    <span className="text-xs font-medium text-success">Confirmed</span>
+      <StepSection
+        step={3}
+        title="Review & Notes"
+        hint="Never billed checkboxes, notes, and Monday output preview."
+      >
+        {/* Medicare A&B · Never Billed attestation boxes */}
+        {primaryInsurance === "Medicare A&B" && (() => {
+          const isState = ins.codes["infusion-sets"];
+          const cartState = ins.codes["cartridges"];
+          const showIsCar = isState?.sos === "clear" && cartState?.sos === "clear";
+          const cgmState = ins.codes["cgm-sensors"];
+          const showCgm = cgmState?.sos === "clear";
+          if (!showIsCar && !showCgm) return null;
+          return (
+            <div className="space-y-3 mb-4">
+              {showIsCar && (
+                <div className={cn(
+                  "rounded-xl border-2 p-4 transition-colors",
+                  ins.neverBilledIsCar
+                    ? "border-success/40 bg-success/5"
+                    : "border-amber-400/60 bg-amber-50/50 dark:bg-amber-950/20",
+                )}>
+                  <div className="flex items-start gap-3">
+                    <Checkbox
+                      id="never-billed-is-car"
+                      checked={!!ins.neverBilledIsCar}
+                      onCheckedChange={(v) => onNeverBilledChange?.("neverBilledIsCar", !!v)}
+                      className="mt-0.5"
+                    />
+                    <label htmlFor="never-billed-is-car" className="cursor-pointer">
+                      <p className="text-sm font-semibold">E0784, A4224, and A4225 has never been billed for the patient</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        Medicare A&B requires confirmation that infusion sets and cartridges have never been billed.
+                      </p>
+                    </label>
                   </div>
-                )}
-              </div>
-            )}
-            {showCgm && (
-              <div className={cn(
-                "rounded-xl border-2 p-4 transition-colors",
-                ins.neverBilledCgm
-                  ? "border-success/40 bg-success/5"
-                  : "border-amber-400/60 bg-amber-50/50 dark:bg-amber-950/20",
-              )}>
-                <div className="flex items-start gap-3">
-                  <Checkbox
-                    id="never-billed-cgm"
-                    checked={!!ins.neverBilledCgm}
-                    onCheckedChange={(v) => onNeverBilledChange?.("neverBilledCgm", !!v)}
-                    className="mt-0.5"
-                  />
-                  <label htmlFor="never-billed-cgm" className="cursor-pointer">
-                    <p className="text-sm font-semibold">A4239, A4238, or E2103 has never been billed for the patient</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      Medicare A&B requires confirmation that CGM codes have never been billed.
-                    </p>
-                  </label>
+                  {ins.neverBilledIsCar && (
+                    <div className="mt-2 ml-7 flex items-center gap-1.5">
+                      <CheckCircle2 className="h-3.5 w-3.5 text-success" />
+                      <span className="text-xs font-medium text-success">Confirmed</span>
+                    </div>
+                  )}
                 </div>
-                {ins.neverBilledCgm && (
-                  <div className="mt-2 ml-7 flex items-center gap-1.5">
-                    <CheckCircle2 className="h-3.5 w-3.5 text-success" />
-                    <span className="text-xs font-medium text-success">Confirmed</span>
+              )}
+              {showCgm && (
+                <div className={cn(
+                  "rounded-xl border-2 p-4 transition-colors",
+                  ins.neverBilledCgm
+                    ? "border-success/40 bg-success/5"
+                    : "border-amber-400/60 bg-amber-50/50 dark:bg-amber-950/20",
+                )}>
+                  <div className="flex items-start gap-3">
+                    <Checkbox
+                      id="never-billed-cgm"
+                      checked={!!ins.neverBilledCgm}
+                      onCheckedChange={(v) => onNeverBilledChange?.("neverBilledCgm", !!v)}
+                      className="mt-0.5"
+                    />
+                    <label htmlFor="never-billed-cgm" className="cursor-pointer">
+                      <p className="text-sm font-semibold">A4239, A4238, or E2103 has never been billed for the patient</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        Medicare A&B requires confirmation that CGM codes have never been billed.
+                      </p>
+                    </label>
                   </div>
-                )}
-              </div>
-            )}
+                  {ins.neverBilledCgm && (
+                    <div className="mt-2 ml-7 flex items-center gap-1.5">
+                      <CheckCircle2 className="h-3.5 w-3.5 text-success" />
+                      <span className="text-xs font-medium text-success">Confirmed</span>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          );
+        })()}
+
+        {/* Reference Notes */}
+        <NotesPanel
+          notes={patient.notes}
+          onNotesChange={onNotesChange}
+          onSaveToMonday={onSaveNotesToMonday}
+          description="Shared notes across Benefits, Submit Auth, and Auth Outstanding."
+          placeholder="Reference notes..."
+        />
+
+        {/* Monday output */}
+        {dropdownsReady && (
+          <div className="mt-4">
+            <MondayOutput patient={patient} resolved={resolved} outcome={outcome} nextOrderDates={nextOrderDates} />
           </div>
-        );
-      })()}
-
-      {/* Reference Notes */}
-      <NotesPanel
-        notes={patient.notes}
-        onNotesChange={onNotesChange}
-        onSaveToMonday={onSaveNotesToMonday}
-        description="Shared notes across Benefits, Submit Auth, and Auth Outstanding."
-        placeholder="Reference notes..."
-      />
-
-      {/* Monday output */}
-      {dropdownsReady && (
-        <MondayOutput patient={patient} resolved={resolved} outcome={outcome} nextOrderDates={nextOrderDates} />
-      )}
+        )}
+      </StepSection>
     </section>
-  );
-}
-
-function StepSection({
-  number,
-  title,
-  subtitle,
-  complete,
-  rightAccessory,
-  children,
-}: {
-  number: number;
-  title: string;
-  subtitle?: string;
-  complete?: boolean;
-  rightAccessory?: React.ReactNode;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className={cn(
-      "rounded-xl border-2 p-4 transition-colors border-border bg-muted/10",
-    )}>
-      <div className="flex items-start justify-between gap-3 mb-3 flex-wrap">
-        <div className="flex items-start gap-3 min-w-0">
-          <div className={cn(
-            "h-8 w-8 rounded-full flex items-center justify-center text-sm font-bold shrink-0 border-2",
-            complete
-              ? "bg-success/15 text-success border-success/40"
-              : "bg-background text-foreground border-border",
-          )}>
-            {number}
-          </div>
-          <div className="min-w-0">
-            <h3 className="text-sm font-semibold">Step {number} · {title}</h3>
-            {subtitle && <p className="text-xs text-muted-foreground mt-0.5">{subtitle}</p>}
-          </div>
-        </div>
-        {rightAccessory}
-      </div>
-      {children}
-    </div>
   );
 }
 

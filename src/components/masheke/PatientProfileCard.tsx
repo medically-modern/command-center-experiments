@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { DoctorNotesPanel } from "@/components/shared/DoctorNotesPanel";
+import { CollapsiblePanel } from "@/components/shared/CollapsiblePanel";
 
 interface Props {
   patient: Patient;
@@ -149,7 +150,7 @@ export function PatientProfileCard({
         </button>
       </div>
 
-      {/* Row 1: identity + insurance */}
+      {/* Always-visible fields */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <Field icon={<User className="h-4 w-4" />} label="Name" value={patient.name} />
         <Field icon={<CalendarDays className="h-4 w-4" />} label="DOB" value={patient.dob} />
@@ -164,222 +165,229 @@ export function PatientProfileCard({
           label="Member ID"
           value={patient.memberId1 ?? ""}
         />
-        {patient.memberId2 && (
-          <Field
-            icon={<IdCard className="h-4 w-4" />}
-            label="Member ID 2"
-            value={patient.memberId2}
-          />
-        )}
         <Field
           icon={<Phone className="h-4 w-4" />}
           label="Phone"
           value={patient.phone ? formatPhone(patient.phone) : ""}
         />
         <Field
-          icon={<MapPin className="h-4 w-4" />}
-          label="Address"
-          value={patient.address ?? ""}
-          className="sm:col-span-2"
+          icon={<Stethoscope className="h-4 w-4" />}
+          label="Serving"
+          value={patient.serving ?? ""}
         />
       </div>
 
-      <div className="h-px bg-border" />
+      {/* Collapsible details */}
+      <CollapsiblePanel title="More Details" defaultOpen={false}>
+        <div className="space-y-4">
+          {/* Address + Member ID 2 */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <Field
+              icon={<MapPin className="h-4 w-4" />}
+              label="Address"
+              value={patient.address ?? ""}
+              className="sm:col-span-2"
+            />
+            {patient.memberId2 && (
+              <Field
+                icon={<IdCard className="h-4 w-4" />}
+                label="Member ID 2"
+                value={patient.memberId2}
+              />
+            )}
+          </div>
 
-      {/* Workflow context + equipment */}
-      {(() => {
-        const showCgmType =
-          patient.serving === "CGM" ||
-          patient.serving === "Insulin Pump + CGM" ||
-          patient.serving === "Supplies + CGM";
-        const showPumpType =
-          patient.serving === "Insulin Pump" ||
-          patient.serving === "Insulin Pump + CGM" ||
-          patient.serving === "Supplies Only" ||
-          patient.serving === "Supplies + CGM";
-        const both = showCgmType && showPumpType;
+          <div className="h-px bg-border" />
 
-        return (
-          <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <Field
-                icon={<Stethoscope className="h-4 w-4" />}
-                label="Referral Type"
-                value={patient.referralType ?? ""}
-              />
-              <Field
-                icon={<Stethoscope className="h-4 w-4" />}
-                label="Referral Source"
-                value={patient.referralSource ?? ""}
-              />
-              <Field
-                icon={<Send className="h-4 w-4" />}
-                label="Request Type"
-                value={patient.requestType ?? ""}
-              />
-              <Field
-                icon={<Stethoscope className="h-4 w-4" />}
-                label="Serving"
-                value={patient.serving ?? ""}
-              />
-              {!both && showCgmType && (
-                <Field
-                  icon={<Stethoscope className="h-4 w-4" />}
-                  label="CGM Type"
-                  value={patient.cgmType ?? ""}
-                />
-              )}
-              {!both && showPumpType && (
-                <Field
-                  icon={<Stethoscope className="h-4 w-4" />}
-                  label="Pump Type"
-                  value={patient.pumpType ?? ""}
-                />
-              )}
-            </div>
-            {both && (
+          {/* Workflow context + equipment */}
+          {(() => {
+            const showCgmType =
+              patient.serving === "CGM" ||
+              patient.serving === "Insulin Pump + CGM" ||
+              patient.serving === "Supplies + CGM";
+            const showPumpType =
+              patient.serving === "Insulin Pump" ||
+              patient.serving === "Insulin Pump + CGM" ||
+              patient.serving === "Supplies Only" ||
+              patient.serving === "Supplies + CGM";
+            const both = showCgmType && showPumpType;
+
+            return (
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <Field
+                    icon={<Stethoscope className="h-4 w-4" />}
+                    label="Referral Type"
+                    value={patient.referralType ?? ""}
+                  />
+                  <Field
+                    icon={<Stethoscope className="h-4 w-4" />}
+                    label="Referral Source"
+                    value={patient.referralSource ?? ""}
+                  />
+                  <Field
+                    icon={<Send className="h-4 w-4" />}
+                    label="Request Type"
+                    value={patient.requestType ?? ""}
+                  />
+                  {!both && showCgmType && (
+                    <Field
+                      icon={<Stethoscope className="h-4 w-4" />}
+                      label="CGM Type"
+                      value={patient.cgmType ?? ""}
+                    />
+                  )}
+                  {!both && showPumpType && (
+                    <Field
+                      icon={<Stethoscope className="h-4 w-4" />}
+                      label="Pump Type"
+                      value={patient.pumpType ?? ""}
+                    />
+                  )}
+                </div>
+                {both && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <Field
+                      icon={<Stethoscope className="h-4 w-4" />}
+                      label="CGM Type"
+                      value={patient.cgmType ?? ""}
+                    />
+                    <Field
+                      icon={<Stethoscope className="h-4 w-4" />}
+                      label="Pump Type"
+                      value={patient.pumpType ?? ""}
+                    />
+                  </div>
+                )}
+              </>
+            );
+          })()}
+
+          {/* OOW Date + Malfunction — only show if either value exists */}
+          {(patient.oowDate || patient.malfunction) && (
+            <>
+              <div className="h-px bg-border" />
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <Field
-                  icon={<Stethoscope className="h-4 w-4" />}
-                  label="CGM Type"
-                  value={patient.cgmType ?? ""}
+                {patient.oowDate && (
+                  <Field
+                    icon={<Clock className="h-4 w-4" />}
+                    label="OOW Date"
+                    value={patient.oowDate}
+                  />
+                )}
+                {patient.malfunction && (
+                  <Field
+                    icon={<AlertTriangle className="h-4 w-4" />}
+                    label="Malfunction Reason"
+                    value={patient.malfunction}
+                  />
+                )}
+              </div>
+            </>
+          )}
+
+          {/* Doctor info */}
+          <div className="border-t pt-3">
+            {lockDoctorOpen ? (
+              <div className="flex items-center justify-between">
+                <p className="text-xs uppercase tracking-wider text-muted-foreground">
+                  Doctor Info
+                </p>
+                {editButton}
+              </div>
+            ) : (
+              <div className="flex items-center justify-between">
+                <button
+                  onClick={() => setDoctorOpen((o) => !o)}
+                  className="flex-1 flex items-center justify-between text-xs uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors gap-3"
+                >
+                  <span className="flex items-center gap-2">
+                    {doctorOpen ? (
+                      <ChevronDown className="h-3 w-3" />
+                    ) : (
+                      <ChevronRight className="h-3 w-3" />
+                    )}
+                    Doctor Info
+                  </span>
+                  {!doctorOpen && (
+                    <span className="flex items-center gap-3 text-[11px] normal-case text-foreground/70 truncate">
+                      <span className="inline-flex items-center gap-1 truncate">
+                        <UserRound className="h-3 w-3 shrink-0" />
+                        <span className="truncate">{patient.doctorName ?? "—"}</span>
+                      </span>
+                      <span className="inline-flex items-center gap-1">
+                        <Send className="h-3 w-3 shrink-0" />
+                        <span>{patient.clinicalsMethod ?? "—"}</span>
+                      </span>
+                    </span>
+                  )}
+                </button>
+                {doctorOpen && editButton}
+              </div>
+            )}
+
+            {(doctorOpen || lockDoctorOpen) && (
+              <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <EditableField
+                  icon={<UserRound className="h-4 w-4" />}
+                  label="Doctor Name"
+                  value={patient.doctorName ?? ""}
+                  editing={editingDoctor}
+                  onChange={(v) => onDoctorEdit?.({ doctorName: v })}
                 />
                 <Field
-                  icon={<Stethoscope className="h-4 w-4" />}
-                  label="Pump Type"
-                  value={patient.pumpType ?? ""}
+                  icon={<Send className="h-4 w-4" />}
+                  label="Clinicals Method"
+                  value={patient.clinicalsMethod ?? ""}
+                />
+                <EditableField
+                  icon={<Hash className="h-4 w-4" />}
+                  label="NPI"
+                  value={patient.doctorNpi ?? ""}
+                  editing={editingDoctor}
+                  onChange={(v) => onDoctorEdit?.({ doctorNpi: v })}
+                />
+                <EditableField
+                  icon={<Phone className="h-4 w-4" />}
+                  label="Phone"
+                  value={patient.doctorPhone ?? ""}
+                  editing={editingDoctor}
+                  onChange={(v) => onDoctorEdit?.({ doctorPhone: v })}
+                />
+                <EditableField
+                  icon={<Mail className="h-4 w-4" />}
+                  label="Fax"
+                  value={patient.doctorFax ?? ""}
+                  editing={editingDoctor}
+                  onChange={(v) => onDoctorEdit?.({ doctorFax: v })}
+                />
+                <EditableField
+                  icon={<Mail className="h-4 w-4" />}
+                  label="Email"
+                  value={patient.doctorEmail ?? ""}
+                  editing={editingDoctor}
+                  onChange={(v) => onDoctorEdit?.({ doctorEmail: v })}
+                />
+                <EditableField
+                  icon={<Building2 className="h-4 w-4" />}
+                  label="Clinic"
+                  value={patient.clinicName ?? ""}
+                  editing={editingDoctor}
+                  onChange={(v) => onDoctorEdit?.({ clinicName: v })}
+                  className="sm:col-span-2"
                 />
               </div>
             )}
-          </>
-        );
-      })()}
 
-      {/* OOW Date + Malfunction — only show if either value exists */}
-      {(patient.oowDate || patient.malfunction) && (
-        <>
-          <div className="h-px bg-border" />
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {patient.oowDate && (
-              <Field
-                icon={<Clock className="h-4 w-4" />}
-                label="OOW Date"
-                value={patient.oowDate}
-              />
-            )}
-            {patient.malfunction && (
-              <Field
-                icon={<AlertTriangle className="h-4 w-4" />}
-                label="Malfunction Reason"
-                value={patient.malfunction}
-              />
+            {/* Doctor-level notes from the Doctor Database */}
+            {(doctorOpen || lockDoctorOpen) && patient.doctorNpi && (
+              <div className="mt-3">
+                <DoctorNotesPanel doctorNpi={patient.doctorNpi} doctorName={patient.doctorName} compact />
+              </div>
             )}
           </div>
-        </>
-      )}
-
-      {/* Doctor info — collapsible by default, locked open on Chase Clinicals.
-         Pencil icon toggles inline editing (local overlay only).
-         Actual Monday write happens on Send to Monday / Save Attempt. */}
-      <div className="border-t pt-3">
-        {lockDoctorOpen ? (
-          <div className="flex items-center justify-between">
-            <p className="text-xs uppercase tracking-wider text-muted-foreground">
-              Doctor Info
-            </p>
-            {editButton}
-          </div>
-        ) : (
-          <div className="flex items-center justify-between">
-            <button
-              onClick={() => setDoctorOpen((o) => !o)}
-              className="flex-1 flex items-center justify-between text-xs uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors gap-3"
-            >
-              <span className="flex items-center gap-2">
-                {doctorOpen ? (
-                  <ChevronDown className="h-3 w-3" />
-                ) : (
-                  <ChevronRight className="h-3 w-3" />
-                )}
-                Doctor Info
-              </span>
-              {!doctorOpen && (
-                <span className="flex items-center gap-3 text-[11px] normal-case text-foreground/70 truncate">
-                  <span className="inline-flex items-center gap-1 truncate">
-                    <UserRound className="h-3 w-3 shrink-0" />
-                    <span className="truncate">{patient.doctorName ?? "—"}</span>
-                  </span>
-                  <span className="inline-flex items-center gap-1">
-                    <Send className="h-3 w-3 shrink-0" />
-                    <span>{patient.clinicalsMethod ?? "—"}</span>
-                  </span>
-                </span>
-              )}
-            </button>
-            {doctorOpen && editButton}
-          </div>
-        )}
-
-        {(doctorOpen || lockDoctorOpen) && (
-          <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <EditableField
-              icon={<UserRound className="h-4 w-4" />}
-              label="Doctor Name"
-              value={patient.doctorName ?? ""}
-              editing={editingDoctor}
-              onChange={(v) => onDoctorEdit?.({ doctorName: v })}
-            />
-            <Field
-              icon={<Send className="h-4 w-4" />}
-              label="Clinicals Method"
-              value={patient.clinicalsMethod ?? ""}
-            />
-            <EditableField
-              icon={<Hash className="h-4 w-4" />}
-              label="NPI"
-              value={patient.doctorNpi ?? ""}
-              editing={editingDoctor}
-              onChange={(v) => onDoctorEdit?.({ doctorNpi: v })}
-            />
-            <EditableField
-              icon={<Phone className="h-4 w-4" />}
-              label="Phone"
-              value={patient.doctorPhone ?? ""}
-              editing={editingDoctor}
-              onChange={(v) => onDoctorEdit?.({ doctorPhone: v })}
-            />
-            <EditableField
-              icon={<Mail className="h-4 w-4" />}
-              label="Fax"
-              value={patient.doctorFax ?? ""}
-              editing={editingDoctor}
-              onChange={(v) => onDoctorEdit?.({ doctorFax: v })}
-            />
-            <EditableField
-              icon={<Mail className="h-4 w-4" />}
-              label="Email"
-              value={patient.doctorEmail ?? ""}
-              editing={editingDoctor}
-              onChange={(v) => onDoctorEdit?.({ doctorEmail: v })}
-            />
-            <EditableField
-              icon={<Building2 className="h-4 w-4" />}
-              label="Clinic"
-              value={patient.clinicName ?? ""}
-              editing={editingDoctor}
-              onChange={(v) => onDoctorEdit?.({ clinicName: v })}
-              className="sm:col-span-2"
-            />
-          </div>
-        )}
-
-        {/* Doctor-level notes from the Doctor Database */}
-        {(doctorOpen || lockDoctorOpen) && patient.doctorNpi && (
-          <div className="mt-3">
-            <DoctorNotesPanel doctorNpi={patient.doctorNpi} doctorName={patient.doctorName} compact />
-          </div>
-        )}
-      </div>
+        </div>
+      </CollapsiblePanel>
 
       {/* Profile Intake Notes Modal */}
       {notesOpen && (

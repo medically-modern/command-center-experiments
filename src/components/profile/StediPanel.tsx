@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { StepSection } from "@/components/shared/StepSection";
 import type { Patient } from "@/lib/profile/workflow";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -326,18 +327,8 @@ export function StediPanel({ patient, onRefresh, onUpdate, onNext, onRemoveOverl
 
   return (
     <div className="space-y-5">
-      {/* Step A: Insurance Input + Run Stedi */}
-      <Card className="shadow-card">
-        <CardHeader className="pb-3">
-          <div className="flex items-start justify-between gap-3 flex-wrap">
-            <div>
-              <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-semibold">Step 1</p>
-              <CardTitle className="text-lg font-bold text-emerald-700">Benefits Information — Run Stedi Check</CardTitle>
-            </div>
-            <ClinicalsDownloadButton itemId={patient.id} />
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-5">
+      <StepSection step={1} title="Insurance Inputs" hint="Set insurance, member IDs, then run Stedi" rightAccessory={<ClinicalsDownloadButton itemId={patient.id} />}>
+        <div className="space-y-5">
           {/* General Insurance + Member IDs + Stedi button */}
           <div className="grid grid-cols-1 md:grid-cols-[1fr_140px_140px_auto] gap-4 items-end">
             <div className="space-y-1.5">
@@ -512,8 +503,8 @@ export function StediPanel({ patient, onRefresh, onUpdate, onNext, onRemoveOverl
               </Select>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </StepSection>
 
       {/* While Stedi is still populating, show a single waiting card so
           eligibility results never appear field-by-field. */}
@@ -556,32 +547,19 @@ export function StediPanel({ patient, onRefresh, onUpdate, onNext, onRemoveOverl
         </Card>
       )}
 
-      {/* Eligibility Results — always visible */}
-      <Card className="shadow-card">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base flex items-center gap-2">
-            {isStediFailed ? (
-              <AlertTriangle className="h-4 w-4 text-red-500" />
-            ) : stediIsComplete ? (
-              <CheckCircle2 className="h-4 w-4 text-green-500" />
-            ) : null}
-            Eligibility Results
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
-            {ALWAYS_FIELDS.map(({ key, label }) => (
-              <ResultRow
-                key={key}
-                label={label}
-                value={patient[key] as string}
-                isError={key === "stediErrorDescription"}
-                alwaysShow
-              />
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      <StepSection step={2} title="Eligibility Results" complete={hasStediData}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
+          {ALWAYS_FIELDS.map(({ key, label }) => (
+            <ResultRow
+              key={key}
+              label={label}
+              value={patient[key] as string}
+              isError={key === "stediErrorDescription"}
+              alwaysShow
+            />
+          ))}
+        </div>
+      </StepSection>
 
       {/* Medicare-only fields */}
       {isMedicare && (
@@ -615,31 +593,19 @@ export function StediPanel({ patient, onRefresh, onUpdate, onNext, onRemoveOverl
         </Card>
       )}
 
-      {/* Cost Sharing section — always visible */}
-      <Card className="shadow-card">
-        <CardHeader className="pb-3">
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <div>
-              <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-semibold">Step 2</p>
-              <CardTitle className="text-base">Verify Cost Sharing Info</CardTitle>
-              <p className="text-xs text-muted-foreground mt-1">
-                Defaults pulled from {costSharingMode === "family" ? "family" : "individual"} amounts. All values are editable.
-              </p>
-            </div>
-            <ToggleGroup
-              type="single"
-              value={costSharingMode}
-              onValueChange={(v) => v && setCostSharingMode(v as "individual" | "family")}
-              size="sm"
-              variant="outline"
-              className="self-start"
-            >
-              <ToggleGroupItem value="individual" className="h-8 px-3 text-xs">Use Individual</ToggleGroupItem>
-              <ToggleGroupItem value="family" className="h-8 px-3 text-xs">Use Family</ToggleGroupItem>
-            </ToggleGroup>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-5">
+      <StepSection step={3} title="Cost Sharing" hint="Editable deductible, copay & coinsurance" rightAccessory={
+          <ToggleGroup
+            type="single"
+            value={costSharingMode}
+            onValueChange={(v) => v && setCostSharingMode(v as "individual" | "family")}
+            size="sm"
+            variant="outline"
+          >
+            <ToggleGroupItem value="individual" className="h-8 px-3 text-xs">Use Individual</ToggleGroupItem>
+            <ToggleGroupItem value="family" className="h-8 px-3 text-xs">Use Family</ToggleGroupItem>
+          </ToggleGroup>
+        }>
+        <div className="space-y-5">
           {/* Editable working values — default source switches with the toggle */}
           {(() => {
             const isFamily = costSharingMode === "family";
@@ -725,8 +691,8 @@ export function StediPanel({ patient, onRefresh, onUpdate, onNext, onRemoveOverl
               <ResultRow label="OOP Max Remaining" value={fmtCurrency(patient.stediFamilyOopMaxRemaining)} />
             </div>
           </details>
-        </CardContent>
-      </Card>
+        </div>
+      </StepSection>
 
       {/* Next button → Serving tab */}
       {onNext && (

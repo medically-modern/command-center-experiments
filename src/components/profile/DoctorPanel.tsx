@@ -1,4 +1,5 @@
 import { useState, useMemo, useRef, useEffect } from "react";
+import { StepSection } from "@/components/shared/StepSection";
 import type { Patient } from "@/lib/profile/workflow";
 import { AddressAutocomplete } from "@/components/profile/AddressAutocomplete";
 import { hasValidZip } from "@/lib/profile/workflow";
@@ -59,13 +60,10 @@ export function DoctorPanel({ patient, onUpdate, clinicLabels, onClinicSelect, o
   };
 
   return (
-    <Card className="shadow-card">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-lg font-bold text-emerald-700">Prescribing Provider &amp; Clinic Information</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-5">
+    <div className="space-y-5">
+      <StepSection step={1} title="Doctor Information" hint="Doctor status, contact details & clinicals method">
         {patient.prescriberRequirements?.trim() && (
-          <div className="rounded-md border border-amber-300 bg-amber-50 px-4 py-3">
+          <div className="rounded-md border border-amber-300 bg-amber-50 px-4 py-3 mb-4">
             <p className="text-sm font-semibold text-amber-800 mb-1 flex items-center gap-1.5">
               <AlertTriangle className="h-4 w-4" />
               Prescriber Requirements
@@ -169,7 +167,16 @@ export function DoctorPanel({ patient, onUpdate, clinicLabels, onClinicSelect, o
               }
             />
           </div>
+        </div>
 
+        {/* Doctor-level notes from the Doctor Database */}
+        <div className="mt-5">
+          <DoctorNotesPanel doctorNpi={patient.doctorNpi} doctorName={patient.doctorName} />
+        </div>
+      </StepSection>
+
+      <StepSection step={2} title="Clinic" hint="Clinic name and address">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {/* Clinic Name — searchable combobox */}
           <div className="space-y-1.5 relative" ref={dropdownRef}>
             <Label className="flex items-center justify-between">
@@ -233,7 +240,7 @@ export function DoctorPanel({ patient, onUpdate, clinicLabels, onClinicSelect, o
           </div>
 
           {/* Clinic Address — with zip validation */}
-          <div className="space-y-1.5 md:col-span-2">
+          <div className="space-y-1.5">
             <Label className="flex items-center gap-2">
               Clinic Address
               {!zipValid && (
@@ -254,10 +261,7 @@ export function DoctorPanel({ patient, onUpdate, clinicLabels, onClinicSelect, o
             />
           </div>
         </div>
-
-        {/* Doctor-level notes from the Doctor Database */}
-        <DoctorNotesPanel doctorNpi={patient.doctorNpi} doctorName={patient.doctorName} />
-      </CardContent>
-    </Card>
+      </StepSection>
+    </div>
   );
 }

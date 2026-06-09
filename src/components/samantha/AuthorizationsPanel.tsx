@@ -21,6 +21,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { CalendarDays, Package, Repeat, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ClinicalsDownloadButton } from "./ClinicalsDownloadButton";
+import { StepSection } from "@/components/shared/StepSection";
 
 interface Props {
   patient: Patient;
@@ -70,78 +71,106 @@ export function AuthorizationsPanel({ patient, onCodeChange, onNotesChange, onSa
         <ClinicalsDownloadButton itemId={patient.id} />
       </div>
 
-      {!dropdownsReady && (
-        <div className="rounded-lg border border-dashed bg-muted/20 p-8 text-center">
-          <p className="text-sm text-muted-foreground">
-            Select Serving and Primary Insurance on the Benefits tab to load auth-eligible products.
-          </p>
-        </div>
-      )}
-
-      {dropdownsReady && (
-        <AuthRequirementsMatrix
-          resolved={resolved}
-          medicaidProducts={new Set(resolved.filter(isAutoFilledMedicaidSupply).map((r) => r.product))}
-          ins={ins}
-        />
-      )}
-
-      {dropdownsReady && authRequired.length === 0 && (
-        <div className="rounded-lg border border-dashed bg-muted/20 p-8 text-center">
-          <p className="text-sm text-muted-foreground">
-            Set a product above to <span className="font-semibold">Required</span> to track its
-            submission and outstanding approval below.
-          </p>
-        </div>
-      )}
-
-      {dropdownsReady && authRequired.length > 0 && (() => {
-        // Carecentrix Intake ID is shared across all auth-required products —
-        // there's only ever one ID per patient. Derive the shared value once
-        // from the first non-empty intakeId, and provide a setter that fans
-        // the change out to every auth-required product so they stay in sync.
-        const sharedIntakeId =
-          authRequired
-            .map((r) => ins.codes[PRODUCT_TO_CODE_ID[r.product]]?.intakeId)
-            .find((v) => !!v) ?? "";
-        const setIntakeIdForAll = (value: string) => {
-          for (const r of authRequired) {
-            onCodeChange(PRODUCT_TO_CODE_ID[r.product], { intakeId: value });
-          }
-        };
-
-        return (
-          <div className="space-y-4">
-            {authRequired.map((r) => {
-              const codeId = PRODUCT_TO_CODE_ID[r.product];
-              const meta = PRODUCT_CODES.find((c) => c.id === codeId);
-              if (!meta) return null;
-              const state = ins.codes[codeId] ?? { status: "pending" as const };
-              return (
-                <ProductAuthBlock
-                  key={codeId}
-                  meta={meta}
-                  resolved={r}
-                  state={state}
-                  onChange={(patch) => onCodeChange(codeId, patch)}
-                  primaryInsurance={primaryInsurance}
-                  sharedIntakeId={sharedIntakeId}
-                  onSharedIntakeIdChange={setIntakeIdForAll}
-                />
-              );
-            })}
+      {/* STEP 1 — Review Auth Matrix */}
+      <StepSection
+        step={1}
+        title="Review Auth Matrix"
+        hint="Read-only auth status pulled from the Monday board."
+      >
+        {!dropdownsReady && (
+          <div className="rounded-lg border border-dashed bg-muted/20 p-8 text-center">
+            <p className="text-sm text-muted-foreground">
+              Select Serving and Primary Insurance on the Benefits tab to load auth-eligible products.
+            </p>
           </div>
-        );
-      })()}
+        )}
 
-      {/* Notes — same Call Reference Notes column as the Benefits tab. */}
-      <NotesPanel
-        notes={patient.notes}
-        onNotesChange={onNotesChange}
-        onSaveToMonday={onSaveNotesToMonday}
-        description="Carries over from the Benefits tab. Add anything new from the auth submission step."
-        placeholder="Auth submission notes, confirmation numbers, any rep feedback…"
-      />
+        {dropdownsReady && (
+          <AuthRequirementsMatrix
+            resolved={resolved}
+            medicaidProducts={new Set(resolved.filter(isAutoFilledMedicaidSupply).map((r) => r.product))}
+            ins={ins}
+          />
+        )}
+      </StepSection>
+
+      {/* STEP 2 — Submit Authorizations */}
+      <StepSection
+        step={2}
+        title="Submit Authorizations"
+        hint="For each required product, enter submission method, dates, and IDs."
+      >
+        {dropdownsReady && authRequired.length === 0 && (
+          <div className="rounded-lg border border-dashed bg-muted/20 p-8 text-center">
+            <p className="text-sm text-muted-foreground">
+              Set a product above to <span className="font-semibold">Required</span> to track its
+              submission and outstanding approval below.
+            </p>
+          </div>
+        )}
+
+        {!dropdownsReady && (
+          <div className="rounded-lg border border-dashed bg-muted/20 p-8 text-center">
+            <p className="text-sm text-muted-foreground">
+              Complete Step 1 first to see submission fields.
+            </p>
+          </div>
+        )}
+
+        {dropdownsReady && authRequired.length > 0 && (() => {
+          // Carecentrix Intake ID is shared across all auth-required products —
+          // there's only ever one ID per patient. Derive the shared value once
+          // from the first non-empty intakeId, and provide a setter that fans
+          // the change out to every auth-required product so they stay in sync.
+          const sharedIntakeId =
+            authRequired
+              .map((r) => ins.codes[PRODUCT_TO_CODE_ID[r.product]]?.intakeId)
+              .find((v) => !!v) ?? "";
+          const setIntakeIdForAll = (value: string) => {
+            for (const r of authRequired) {
+              onCodeChange(PRODUCT_TO_CODE_ID[r.product], { intakeId: value });
+            }
+          };
+
+          return (
+            <div className="space-y-4">
+              {authRequired.map((r) => {
+                const codeId = PRODUCT_TO_CODE_ID[r.product];
+                const meta = PRODUCT_CODES.find((c) => c.id === codeId);
+                if (!meta) return null;
+                const state = ins.codes[codeId] ?? { status: "pending" as const };
+                return (
+                  <ProductAuthBlock
+                    key={codeId}
+                    meta={meta}
+                    resolved={r}
+                    state={state}
+                    onChange={(patch) => onCodeChange(codeId, patch)}
+                    primaryInsurance={primaryInsurance}
+                    sharedIntakeId={sharedIntakeId}
+                    onSharedIntakeIdChange={setIntakeIdForAll}
+                  />
+                );
+              })}
+            </div>
+          );
+        })()}
+      </StepSection>
+
+      {/* STEP 3 — Notes */}
+      <StepSection
+        step={3}
+        title="Notes"
+        hint="Carries over from the Benefits tab. Add anything new from the auth submission step."
+      >
+        <NotesPanel
+          notes={patient.notes}
+          onNotesChange={onNotesChange}
+          onSaveToMonday={onSaveNotesToMonday}
+          description="Carries over from the Benefits tab. Add anything new from the auth submission step."
+          placeholder="Auth submission notes, confirmation numbers, any rep feedback..."
+        />
+      </StepSection>
     </section>
   );
 }

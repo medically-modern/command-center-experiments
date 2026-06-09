@@ -89,6 +89,7 @@ import {
   Send,
   ChevronRight,
 } from "lucide-react";
+import { StepSection } from "@/components/shared/StepSection";
 
 interface Props {
   patient: Patient;
@@ -464,7 +465,7 @@ export function EvaluatePanel({ patient, resetVersion = 0, onUpdate, onOpenForm 
   const anyYes = state.cgmScriptReceived === "Yes" || state.ipScriptReceived === "Yes" || state.mrReceived === "Yes";
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
       {/* Banner: Serving forces a path */}
       {!showCgm && !showIp && (
         <div className="rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
@@ -472,187 +473,195 @@ export function EvaluatePanel({ patient, resetVersion = 0, onUpdate, onOpenForm 
         </div>
       )}
 
-
-
-      {/* ── Quick Check ────────────────────────────────── */}
-      <SectionCard title="Quick Check">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-          {showCgm && (
-            <div className="space-y-3">
-              <ToggleField
-                label="CGM Script Received?"
-                value={state.cgmScriptReceived}
-                onChange={(v) => {
-                  update("cgmScriptReceived", v as YesNo);
-                  if (v === "No") update("cgmScriptValid", undefined);
-                }}
-              />
-              {state.cgmScriptReceived === "Yes" && (
+      <StepSection step={1} title="Quick Check" hint="Verify received documents">
+        <SectionCard title="Quick Check">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            {showCgm && (
+              <div className="space-y-3">
                 <ToggleField
-                  label="Valid?"
-                  optionA="Valid"
-                  optionB="Invalid"
-                  value={state.cgmScriptValid}
-                  onChange={(v) => update("cgmScriptValid", v as ValidInvalid)}
+                  label="CGM Script Received?"
+                  value={state.cgmScriptReceived}
+                  onChange={(v) => {
+                    update("cgmScriptReceived", v as YesNo);
+                    if (v === "No") update("cgmScriptValid", undefined);
+                  }}
                 />
-              )}
-            </div>
-          )}
-          {showIp && (
-            <div className="space-y-3">
-              <ToggleField
-                label="IP Script Received?"
-                value={state.ipScriptReceived}
-                onChange={(v) => {
-                  update("ipScriptReceived", v as YesNo);
-                  if (v === "No") update("ipScriptValid", undefined);
-                }}
-              />
-              {state.ipScriptReceived === "Yes" && (
-                <ToggleField
-                  label="Valid?"
-                  optionA="Valid"
-                  optionB="Invalid"
-                  value={state.ipScriptValid}
-                  onChange={(v) => update("ipScriptValid", v as ValidInvalid)}
-                />
-              )}
-            </div>
-          )}
-          <ToggleField
-            label="Clinicals Received?"
-            value={state.mrReceived}
-            onChange={(v) => setMrReceived(v as YesNo)}
-          />
-        </div>
-      </SectionCard>
-
-      {/* ── Diagnosis & Clinicals ───────────────────────── */}
-      <SectionCard title="Diagnosis & Clinicals" status={validity.sections.diagnosis.valid && validity.sections.mr.valid}>
-        <DiagnosisField
-          value={state.diagnosis}
-          onChange={(v) => setDiagnosis(v)}
-        />
-        {state.mrReceived === "Yes" && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 mt-4 pt-4 border-t border-border">
-            <DateField
-              label="Last Visit Date"
-              value={state.lastVisitDate}
-              onChange={(v) => setLastVisitDate(v)}
-            />
-            <MrExpiryField lastVisit={state.lastVisitDate} />
-          </div>
-        )}
-      </SectionCard>
-
-      {anyYes && (<>
-
-      {/* CGM block */}
-      {showCgm && (
-        <SectionCard
-          title="CGM"
-          status={validity.sections.cgm.shown ? validity.sections.cgm.valid : null}
-        >
-          <StatusSelect
-            label="CGM Coverage Path"
-            value={state.cgmCoveragePath}
-            options={CGM_COVERAGE_OPTS}
-            onChange={(v) => setCgmCoveragePath(v as CgmCoveragePath)}
-          />
-        </SectionCard>
-      )}
-
-      {/* IP block */}
-      {showIp && (
-        <SectionCard
-          title="Insulin Pump"
-          status={validity.sections.ip.shown ? validity.sections.ip.valid : null}
-        >
-          <div className="space-y-4">
-            <StatusSelect
-              label="Insulin Pump Coverage Path"
-              value={state.ipCoveragePath}
-              options={IP_PATH_OPTS}
-              onChange={(v) => setIpCoveragePath(v as IpPath)}
-            />
-            {state.ipCoveragePath && (
-              <IpCriteria state={state} patient={patient} update={update} />
+                {state.cgmScriptReceived === "Yes" && (
+                  <ToggleField
+                    label="Valid?"
+                    optionA="Valid"
+                    optionB="Invalid"
+                    value={state.cgmScriptValid}
+                    onChange={(v) => update("cgmScriptValid", v as ValidInvalid)}
+                  />
+                )}
+              </div>
             )}
+            {showIp && (
+              <div className="space-y-3">
+                <ToggleField
+                  label="IP Script Received?"
+                  value={state.ipScriptReceived}
+                  onChange={(v) => {
+                    update("ipScriptReceived", v as YesNo);
+                    if (v === "No") update("ipScriptValid", undefined);
+                  }}
+                />
+                {state.ipScriptReceived === "Yes" && (
+                  <ToggleField
+                    label="Valid?"
+                    optionA="Valid"
+                    optionB="Invalid"
+                    value={state.ipScriptValid}
+                    onChange={(v) => update("ipScriptValid", v as ValidInvalid)}
+                  />
+                )}
+              </div>
+            )}
+            <ToggleField
+              label="Clinicals Received?"
+              value={state.mrReceived}
+              onChange={(v) => setMrReceived(v as YesNo)}
+            />
           </div>
         </SectionCard>
-      )}
+      </StepSection>
 
-      {/* Clinical files (uploads) */}
-      <SectionCard title="Clinical Files">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <FileUploadCard
-            label="Clinical Files"
-            files={state.clinicalFiles ?? []}
-            mondayFiles={mondayFiles.clinicalFiles}
-            mondayLoading={mondayFiles.loading}
-            trackedFiles={clinicalUpload.files}
-            itemId={patient.id}
-            columnId={COL.clinicalFiles}
-            onRefetch={mondayFiles.refetch}
-            onAdd={(files) => update("clinicalFiles", [...(state.clinicalFiles ?? []), ...files])}
-            onAddRaw={(rawFiles) => {
-              // Upload immediately to Monday instead of batching
-              clinicalUpload.upload(patient.id, COL.clinicalFiles, rawFiles);
-            }}
-            onRemove={(idx) => {
-              const next = [...(state.clinicalFiles ?? [])];
-              next.splice(idx, 1);
-              update("clinicalFiles", next);
-            }}
+      <StepSection step={2} title="Diagnosis & Medical Necessity" hint="Diagnosis, last visit date, MR expiry">
+        <SectionCard title="Diagnosis & Clinicals" status={validity.sections.diagnosis.valid && validity.sections.mr.valid}>
+          <DiagnosisField
+            value={state.diagnosis}
+            onChange={(v) => setDiagnosis(v)}
           />
-          <FileUploadCard
-            label="Final Clinical Files"
-            files={state.finalClinicalFiles ?? []}
-            mondayFiles={mondayFiles.finalClinicals}
-            mondayLoading={mondayFiles.loading}
-            trackedFiles={finalClinicalUpload.files}
-            itemId={patient.id}
-            columnId={COL.finalClinicals}
-            onRefetch={mondayFiles.refetch}
-            onAdd={(files) =>
-              update("finalClinicalFiles", [...(state.finalClinicalFiles ?? []), ...files])
-            }
-            onAddRaw={(rawFiles) => {
-              // Upload immediately to Monday instead of batching
-              finalClinicalUpload.upload(patient.id, COL.finalClinicals, rawFiles);
-            }}
-            onRemove={(idx) => {
-              const next = [...(state.finalClinicalFiles ?? [])];
-              next.splice(idx, 1);
-              update("finalClinicalFiles", next);
-            }}
+          {state.mrReceived === "Yes" && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 mt-4 pt-4 border-t border-border">
+              <DateField
+                label="Last Visit Date"
+                value={state.lastVisitDate}
+                onChange={(v) => setLastVisitDate(v)}
+              />
+              <MrExpiryField lastVisit={state.lastVisitDate} />
+            </div>
+          )}
+        </SectionCard>
+      </StepSection>
+
+      <StepSection step={3} title="Coverage" hint="Coverage paths, CGM/IP blocks, OOW fields">
+        {anyYes && (<>
+          {/* CGM block */}
+          {showCgm && (
+            <SectionCard
+              title="CGM"
+              status={validity.sections.cgm.shown ? validity.sections.cgm.valid : null}
+            >
+              <StatusSelect
+                label="CGM Coverage Path"
+                value={state.cgmCoveragePath}
+                options={CGM_COVERAGE_OPTS}
+                onChange={(v) => setCgmCoveragePath(v as CgmCoveragePath)}
+              />
+            </SectionCard>
+          )}
+
+          {/* IP block */}
+          {showIp && (
+            <SectionCard
+              title="Insulin Pump"
+              status={validity.sections.ip.shown ? validity.sections.ip.valid : null}
+            >
+              <div className="space-y-4">
+                <StatusSelect
+                  label="Insulin Pump Coverage Path"
+                  value={state.ipCoveragePath}
+                  options={IP_PATH_OPTS}
+                  onChange={(v) => setIpCoveragePath(v as IpPath)}
+                />
+                {state.ipCoveragePath && (
+                  <IpCriteria state={state} patient={patient} update={update} />
+                )}
+              </div>
+            </SectionCard>
+          )}
+        </>)}
+      </StepSection>
+
+      <StepSection step={4} title="LMN & Files" hint="LMN status and file upload zones">
+        {anyYes && (
+          <SectionCard title="Clinical Files">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <FileUploadCard
+                label="Clinical Files"
+                files={state.clinicalFiles ?? []}
+                mondayFiles={mondayFiles.clinicalFiles}
+                mondayLoading={mondayFiles.loading}
+                trackedFiles={clinicalUpload.files}
+                itemId={patient.id}
+                columnId={COL.clinicalFiles}
+                onRefetch={mondayFiles.refetch}
+                onAdd={(files) => update("clinicalFiles", [...(state.clinicalFiles ?? []), ...files])}
+                onAddRaw={(rawFiles) => {
+                  // Upload immediately to Monday instead of batching
+                  clinicalUpload.upload(patient.id, COL.clinicalFiles, rawFiles);
+                }}
+                onRemove={(idx) => {
+                  const next = [...(state.clinicalFiles ?? [])];
+                  next.splice(idx, 1);
+                  update("clinicalFiles", next);
+                }}
+              />
+              <FileUploadCard
+                label="Final Clinical Files"
+                files={state.finalClinicalFiles ?? []}
+                mondayFiles={mondayFiles.finalClinicals}
+                mondayLoading={mondayFiles.loading}
+                trackedFiles={finalClinicalUpload.files}
+                itemId={patient.id}
+                columnId={COL.finalClinicals}
+                onRefetch={mondayFiles.refetch}
+                onAdd={(files) =>
+                  update("finalClinicalFiles", [...(state.finalClinicalFiles ?? []), ...files])
+                }
+                onAddRaw={(rawFiles) => {
+                  // Upload immediately to Monday instead of batching
+                  finalClinicalUpload.upload(patient.id, COL.finalClinicals, rawFiles);
+                }}
+                onRemove={(idx) => {
+                  const next = [...(state.finalClinicalFiles ?? [])];
+                  next.splice(idx, 1);
+                  update("finalClinicalFiles", next);
+                }}
+              />
+            </div>
+          </SectionCard>
+        )}
+      </StepSection>
+
+      <StepSection step={5} title="Review & Send" hint="Monday preview and send to Monday">
+        <div className="space-y-4">
+          {/* Notes */}
+          <NotesPanel
+            notes={patient.mnEvalNotes ?? ""}
+            onNotesChange={(v) => onUpdate({ mnEvalNotes: v })}
+            onSaveToMonday={(v) => writeLongText(patient.id, COL.mnEvalNotes, v)}
+          />
+
+          {/* Sticky validity / preview footer */}
+          <ValiditySummary
+            validity={validity}
+            preview={preview}
+            onSendToMonday={handleSendToMonday}
+            sending={sending}
+            state={state}
+            showCgm={showCgm}
+            showIp={showIp}
+            patient={patient}
+            escalated={escalated}
+            onToggleEscalate={() => setEscalated((v) => { const nv = !v; escalatedRef.current = nv; return nv; })}
+            onOpenForm={onOpenForm}
+            filesUploading={filesUploading}
           />
         </div>
-      </SectionCard>
-      </>)}
-
-      {/* Notes */}
-      <NotesPanel
-        notes={patient.mnEvalNotes ?? ""}
-        onNotesChange={(v) => onUpdate({ mnEvalNotes: v })}
-        onSaveToMonday={(v) => writeLongText(patient.id, COL.mnEvalNotes, v)}
-      />
-
-      {/* Sticky validity / preview footer */}
-      <ValiditySummary
-        validity={validity}
-        preview={preview}
-        onSendToMonday={handleSendToMonday}
-        sending={sending}
-        state={state}
-        showCgm={showCgm}
-        showIp={showIp}
-        patient={patient}
-        escalated={escalated}
-        onToggleEscalate={() => setEscalated((v) => { const nv = !v; escalatedRef.current = nv; return nv; })}
-        onOpenForm={onOpenForm}
-        filesUploading={filesUploading}
-      />
+      </StepSection>
     </div>
   );
 }

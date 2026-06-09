@@ -14,6 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { DoctorNotesPanel } from "@/components/shared/DoctorNotesPanel";
+import { CollapsiblePanel } from "@/components/shared/CollapsiblePanel";
 
 interface Props {
   patient: Patient;
@@ -514,179 +515,188 @@ export function PatientInfoCard({ patient, onFieldChange, onSavePhone, onSaveSec
         />
       </Card>
 
-      {/* Row 1: Referral/Product + SOS + Insurance */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <Card className="p-4">
-          <div className="grid grid-cols-2 gap-3">
-            <Field label="Referral Source" value={patient.referralSource} />
-            <Field label="Doctor Name" value={patient.doctorName} />
-            <Field label="Request Type" value={patient.requestType} />
-            <div>
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">
-                Serving
-              </p>
-              <Select
-                value={
-                  patient.servingIndexEdited !== null
-                    ? String(patient.servingIndexEdited)
-                    : patient.servingIndex !== null
-                      ? String(patient.servingIndex)
-                      : ""
+      {/* Always-visible: Serving, Primary Insurance, Doctor Name */}
+      <Card className="p-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div>
+            <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">
+              Serving
+            </p>
+            <Select
+              value={
+                patient.servingIndexEdited !== null
+                  ? String(patient.servingIndexEdited)
+                  : patient.servingIndex !== null
+                    ? String(patient.servingIndex)
+                    : ""
+              }
+              onValueChange={(value) => {
+                const option = SERVING_OPTIONS.find((o) => String(o.index) === value);
+                if (onFieldChange && option) {
+                  onFieldChange("servingEdited", option.label);
+                  onFieldChange("servingIndexEdited" as keyof Patient, option.index);
                 }
-                onValueChange={(value) => {
-                  const option = SERVING_OPTIONS.find((o) => String(o.index) === value);
-                  if (onFieldChange && option) {
-                    onFieldChange("servingEdited", option.label);
-                    onFieldChange("servingIndexEdited" as keyof Patient, option.index);
-                  }
-                }}
-              >
-                <SelectTrigger className="h-8 text-sm">
-                  <SelectValue placeholder="Select serving" />
-                </SelectTrigger>
-                <SelectContent>
-                  {SERVING_OPTIONS.map((opt) => (
-                    <SelectItem key={opt.index} value={String(opt.index)}>
-                      {opt.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {isCrossSell({ serving: patient.servingEdited ?? patient.serving, requestType: patient.requestType }) && (
-                <span className="inline-flex items-center rounded-full bg-amber-100 text-amber-800 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider border border-amber-300 mt-1">
-                  Cross Sell
-                </span>
+              }}
+            >
+              <SelectTrigger className="h-8 text-sm">
+                <SelectValue placeholder="Select serving" />
+              </SelectTrigger>
+              <SelectContent>
+                {SERVING_OPTIONS.map((opt) => (
+                  <SelectItem key={opt.index} value={String(opt.index)}>
+                    {opt.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {isCrossSell({ serving: patient.servingEdited ?? patient.serving, requestType: patient.requestType }) && (
+              <span className="inline-flex items-center rounded-full bg-amber-100 text-amber-800 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider border border-amber-300 mt-1">
+                Cross Sell
+              </span>
+            )}
+          </div>
+          <Field label="Primary Insurance" value={patient.primaryInsurance} />
+          <Field label="Doctor Name" value={patient.doctorName} />
+        </div>
+      </Card>
+
+      {/* Collapsible: everything else */}
+      <CollapsiblePanel title="More Details" defaultOpen={false}>
+        <div className="space-y-4">
+          {/* Referral/Product + Last Bill Dates + Insurance Details */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <Card className="p-4">
+              <div className="grid grid-cols-2 gap-3">
+                <Field label="Referral Source" value={patient.referralSource} />
+                <Field label="Request Type" value={patient.requestType} />
+              </div>
+
+              {/* Doctor-level notes from the Doctor Database */}
+              {patient.doctorNpi && (
+                <div className="mt-3">
+                  <DoctorNotesPanel doctorNpi={patient.doctorNpi} doctorName={patient.doctorName} compact />
+                </div>
               )}
-            </div>
+            </Card>
+
+            <Card className="p-4">
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-3">Last Bill Dates</p>
+              <div className="grid grid-cols-1 gap-3">
+                <OrderDateField label="CGM Last Bill Date" dateStr={patient.cgmLastBillDate} />
+                <OrderDateField label="Sensors Last Bill Date" dateStr={patient.sensorsLastBillDate} />
+                <OrderDateField label="IP Last Bill Date" dateStr={patient.ipLastBillDate} />
+                <OrderDateField label="Infusion Set Last Bill Date" dateStr={patient.infusionSetLastBillDate} />
+                <OrderDateField label="Cartridge Last Bill Date" dateStr={patient.cartridgeLastBillDate} />
+              </div>
+            </Card>
+
+            <Card className="p-4">
+              <div className="grid grid-cols-2 gap-3">
+                {/* Member ID 1 — read-only */}
+                <Field label="Member ID 1" value={patient.memberId1} />
+
+                {/* Secondary Insurance — always editable dropdown */}
+                <div>
+                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">
+                    Secondary Insurance
+                  </p>
+                  <Select
+                    value={
+                      patient.secondaryInsuranceEdited !== null
+                        ? String(
+                            SECONDARY_INSURANCE_OPTIONS.find(
+                              (o) => o.label === patient.secondaryInsuranceEdited
+                            )?.index ?? ""
+                          )
+                        : hasSecondaryInsurance
+                          ? String(
+                              SECONDARY_INSURANCE_OPTIONS.find(
+                                (o) => o.label === patient.secondaryInsurance
+                              )?.index ?? ""
+                            )
+                          : ""
+                    }
+                    onValueChange={(value) => {
+                      const option = SECONDARY_INSURANCE_OPTIONS.find(
+                        (o) => String(o.index) === value
+                      );
+                      if (option) {
+                        onFieldChange?.("secondaryInsuranceEdited", option.label);
+                        onFieldChange?.("secondaryInsuranceIndex", option.index);
+                      }
+                    }}
+                  >
+                    <SelectTrigger className="h-8 text-sm">
+                      <SelectValue placeholder="Select insurance" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {SECONDARY_INSURANCE_OPTIONS.map((opt) => (
+                        <SelectItem key={opt.index} value={String(opt.index)}>
+                          {opt.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {showMedicareSecondaryWarning && (
+                    <p className="text-xs text-red-600 font-semibold mt-1.5">
+                      Patient likely has a secondary insurance, ask on welcome call.
+                    </p>
+                  )}
+                  {showQmbWarning && (
+                    <p className="text-xs text-red-600 font-semibold mt-1">
+                      Stedi QMB returned YES — patient very likely has a secondary supplement plan.
+                    </p>
+                  )}
+                </div>
+
+                {/* Member ID 2 — always editable text input */}
+                <div>
+                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">
+                    Member ID 2
+                  </p>
+                  <Input
+                    className="h-8 text-sm"
+                    value={patient.memberId2Edited ?? patient.memberId2}
+                    onChange={(e) => {
+                      onFieldChange?.("memberId2Edited", e.target.value);
+                    }}
+                    placeholder="Enter member ID"
+                  />
+                </div>
+              </div>
+            </Card>
           </div>
 
-          {/* Doctor-level notes from the Doctor Database */}
-          {patient.doctorNpi && (
-            <div className="mt-3">
-              <DoctorNotesPanel doctorNpi={patient.doctorNpi} doctorName={patient.doctorName} compact />
-            </div>
-          )}
-        </Card>
-
-        <Card className="p-4">
-          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-3">Last Bill Dates</p>
-          <div className="grid grid-cols-1 gap-3">
-            <OrderDateField label="CGM Last Bill Date" dateStr={patient.cgmLastBillDate} />
-            <OrderDateField label="Sensors Last Bill Date" dateStr={patient.sensorsLastBillDate} />
-            <OrderDateField label="IP Last Bill Date" dateStr={patient.ipLastBillDate} />
-            <OrderDateField label="Infusion Set Last Bill Date" dateStr={patient.infusionSetLastBillDate} />
-            <OrderDateField label="Cartridge Last Bill Date" dateStr={patient.cartridgeLastBillDate} />
-          </div>
-        </Card>
-
-        <Card className="p-4">
-          <div className="grid grid-cols-2 gap-3">
-            {/* Primary Insurance — read-only */}
-            <Field label="Primary Insurance" value={patient.primaryInsurance} />
-
-            {/* Member ID 1 — read-only */}
-            <Field label="Member ID 1" value={patient.memberId1} />
-
-            {/* Secondary Insurance — always editable dropdown */}
-            <div>
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">
-                Secondary Insurance
-              </p>
-              <Select
-                value={
-                  patient.secondaryInsuranceEdited !== null
-                    ? String(
-                        SECONDARY_INSURANCE_OPTIONS.find(
-                          (o) => o.label === patient.secondaryInsuranceEdited
-                        )?.index ?? ""
-                      )
-                    : hasSecondaryInsurance
-                      ? String(
-                          SECONDARY_INSURANCE_OPTIONS.find(
-                            (o) => o.label === patient.secondaryInsurance
-                          )?.index ?? ""
-                        )
-                      : ""
-                }
-                onValueChange={(value) => {
-                  const option = SECONDARY_INSURANCE_OPTIONS.find(
-                    (o) => String(o.index) === value
-                  );
-                  if (option) {
-                    onFieldChange?.("secondaryInsuranceEdited", option.label);
-                    onFieldChange?.("secondaryInsuranceIndex", option.index);
-                  }
-                }}
-              >
-                <SelectTrigger className="h-8 text-sm">
-                  <SelectValue placeholder="Select insurance" />
-                </SelectTrigger>
-                <SelectContent>
-                  {SECONDARY_INSURANCE_OPTIONS.map((opt) => (
-                    <SelectItem key={opt.index} value={String(opt.index)}>
-                      {opt.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {showMedicareSecondaryWarning && (
-                <p className="text-xs text-red-600 font-semibold mt-1.5">
-                  Patient likely has a secondary insurance, ask on welcome call.
-                </p>
+          {/* Benefits + Auth Results */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <Card className="p-4">
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-3">Benefits</p>
+              <div className="grid grid-cols-2 gap-3">
+                <Field label="Deductible" value={fmtDollar(patient.deductible)} />
+                <Field label="Deductible Remaining" value={fmtDollar(patient.deductibleRemaining)} />
+                <Field label="Coinsurance %" value={fmtCoinsurance(patient.stediCoinsurance)} />
+                <Field label="OOP Max Remaining" value={fmtDollar(patient.oopMaxRemaining)} />
+              </div>
+              {!patient.deductible && !patient.deductibleRemaining && !patient.stediCoinsurance && !patient.oopMaxRemaining && (
+                <p className="text-sm text-muted-foreground italic">No benefits data yet.</p>
               )}
-              {showQmbWarning && (
-                <p className="text-xs text-red-600 font-semibold mt-1">
-                  Stedi QMB returned YES — patient very likely has a secondary supplement plan.
-                </p>
-              )}
-            </div>
+            </Card>
 
-            {/* Member ID 2 — always editable text input */}
-            <div>
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">
-                Member ID 2
-              </p>
-              <Input
-                className="h-8 text-sm"
-                value={patient.memberId2Edited ?? patient.memberId2}
-                onChange={(e) => {
-                  onFieldChange?.("memberId2Edited", e.target.value);
-                }}
-                placeholder="Enter member ID"
-              />
-            </div>
+            {(patient.cgmAuthResult || patient.sensorsAuthResult || patient.ipAuthResult || patient.infusionSetAuthResult || patient.cartridgeAuthResult) && (
+              <Card className="p-4">
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-3">Auth Results</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <Field label="CGM" value={patient.cgmAuthResult} />
+                  <Field label="Sensors" value={patient.sensorsAuthResult} />
+                  <Field label="Insulin Pump" value={patient.ipAuthResult} />
+                  <Field label="Infusion Set" value={patient.infusionSetAuthResult} />
+                  <Field label="Cartridge" value={patient.cartridgeAuthResult} />
+                </div>
+              </Card>
+            )}
           </div>
-        </Card>
-      </div>
-
-      {/* Row 2: Benefits + Auth Results */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <Card className="p-4">
-          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-3">Benefits</p>
-          <div className="grid grid-cols-2 gap-3">
-            <Field label="Deductible" value={fmtDollar(patient.deductible)} />
-            <Field label="Deductible Remaining" value={fmtDollar(patient.deductibleRemaining)} />
-            <Field label="Coinsurance %" value={fmtCoinsurance(patient.stediCoinsurance)} />
-            <Field label="OOP Max Remaining" value={fmtDollar(patient.oopMaxRemaining)} />
-          </div>
-          {!patient.deductible && !patient.deductibleRemaining && !patient.stediCoinsurance && !patient.oopMaxRemaining && (
-            <p className="text-sm text-muted-foreground italic">No benefits data yet.</p>
-          )}
-        </Card>
-
-        {(patient.cgmAuthResult || patient.sensorsAuthResult || patient.ipAuthResult || patient.infusionSetAuthResult || patient.cartridgeAuthResult) && (
-          <Card className="p-4">
-            <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-3">Auth Results</p>
-            <div className="grid grid-cols-2 gap-3">
-              <Field label="CGM" value={patient.cgmAuthResult} />
-              <Field label="Sensors" value={patient.sensorsAuthResult} />
-              <Field label="Insulin Pump" value={patient.ipAuthResult} />
-              <Field label="Infusion Set" value={patient.infusionSetAuthResult} />
-              <Field label="Cartridge" value={patient.cartridgeAuthResult} />
-            </div>
-          </Card>
-        )}
-      </div>
+        </div>
+      </CollapsiblePanel>
     </div>
   );
 }

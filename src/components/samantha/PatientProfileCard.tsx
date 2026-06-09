@@ -32,6 +32,7 @@ import {
   X,
 } from "lucide-react";
 import { DoctorNotesPanel } from "@/components/shared/DoctorNotesPanel";
+import { CollapsiblePanel } from "@/components/shared/CollapsiblePanel";
 
 interface Props {
   patient: Patient;
@@ -183,7 +184,7 @@ export function PatientProfileCard({ patient, onUpdate }: Props) {
         </div>
       </div>
 
-      {/* Row 1 */}
+      {/* Always-visible fields */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {editing ? (
           <EditableField
@@ -213,10 +214,7 @@ export function PatientProfileCard({ patient, onUpdate }: Props) {
           label="Serving"
           value={patient.serving ?? ""}
         />
-      </div>
 
-      {/* Row 1b — Patient Phone, Address, Pump Brand */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {editing ? (
           <EditableField
             icon={<Phone className="h-4 w-4" />}
@@ -232,40 +230,7 @@ export function PatientProfileCard({ patient, onUpdate }: Props) {
             value={formatPhone(patient.patientPhone ?? "")}
           />
         )}
-        {editing ? (
-          <EditableField
-            icon={<MapPin className="h-4 w-4" />}
-            label="Patient Address"
-            value={patient.patientAddress ?? ""}
-            onChange={(v) => patch({ patientAddress: v })}
-            className="sm:col-span-2"
-          />
-        ) : (
-          <Field
-            icon={<MapPin className="h-4 w-4" />}
-            label="Patient Address"
-            value={patient.patientAddress ?? ""}
-            className="sm:col-span-2"
-          />
-        )}
-      </div>
 
-      {/* Row 1c — Pump Type (visible when serving includes Pump or Supplies) */}
-      {hasPumpOrSupplies && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <Field
-            icon={<Cpu className="h-4 w-4" />}
-            label="Pump Type"
-            value={patient.pumpBrand ?? ""}
-          />
-        </div>
-      )}
-
-      {/* Divider */}
-      <div className="h-px bg-border" />
-
-      {/* Row 2 */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {/* Primary Insurance — editable via pencil toggle */}
         {editing ? (
           <div className="flex items-start gap-2 min-w-0">
@@ -296,195 +261,232 @@ export function PatientProfileCard({ patient, onUpdate }: Props) {
         ) : (
           <Field icon={<ShieldCheck className="h-4 w-4" />} label="Primary Insurance" value={patient.primaryInsurance ?? ""} />
         )}
+      </div>
 
-        {editing ? (
-          <EditableField
-            icon={<IdCard className="h-4 w-4" />}
-            label="Member ID"
-            value={patient.memberId1 ?? ""}
-            onChange={(v) => patch({ memberId1: v })}
-          />
-        ) : (
-          <Field icon={<IdCard className="h-4 w-4" />} label="Member ID" value={patient.memberId1 ?? ""} />
-        )}
-
-        {editing ? (
-          <EditableField
-            icon={<Activity className="h-4 w-4" />}
-            label="Diagnosis"
-            value={patient.diagnosis ?? ""}
-            onChange={(v) => patch({ diagnosis: v })}
-          />
-        ) : (
-          <Field icon={<Activity className="h-4 w-4" />} label="Diagnosis" value={patient.diagnosis ?? ""} />
-        )}
-
-        {/* Secondary Insurance — always editable dropdown */}
-        <div className="flex items-start gap-2 min-w-0">
-          <div className="h-8 w-8 rounded-md bg-muted flex items-center justify-center text-muted-foreground shrink-0 mt-1">
-            <ShieldCheck className="h-4 w-4" />
+      {/* Collapsible details */}
+      <CollapsiblePanel title="More Details" defaultOpen={false}>
+        <div className="space-y-4">
+          {/* Address + Pump Type */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {editing ? (
+              <EditableField
+                icon={<MapPin className="h-4 w-4" />}
+                label="Patient Address"
+                value={patient.patientAddress ?? ""}
+                onChange={(v) => patch({ patientAddress: v })}
+                className="sm:col-span-2"
+              />
+            ) : (
+              <Field
+                icon={<MapPin className="h-4 w-4" />}
+                label="Patient Address"
+                value={patient.patientAddress ?? ""}
+                className="sm:col-span-2"
+              />
+            )}
+            {hasPumpOrSupplies && (
+              <Field
+                icon={<Cpu className="h-4 w-4" />}
+                label="Pump Type"
+                value={patient.pumpBrand ?? ""}
+              />
+            )}
           </div>
-          <div className="min-w-0 flex-1">
-            <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
-              Secondary Insurance
-            </p>
-            <Select
-              value={patient.secondaryInsurance ?? ""}
-              onValueChange={(v) => patch({ secondaryInsurance: v })}
-            >
-              <SelectTrigger className="h-7 text-sm mt-0.5">
-                <SelectValue placeholder="Select insurance" />
-              </SelectTrigger>
-              <SelectContent>
-                {SECONDARY_INSURANCE_OPTIONS_SAMANTHA.map((opt) => (
-                  <SelectItem key={opt} value={opt}>
-                    {opt}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
 
-        {/* Member ID 2 — always editable */}
-        <EditableField
-          icon={<IdCard className="h-4 w-4" />}
-          label="Member ID 2"
-          value={patient.memberId2 ?? ""}
-          onChange={(v) => patch({ memberId2: v })}
-        />
+          <div className="h-px bg-border" />
 
-        <Field
-          icon={<Stethoscope className="h-4 w-4" />}
-          label="Referral Source"
-          value={patient.referralSource ?? ""}
-        />
+          {/* Insurance, IDs, diagnosis, referral */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {editing ? (
+              <EditableField
+                icon={<IdCard className="h-4 w-4" />}
+                label="Member ID"
+                value={patient.memberId1 ?? ""}
+                onChange={(v) => patch({ memberId1: v })}
+              />
+            ) : (
+              <Field icon={<IdCard className="h-4 w-4" />} label="Member ID" value={patient.memberId1 ?? ""} />
+            )}
 
-        {patient.referralSource === "CareCentrix" && (() => {
-          const isEmpty = !patient.carecentrixIntakeId;
-          return (
-            <div className={`flex items-start gap-2 min-w-0 rounded-lg p-1.5 -m-1.5 transition-colors ${isEmpty ? "bg-red-50 dark:bg-red-950/20 ring-1 ring-red-200 dark:ring-red-800/40" : ""}`}>
-              <div className={`h-8 w-8 rounded-md flex items-center justify-center shrink-0 mt-1 ${isEmpty ? "bg-red-100 dark:bg-red-900/30 text-red-500" : "bg-muted text-muted-foreground"}`}>
-                <IdCard className="h-4 w-4" />
+            {editing ? (
+              <EditableField
+                icon={<Activity className="h-4 w-4" />}
+                label="Diagnosis"
+                value={patient.diagnosis ?? ""}
+                onChange={(v) => patch({ diagnosis: v })}
+              />
+            ) : (
+              <Field icon={<Activity className="h-4 w-4" />} label="Diagnosis" value={patient.diagnosis ?? ""} />
+            )}
+
+            {/* Secondary Insurance — always editable dropdown */}
+            <div className="flex items-start gap-2 min-w-0">
+              <div className="h-8 w-8 rounded-md bg-muted flex items-center justify-center text-muted-foreground shrink-0 mt-1">
+                <ShieldCheck className="h-4 w-4" />
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
-                  Carecentrix Intake I.D.
+                  Secondary Insurance
                 </p>
-                <Input
-                  value={patient.carecentrixIntakeId ?? ""}
-                  onChange={(e) => patch({ carecentrixIntakeId: e.target.value })}
-                  placeholder="Enter Carecentrix Intake I.D."
-                  className={`h-7 text-sm mt-0.5 ${isEmpty ? "border-red-300 dark:border-red-700" : ""}`}
-                />
+                <Select
+                  value={patient.secondaryInsurance ?? ""}
+                  onValueChange={(v) => patch({ secondaryInsurance: v })}
+                >
+                  <SelectTrigger className="h-7 text-sm mt-0.5">
+                    <SelectValue placeholder="Select insurance" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {SECONDARY_INSURANCE_OPTIONS_SAMANTHA.map((opt) => (
+                      <SelectItem key={opt} value={opt}>
+                        {opt}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
-          );
-        })()}
-      </div>
 
-      {/* Doctor info — collapsible */}
-      <div className="border-t pt-3">
-        <div className="flex items-center justify-between">
-          <button
-            onClick={() => setDoctorOpen((o) => !o)}
-            className="flex-1 flex items-center justify-between text-xs uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors gap-3"
-          >
-            <span className="flex items-center gap-2">
-              {doctorOpen ? (
-                <ChevronDown className="h-3 w-3" />
-              ) : (
-                <ChevronRight className="h-3 w-3" />
-              )}
-              Doctor Info
-            </span>
-            {!doctorOpen && (
-              <span className="flex items-center gap-3 text-[11px] normal-case text-foreground/70 truncate">
-                <span className="inline-flex items-center gap-1 truncate">
-                  <UserRound className="h-3 w-3 shrink-0" />
-                  <span className="truncate">{patient.doctorName || "—"}</span>
-                </span>
-                <span className="inline-flex items-center gap-1">
-                  <Send className="h-3 w-3 shrink-0" />
-                  <span>{patient.clinicalsMethod || "—"}</span>
-                </span>
-              </span>
-            )}
-          </button>
-        </div>
+            {/* Member ID 2 — always editable */}
+            <EditableField
+              icon={<IdCard className="h-4 w-4" />}
+              label="Member ID 2"
+              value={patient.memberId2 ?? ""}
+              onChange={(v) => patch({ memberId2: v })}
+            />
 
-        {doctorOpen && !editing && (
-          <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Field icon={<UserRound className="h-4 w-4" />} label="Doctor Name" value={patient.doctorName ?? ""} />
-            <Field icon={<Send className="h-4 w-4" />} label="Clinicals Method" value={patient.clinicalsMethod ?? ""} />
-            <Field icon={<Hash className="h-4 w-4" />} label="NPI" value={patient.doctorNpi ?? ""} />
-            <Field icon={<Phone className="h-4 w-4" />} label="Phone" value={patient.doctorPhone ?? ""} />
-            <Field icon={<Mail className="h-4 w-4" />} label="Fax" value={patient.doctorFax ?? ""} />
-            <Field icon={<Mail className="h-4 w-4" />} label="Email" value={patient.doctorEmail ?? ""} />
             <Field
-              icon={<Building2 className="h-4 w-4" />}
-              label="Clinic"
-              value={patient.clinicName ?? ""}
-              className="sm:col-span-2"
+              icon={<Stethoscope className="h-4 w-4" />}
+              label="Referral Source"
+              value={patient.referralSource ?? ""}
             />
-          </div>
-        )}
 
-        {doctorOpen && editing && (
-          <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <EditableField
-              icon={<UserRound className="h-4 w-4" />}
-              label="Doctor Name"
-              value={patient.doctorName ?? ""}
-              onChange={(v) => patch({ doctorName: v })}
-            />
-            <EditableField
-              icon={<Send className="h-4 w-4" />}
-              label="Clinicals Method"
-              value={patient.clinicalsMethod ?? ""}
-              onChange={(v) => patch({ clinicalsMethod: v })}
-            />
-            <EditableField
-              icon={<Hash className="h-4 w-4" />}
-              label="NPI"
-              value={patient.doctorNpi ?? ""}
-              onChange={(v) => patch({ doctorNpi: v })}
-            />
-            <EditableField
-              icon={<Phone className="h-4 w-4" />}
-              label="Phone"
-              value={patient.doctorPhone ?? ""}
-              onChange={(v) => patch({ doctorPhone: v })}
-            />
-            <EditableField
-              icon={<Mail className="h-4 w-4" />}
-              label="Fax"
-              value={patient.doctorFax ?? ""}
-              onChange={(v) => patch({ doctorFax: v })}
-            />
-            <EditableField
-              icon={<Mail className="h-4 w-4" />}
-              label="Email"
-              value={patient.doctorEmail ?? ""}
-              onChange={(v) => patch({ doctorEmail: v })}
-            />
-            <EditableField
-              icon={<Building2 className="h-4 w-4" />}
-              label="Clinic"
-              value={patient.clinicName ?? ""}
-              onChange={(v) => patch({ clinicName: v })}
-              className="sm:col-span-2"
-            />
+            {patient.referralSource === "CareCentrix" && (() => {
+              const isEmpty = !patient.carecentrixIntakeId;
+              return (
+                <div className={`flex items-start gap-2 min-w-0 rounded-lg p-1.5 -m-1.5 transition-colors ${isEmpty ? "bg-red-50 dark:bg-red-950/20 ring-1 ring-red-200 dark:ring-red-800/40" : ""}`}>
+                  <div className={`h-8 w-8 rounded-md flex items-center justify-center shrink-0 mt-1 ${isEmpty ? "bg-red-100 dark:bg-red-900/30 text-red-500" : "bg-muted text-muted-foreground"}`}>
+                    <IdCard className="h-4 w-4" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
+                      Carecentrix Intake I.D.
+                    </p>
+                    <Input
+                      value={patient.carecentrixIntakeId ?? ""}
+                      onChange={(e) => patch({ carecentrixIntakeId: e.target.value })}
+                      placeholder="Enter Carecentrix Intake I.D."
+                      className={`h-7 text-sm mt-0.5 ${isEmpty ? "border-red-300 dark:border-red-700" : ""}`}
+                    />
+                  </div>
+                </div>
+              );
+            })()}
           </div>
-        )}
 
-        {/* Doctor-level notes from the Doctor Database */}
-        {doctorOpen && patient.doctorNpi && (
-          <div className="mt-3">
-            <DoctorNotesPanel doctorNpi={patient.doctorNpi} doctorName={patient.doctorName} compact />
+          {/* Doctor info — collapsible */}
+          <div className="border-t pt-3">
+            <div className="flex items-center justify-between">
+              <button
+                onClick={() => setDoctorOpen((o) => !o)}
+                className="flex-1 flex items-center justify-between text-xs uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors gap-3"
+              >
+                <span className="flex items-center gap-2">
+                  {doctorOpen ? (
+                    <ChevronDown className="h-3 w-3" />
+                  ) : (
+                    <ChevronRight className="h-3 w-3" />
+                  )}
+                  Doctor Info
+                </span>
+                {!doctorOpen && (
+                  <span className="flex items-center gap-3 text-[11px] normal-case text-foreground/70 truncate">
+                    <span className="inline-flex items-center gap-1 truncate">
+                      <UserRound className="h-3 w-3 shrink-0" />
+                      <span className="truncate">{patient.doctorName || "—"}</span>
+                    </span>
+                    <span className="inline-flex items-center gap-1">
+                      <Send className="h-3 w-3 shrink-0" />
+                      <span>{patient.clinicalsMethod || "—"}</span>
+                    </span>
+                  </span>
+                )}
+              </button>
+            </div>
+
+            {doctorOpen && !editing && (
+              <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <Field icon={<UserRound className="h-4 w-4" />} label="Doctor Name" value={patient.doctorName ?? ""} />
+                <Field icon={<Send className="h-4 w-4" />} label="Clinicals Method" value={patient.clinicalsMethod ?? ""} />
+                <Field icon={<Hash className="h-4 w-4" />} label="NPI" value={patient.doctorNpi ?? ""} />
+                <Field icon={<Phone className="h-4 w-4" />} label="Phone" value={patient.doctorPhone ?? ""} />
+                <Field icon={<Mail className="h-4 w-4" />} label="Fax" value={patient.doctorFax ?? ""} />
+                <Field icon={<Mail className="h-4 w-4" />} label="Email" value={patient.doctorEmail ?? ""} />
+                <Field
+                  icon={<Building2 className="h-4 w-4" />}
+                  label="Clinic"
+                  value={patient.clinicName ?? ""}
+                  className="sm:col-span-2"
+                />
+              </div>
+            )}
+
+            {doctorOpen && editing && (
+              <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <EditableField
+                  icon={<UserRound className="h-4 w-4" />}
+                  label="Doctor Name"
+                  value={patient.doctorName ?? ""}
+                  onChange={(v) => patch({ doctorName: v })}
+                />
+                <EditableField
+                  icon={<Send className="h-4 w-4" />}
+                  label="Clinicals Method"
+                  value={patient.clinicalsMethod ?? ""}
+                  onChange={(v) => patch({ clinicalsMethod: v })}
+                />
+                <EditableField
+                  icon={<Hash className="h-4 w-4" />}
+                  label="NPI"
+                  value={patient.doctorNpi ?? ""}
+                  onChange={(v) => patch({ doctorNpi: v })}
+                />
+                <EditableField
+                  icon={<Phone className="h-4 w-4" />}
+                  label="Phone"
+                  value={patient.doctorPhone ?? ""}
+                  onChange={(v) => patch({ doctorPhone: v })}
+                />
+                <EditableField
+                  icon={<Mail className="h-4 w-4" />}
+                  label="Fax"
+                  value={patient.doctorFax ?? ""}
+                  onChange={(v) => patch({ doctorFax: v })}
+                />
+                <EditableField
+                  icon={<Mail className="h-4 w-4" />}
+                  label="Email"
+                  value={patient.doctorEmail ?? ""}
+                  onChange={(v) => patch({ doctorEmail: v })}
+                />
+                <EditableField
+                  icon={<Building2 className="h-4 w-4" />}
+                  label="Clinic"
+                  value={patient.clinicName ?? ""}
+                  onChange={(v) => patch({ clinicName: v })}
+                  className="sm:col-span-2"
+                />
+              </div>
+            )}
+
+            {/* Doctor-level notes from the Doctor Database */}
+            {doctorOpen && patient.doctorNpi && (
+              <div className="mt-3">
+                <DoctorNotesPanel doctorNpi={patient.doctorNpi} doctorName={patient.doctorName} compact />
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        </div>
+      </CollapsiblePanel>
 
       {/* Profile Intake Notes Modal */}
       {notesOpen && (

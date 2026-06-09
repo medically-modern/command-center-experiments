@@ -22,6 +22,7 @@ import { Package, Repeat, Send, Inbox, ShieldCheck, CalendarDays } from "lucide-
 import { cn } from "@/lib/utils";
 import { ClinicalsDownloadButton } from "./ClinicalsDownloadButton";
 import { FinalClinicalsUpload } from "./FinalClinicalsUpload";
+import { StepSection } from "@/components/shared/StepSection";
 
 interface Props {
   patient: Patient;
@@ -74,62 +75,87 @@ export function AuthOutstandingPanel({ patient, onCodeChange, onNotesChange, onS
         </div>
       </div>
 
-      {!dropdownsReady && (
-        <div className="rounded-lg border border-dashed bg-muted/20 p-8 text-center">
-          <p className="text-sm text-muted-foreground">
-            Select Serving and Primary Insurance on the Benefits tab to load auth-eligible products.
-          </p>
-        </div>
-      )}
+      {/* STEP 1 — Review Submissions */}
+      <StepSection
+        step={1}
+        title="Review Submissions"
+        hint="Auth matrix and submitted info from the Monday board (read-only)."
+      >
+        {!dropdownsReady && (
+          <div className="rounded-lg border border-dashed bg-muted/20 p-8 text-center">
+            <p className="text-sm text-muted-foreground">
+              Select Serving and Primary Insurance on the Benefits tab to load auth-eligible products.
+            </p>
+          </div>
+        )}
 
-      {dropdownsReady && (
-        <AuthRequirementsMatrix
-          resolved={resolved}
-          medicaidProducts={new Set(resolved.filter(isAutoFilledMedicaidSupply).map((r) => r.product))}
-          ins={ins}
+        {dropdownsReady && (
+          <AuthRequirementsMatrix
+            resolved={resolved}
+            medicaidProducts={new Set(resolved.filter(isAutoFilledMedicaidSupply).map((r) => r.product))}
+            ins={ins}
+          />
+        )}
+      </StepSection>
+
+      {/* STEP 2 — Update Outstanding */}
+      <StepSection
+        step={2}
+        title="Update Outstanding"
+        hint="Enter approval details for each required product — auth result, ID, dates, units."
+      >
+        {dropdownsReady && authRequired.length === 0 && (
+          <div className="rounded-lg border border-dashed bg-muted/20 p-8 text-center">
+            <p className="text-sm text-muted-foreground">
+              No products with auth required found.
+            </p>
+          </div>
+        )}
+
+        {!dropdownsReady && (
+          <div className="rounded-lg border border-dashed bg-muted/20 p-8 text-center">
+            <p className="text-sm text-muted-foreground">
+              Complete Step 1 first to see outstanding fields.
+            </p>
+          </div>
+        )}
+
+        {dropdownsReady && authRequired.length > 0 && (
+          <div className="space-y-4">
+            {authRequired.map((r) => {
+              const codeId = PRODUCT_TO_CODE_ID[r.product];
+              const meta = PRODUCT_CODES.find((c) => c.id === codeId);
+              if (!meta) return null;
+              const state = ins.codes[codeId] ?? { status: "pending" as const };
+              return (
+                <ProductAuthBlock
+                  key={codeId}
+                  meta={meta}
+                  resolved={r}
+                  state={state}
+                  onChange={(patch) => onCodeChange(codeId, patch)}
+                  primaryInsurance={primaryInsurance}
+                />
+              );
+            })}
+          </div>
+        )}
+      </StepSection>
+
+      {/* STEP 3 — Notes & Status */}
+      <StepSection
+        step={3}
+        title="Notes & Status"
+        hint="Carries over from Benefits + Submit Auth. Add anything from approval / denial follow-up."
+      >
+        <NotesPanel
+          notes={patient.notes}
+          onNotesChange={onNotesChange}
+          onSaveToMonday={onSaveNotesToMonday}
+          description="Carries over from Benefits + Submit Auth. Add anything from approval / denial follow-up."
+          placeholder="Approval / denial details, rep names, follow-up actions..."
         />
-      )}
-
-
-            {dropdownsReady && authRequired.length === 0 && (
-        <div className="rounded-lg border border-dashed bg-muted/20 p-8 text-center">
-          <p className="text-sm text-muted-foreground">
-            No products with auth required found.
-          </p>
-        </div>
-      )}
-
-      {dropdownsReady && authRequired.length > 0 && (
-        <div className="space-y-4">
-          {authRequired.map((r) => {
-            const codeId = PRODUCT_TO_CODE_ID[r.product];
-            const meta = PRODUCT_CODES.find((c) => c.id === codeId);
-            if (!meta) return null;
-            const state = ins.codes[codeId] ?? { status: "pending" as const };
-            return (
-              <ProductAuthBlock
-                key={codeId}
-                meta={meta}
-                resolved={r}
-                state={state}
-                onChange={(patch) => onCodeChange(codeId, patch)}
-                primaryInsurance={primaryInsurance}
-              />
-            );
-          })}
-        </div>
-      )}
-
-      {/* Notes — same Call Reference Notes column as Benefits + Submit Auth.
-          Carries the running log forward so anything Samantha logs at the
-          outstanding-auth step lands in the same place. */}
-      <NotesPanel
-        notes={patient.notes}
-        onNotesChange={onNotesChange}
-        onSaveToMonday={onSaveNotesToMonday}
-        description="Carries over from Benefits + Submit Auth. Add anything from approval / denial follow-up."
-        placeholder="Approval / denial details, rep names, follow-up actions…"
-      />
+      </StepSection>
     </section>
   );
 }
