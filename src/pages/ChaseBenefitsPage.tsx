@@ -18,8 +18,8 @@ import { PatientProfileCard } from "@/components/samantha/PatientProfileCard";
 import { SendToMondayButton } from "@/components/samantha/SendToMondayButton";
 import { Button } from "@/components/ui/button";
 import { EscalateButton } from "@/components/samantha/EscalateButton";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { RotateCcw, Stethoscope, ArrowLeft, Zap, Clock , Save} from "lucide-react";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { RotateCcw, Stethoscope, Zap, Clock, Save, User, Shield, FileText } from "lucide-react";
 import { ClinicalsDownloadButton } from "@/components/samantha/ClinicalsDownloadButton";
 import { resolveHcpcs } from "@/lib/samantha/hcpcRules";
 import { toast } from "sonner";
@@ -30,6 +30,10 @@ import { ESCALATION_INDEX } from "@/lib/samantha/mondayMapping";
 import { FollowUpModal } from "@/components/samantha/FollowUpModal";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useBackNavigation } from "@/hooks/useBackNavigation";
+import { PageHeader } from "@/components/shared/PageHeader";
+import { HighlightsStrip } from "@/components/shared/HighlightsStrip";
+import { CollapsibleSection } from "@/components/shared/CollapsibleSection";
+import { StickyActionBar } from "@/components/shared/StickyActionBar";
 
 const ChaseBenefitsPage = () => {
   const navigate = useNavigate();
@@ -117,43 +121,44 @@ const ChaseBenefitsPage = () => {
         />
 
         <div className="flex-1 flex flex-col min-w-0">
-          <header className={`${isEscalated ? "bg-red-700" : "bg-gradient-navy"} text-navy-foreground border-b border-sidebar-border`}>
-            <div className="px-3 sm:px-6 py-5 flex items-center justify-between gap-4 flex-wrap">
-              <div className="flex items-center gap-3">
-                <SidebarTrigger className="text-navy-foreground hover:bg-white/10" />
-                <button onClick={() => goBack()} className="p-1.5 rounded-md hover:bg-white/10 transition-colors">
-                  <ArrowLeft className="h-5 w-5" />
-                </button>
-                <div className="h-10 w-10 rounded-lg bg-gradient-primary flex items-center justify-center shadow-elevate">
-                  <Stethoscope className="h-5 w-5 text-primary-foreground" />
-                </div>
-                <div>
-                  <p className="text-[10px] uppercase tracking-[0.2em] opacity-70">Medically Modern</p>
-                  <h1 className="text-2xl font-bold">Benefits</h1>{selected && <p className="text-sm opacity-80 mt-0.5">{selected.name}</p>}
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                {selected && <ClinicalsDownloadButton itemId={selected.id} />}
-                <Button onClick={() => setFollowUpOpen(true)} disabled={!selected} className="gap-2 bg-white/90 text-blue-700 hover:bg-white shadow-elevate">
-                  <Clock className="h-4 w-4" /> Follow Up
-                </Button>
-                <Button
-                  onClick={() => {
-                    if (!selected) return;
-                    saveOverlay(selected.id);
-                    toast.success("Progress saved — you can leave and come back");
-                  }}
-                  disabled={!selected || !hasOverlay(selected.id)}
-                  className="gap-2 bg-emerald-600 text-white hover:bg-emerald-700 shadow-elevate"
-                >
-                  <Save className="h-4 w-4" /> Save
-                </Button>
-                <Button onClick={resetForNewPatient} disabled={!selected} className="gap-2 bg-white text-navy hover:bg-white/90 shadow-elevate">
-                  <RotateCcw className="h-4 w-4" /> Reset
-                </Button>
-              </div>
-            </div>
-          </header>
+          <PageHeader
+            title="Benefits"
+            subtitle={selected?.name}
+            icon={<Stethoscope className="h-5 w-5 text-primary-foreground" />}
+            variant={isEscalated ? "escalated" : "default"}
+            onBack={() => goBack()}
+          >
+            {selected && <ClinicalsDownloadButton itemId={selected.id} />}
+            <Button onClick={() => setFollowUpOpen(true)} disabled={!selected} className="gap-2 bg-white/90 text-blue-700 hover:bg-white shadow-elevate">
+              <Clock className="h-4 w-4" /> Follow Up
+            </Button>
+            <Button
+              onClick={() => {
+                if (!selected) return;
+                saveOverlay(selected.id);
+                toast.success("Progress saved — you can leave and come back");
+              }}
+              disabled={!selected || !hasOverlay(selected.id)}
+              className="gap-2 bg-emerald-600 text-white hover:bg-emerald-700 shadow-elevate"
+            >
+              <Save className="h-4 w-4" /> Save
+            </Button>
+            <Button onClick={resetForNewPatient} disabled={!selected} className="gap-2 bg-white text-navy hover:bg-white/90 shadow-elevate">
+              <RotateCcw className="h-4 w-4" /> Reset
+            </Button>
+          </PageHeader>
+
+          {selected && (
+            <HighlightsStrip
+              items={[
+                { label: "Patient", value: selected.name },
+                { label: "Insurance", value: selected.primaryInsurance || "—" },
+                { label: "Serving", value: selected.serving || "—" },
+                { label: "Days in Stage", value: selected.daysSinceStage || "—", valueColor: (selected.daysSinceStageIndex ?? 0) >= 3 ? "text-destructive" : undefined },
+                { label: "Diagnosis", value: selected.diagnosis || "—" },
+              ]}
+            />
+          )}
 
           <main className="flex-1 px-3 sm:px-6 py-6">
             <section className="max-w-5xl xl:max-w-7xl 2xl:max-w-[1800px] mx-auto space-y-5">
@@ -167,26 +172,47 @@ const ChaseBenefitsPage = () => {
 
               {selected && (
                 <>
-                  <PatientProfileCard patient={selected} onUpdate={(p) => update(selected.id, p)} />
+                  <CollapsibleSection
+                    title="Patient Profile"
+                    icon={<User className="h-4 w-4" />}
+                    defaultOpen={false}
+                  >
+                    <div className="opacity-80">
+                      <PatientProfileCard patient={selected} onUpdate={(p) => update(selected.id, p)} />
+                    </div>
+                  </CollapsibleSection>
 
-                  <InsurancePanel
-                    patient={selected}
-                    onUniversalChange={onUniversalChange}
-                    onCodeChange={updateCode}
-                    onNotesChange={(v) => update(selected.id, { notes: v })}
-                    onSaveNotesToMonday={(v) => writeLongText(selected.id, COL.callReferenceNotes, v)}
-                    onNeverBilledChange={(field, value) => {
-                      const ins = selected.insurance ?? EMPTY_INSURANCE;
-                      update(selected.id, { insurance: { ...ins, [field]: value } });
-                    }}
-                  />
+                  <CollapsibleSection
+                    title="Insurance Verification"
+                    icon={<Shield className="h-4 w-4" />}
+                    forceOpen={true}
+                    accentColor="hsl(var(--primary))"
+                  >
+                    <InsurancePanel
+                      patient={selected}
+                      onUniversalChange={onUniversalChange}
+                      onCodeChange={updateCode}
+                      onNotesChange={(v) => update(selected.id, { notes: v })}
+                      onSaveNotesToMonday={(v) => writeLongText(selected.id, COL.callReferenceNotes, v)}
+                      onNeverBilledChange={(field, value) => {
+                        const ins = selected.insurance ?? EMPTY_INSURANCE;
+                        update(selected.id, { insurance: { ...ins, [field]: value } });
+                      }}
+                    />
+                  </CollapsibleSection>
 
-                  <div className="rounded-xl bg-card border shadow-card p-5">
-                    <p className="text-xs uppercase tracking-wider text-muted-foreground mb-1">Insurance Verification</p>
-                    <p className="text-sm text-muted-foreground">
-                      Edits stay local until you click "Send to Monday". List refreshes every 60 seconds.
-                    </p>
-                  </div>
+                  <CollapsibleSection
+                    title="Notes"
+                    icon={<FileText className="h-4 w-4" />}
+                    defaultOpen={false}
+                  >
+                    <div className="rounded-xl bg-card border shadow-card p-5">
+                      <p className="text-xs uppercase tracking-wider text-muted-foreground mb-1">Insurance Verification</p>
+                      <p className="text-sm text-muted-foreground">
+                        Edits stay local until you click "Send to Monday". List refreshes every 60 seconds.
+                      </p>
+                    </div>
+                  </CollapsibleSection>
 
                   <EscalateButton
                     escalated={!!selected.escalated}
@@ -211,7 +237,6 @@ const ChaseBenefitsPage = () => {
                     </div>
                   )}
 
-                  <SendToMondayButton onSend={handleSend} disabled={!selected || benefitsMissing.length > 0} />
                   {benefitsMissing.length > 0 && (
                     <div className="max-w-xl mx-auto rounded-md border border-warning/40 bg-warning/10 px-4 py-2 text-center">
                       <p className="text-[11px] font-semibold uppercase tracking-wider text-warning-foreground/80">Missing before send</p>
@@ -222,6 +247,20 @@ const ChaseBenefitsPage = () => {
               )}
             </section>
           </main>
+
+          {selected && (
+            <StickyActionBar
+              stepLabel="Benefits"
+              hint="Verify insurance benefits, then send to Monday"
+            >
+              <EscalateButton
+                escalated={!!selected.escalated}
+                onToggle={() => update(selected.id, { escalated: !selected.escalated })}
+                onOpenForm={() => setEscalationModalOpen(true)}
+              />
+              <SendToMondayButton onSend={handleSend} disabled={!selected || benefitsMissing.length > 0} />
+            </StickyActionBar>
+          )}
         </div>
       </div>
 

@@ -16,6 +16,18 @@ import { AlertTriangle, Loader2, RefreshCw, User, AlertCircle, Search, X} from "
 import type { Patient } from "@/lib/finalConfirm/workflow";
 import { cn } from "@/lib/utils";
 
+/** Return an urgency-ring CSS class based on days since a date */
+function urgencyClass(dateStr: string | undefined): string {
+  if (!dateStr) return "";
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return "";
+  const days = Math.floor((Date.now() - d.getTime()) / 86_400_000);
+  if (days >= 21) return "urgency-ring-red";
+  if (days >= 12) return "urgency-ring-orange";
+  if (days >= 5) return "urgency-ring-green";
+  return "urgency-ring-blue";
+}
+
 interface Props {
   patients: Patient[];
   selectedId: string | null;
@@ -90,6 +102,7 @@ export function PatientsSidebar({ patients, selectedId, onSelect, loading, error
                     onClick={() => onSelect(p.id)}
                     className={cn(
                       "flex items-start gap-2 py-2 h-auto",
+                      urgencyClass(p.dateOfStageStart),
                       selectedId === p.id && "bg-sidebar-accent",
                     )}
                   >

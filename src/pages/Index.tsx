@@ -99,11 +99,13 @@ function UserList({ selectedUser, onSelect, getRolesForUser }: { selectedUser: U
             key={user}
             onClick={() => onSelect(user)}
             className={cn(
-              "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors",
-              active ? "bg-primary/10 text-primary font-medium border border-primary/20" : "hover:bg-muted/50 text-foreground border border-transparent",
+              "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200",
+              active
+                ? "bg-gradient-to-r from-primary/15 to-primary/5 text-primary font-medium border border-primary/20 shadow-sm"
+                : "hover:bg-muted/50 text-foreground border border-transparent",
             )}
           >
-            <div className={cn("w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs shrink-0", active ? "bg-primary" : "bg-gradient-primary")}>
+            <div className={cn("w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs shrink-0 transition-transform duration-200", active ? "bg-primary scale-110" : "bg-gradient-primary")}>
               {user[0]}
             </div>
             <div className="flex-1 text-left">

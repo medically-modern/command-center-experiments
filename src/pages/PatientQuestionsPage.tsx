@@ -8,8 +8,10 @@ import { useMondayPatients } from "@/hooks/patientQuestions/useMondayPatients";
 import type { PatientQuestion } from "@/lib/patientQuestions/types";
 import { PatientsSidebar } from "@/components/patientQuestions/PatientsSidebar";
 import { PatientDetailCard } from "@/components/patientQuestions/PatientDetailCard";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { ArrowLeft, MessageCircleQuestion } from "lucide-react";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { MessageCircleQuestion } from "lucide-react";
+import { PageHeader } from "@/components/shared/PageHeader";
+import { HighlightsStrip } from "@/components/shared/HighlightsStrip";
 import { useNavigate } from "react-router-dom";
 
 const PatientQuestionsPage = () => {
@@ -55,30 +57,26 @@ const PatientQuestionsPage = () => {
         />
 
         <div className="flex-1 flex flex-col min-w-0">
-          <header className="bg-gradient-navy text-navy-foreground border-b border-sidebar-border">
-            <div className="px-6 py-5 flex items-center justify-between gap-4 flex-wrap">
-              <div className="flex items-center gap-3">
-                <SidebarTrigger className="text-navy-foreground hover:bg-white/10" />
-                <button
-                  onClick={() => navigate("/?tab=dashboard")}
-                  className="p-1.5 rounded-md hover:bg-white/10 transition-colors"
-                >
-                  <ArrowLeft className="h-5 w-5" />
-                </button>
-                <div className="h-10 w-10 rounded-lg bg-gradient-primary flex items-center justify-center shadow-elevate">
-                  <MessageCircleQuestion className="h-5 w-5 text-primary-foreground" />
-                </div>
-                <div>
-                  <p className="text-[10px] uppercase tracking-[0.2em] opacity-70">Medically Modern</p>
-                  <h1 className="text-2xl font-bold">Patient Questions</h1>
-                  {selected && <p className="text-sm opacity-80 mt-0.5">{selected.name}</p>}
-                </div>
-              </div>
-              <div className="flex items-center gap-3 text-sm opacity-80">
-                <span>{filtered.length} message{filtered.length !== 1 ? "s" : ""}</span>
-              </div>
-            </div>
-          </header>
+          <PageHeader
+            title="Patient Questions"
+            subtitle={selected?.name}
+            icon={<MessageCircleQuestion className="h-5 w-5 text-primary-foreground" />}
+            onBack={() => navigate("/?tab=dashboard")}
+          >
+            <span className="text-sm text-white/80">
+              {filtered.length} message{filtered.length !== 1 ? "s" : ""}
+            </span>
+          </PageHeader>
+
+          {selected && (
+            <HighlightsStrip
+              items={[
+                { label: "Patient", value: selected.name },
+                { label: "Source", value: selected.source || "—" },
+                { label: "Message", value: selected.message ? (selected.message.length > 60 ? selected.message.slice(0, 60) + "..." : selected.message) : "—" },
+              ]}
+            />
+          )}
 
           <main className="flex-1 px-6 py-6 overflow-y-auto">
             <section className="max-w-4xl mx-auto space-y-5">

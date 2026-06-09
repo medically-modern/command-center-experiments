@@ -242,7 +242,10 @@ export function DailyBurndown({
                     Done!
                   </span>
                 ) : (
-                  <span className="text-sm font-semibold text-foreground tabular-nums">
+                  <span className={cn(
+                    "text-sm font-semibold tabular-nums",
+                    d.current >= 20 ? "text-red-500" : d.current >= 12 ? "text-orange-500" : "text-foreground",
+                  )}>
                     {countsLoading ? "…" : d.current}
                   </span>
                 )}
@@ -268,7 +271,13 @@ export function DailyBurndown({
                     className="absolute inset-y-0 left-0 rounded-lg transition-all duration-1000 ease-out"
                     style={{
                       width: animateIn ? `${currentPct}%` : "0%",
-                      background: `linear-gradient(90deg, ${hex}, ${hexToRgba(hex, 0.75)})`,
+                      background: d.current >= 20
+                        ? `linear-gradient(90deg, #ef4444, ${hexToRgba("#ef4444", 0.75)})`
+                        : d.current >= 12
+                          ? `linear-gradient(90deg, #f97316, ${hexToRgba("#f97316", 0.75)})`
+                          : d.current >= 5
+                            ? `linear-gradient(90deg, ${hex}, ${hexToRgba(hex, 0.75)})`
+                            : `linear-gradient(90deg, ${hex}, ${hexToRgba(hex, 0.75)})`,
                       transitionDelay: `${i * 60 + 200}ms`,
                     }}
                   />

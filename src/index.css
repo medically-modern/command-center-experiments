@@ -205,3 +205,40 @@ h3 { font-size: 1.125rem; font-weight: 600; }
   0%, 100% { border-color: rgb(239, 68, 68); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
   50% { border-color: rgb(185, 28, 28); box-shadow: 0 0 12px 2px rgba(239, 68, 68, 0.3); }
 }
+
+/* ═══════ UI REDESIGN — Global utilities ═══════ */
+
+/* Urgency rings for sidebar patient items */
+.urgency-ring-red { box-shadow: 0 0 0 2px rgb(239 68 68); color: rgb(239 68 68); }
+.urgency-ring-orange { box-shadow: 0 0 0 2px rgb(245 158 11); color: rgb(245 158 11); }
+.urgency-ring-green { box-shadow: 0 0 0 2px rgb(34 197 94); color: rgb(34 197 94); }
+.urgency-ring-blue { box-shadow: 0 0 0 2px rgb(59 130 246); color: rgb(59 130 246); }
+
+/* Days badge colors */
+.days-badge-critical { @apply bg-red-100 text-red-700 border-red-200; }
+.days-badge-warning { @apply bg-amber-100 text-amber-700 border-amber-200; }
+.days-badge-ok { @apply bg-emerald-100 text-emerald-700 border-emerald-200; }
+.days-badge-new { @apply bg-blue-100 text-blue-700 border-blue-200; }
+
+/* Scrollbar-none utility for highlights strip */
+.scrollbar-none::-webkit-scrollbar { display: none; }
+.scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Read-only field styling — muted, clearly not editable */
+.field-readonly {
+  @apply bg-muted/40 rounded-md px-3 py-2 text-sm text-foreground min-h-[36px] flex items-center;
+}
+
+/* Editable field accent — blue left border */
+.field-editable-wrap {
+  @apply border-l-2 border-l-blue-400 pl-3;
+}
+
+/* Action bar pulse for unsaved changes */
+@keyframes action-pulse {
+  0%, 100% { box-shadow: 0 -2px 8px rgba(0,0,0,0.06); }
+  50% { box-shadow: 0 -2px 16px rgba(37,99,235,0.15); }
+}
+.action-bar-unsaved {
+  animation: action-pulse 2s ease-in-out infinite;
+}

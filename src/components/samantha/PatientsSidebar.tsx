@@ -36,6 +36,33 @@ function fmtDate(iso: string): string {
   return `${m}/${d}/${y}`;
 }
 
+/**
+ * Parse a numeric day count from daysSinceStage text like "6–8 Days", "21+ Days", "0–2 Days".
+ * Returns the upper bound of the range (or the number itself).
+ */
+function parseDaysFromLabel(label: string | undefined): number {
+  if (!label) return 0;
+  // Match patterns like "6–8", "21+", "0-2", single numbers, etc.
+  const rangeMatch = label.match(/(\d+)\s*[–\-]\s*(\d+)/);
+  if (rangeMatch) return parseInt(rangeMatch[2], 10);
+  const plusMatch = label.match(/(\d+)\s*\+/);
+  if (plusMatch) return parseInt(plusMatch[1], 10);
+  const singleMatch = label.match(/(\d+)/);
+  if (singleMatch) return parseInt(singleMatch[1], 10);
+  return 0;
+}
+
+/**
+ * Determine urgency ring CSS class based on days in queue.
+ * >= 21 days: red, >= 12 days: orange, >= 5 days: green, < 5 days: blue
+ */
+function getUrgencyRingClass(days: number): string {
+  if (days >= 21) return "urgency-ring-red";
+  if (days >= 12) return "urgency-ring-orange";
+  if (days >= 5) return "urgency-ring-green";
+  return "urgency-ring-blue";
+}
+
 /** Small button to clear Follow Up status + date on Monday */
 function ClearFollowUpButton({ patientId, patientName, onSuccess }: { patientId: string; patientName: string; onSuccess: () => void }) {
   const [sending, setSending] = useState(false);
@@ -127,38 +154,45 @@ export function PatientsSidebar({ patients, selectedId, onSelect, loading, error
 
   const isAuthOutstanding = activeGroup === "authOutstanding";
 
-  const renderPatient = (p: Patient) => (
-    <SidebarMenuItem key={p.id}>
-      <SidebarMenuButton
-        isActive={selectedId === p.id}
-        onClick={() => onSelect(p.id)}
-        className={cn(
-          "flex items-start gap-2 py-2 h-auto",
-          selectedId === p.id && "bg-sidebar-accent",
-        )}
-      >
-        <User className="h-4 w-4 mt-0.5 shrink-0" />
-        {!collapsed && (
-          <div className="min-w-0 text-left">
-            <p className="text-sm font-medium truncate">{p.name}</p>
-            <p className="text-[11px] text-muted-foreground truncate">
-              {p.primaryInsurance || "—"} · {p.serving || "—"}
-            </p>
-            {isAuthOutstanding && p.daysSinceStage && (
-              <p className={cn(
-                "text-[10px] font-medium truncate mt-0.5",
-                (p.daysSinceStageIndex ?? 0) >= 3 ? "text-destructive" :
-                (p.daysSinceStageIndex ?? 0) >= 2 ? "text-amber-400" :
-                "text-muted-foreground",
-              )}>
-                {p.daysSinceStage}
-              </p>
-            )}
+  const renderPatient = (p: Patient) => {
+    const days = parseDaysFromLabel(p.daysSinceStage);
+    const urgencyClass = getUrgencyRingClass(days);
+
+    return (
+      <SidebarMenuItem key={p.id}>
+        <SidebarMenuButton
+          isActive={selectedId === p.id}
+          onClick={() => onSelect(p.id)}
+          className={cn(
+            "flex items-start gap-2 py-2 h-auto",
+            selectedId === p.id && "bg-sidebar-accent",
+          )}
+        >
+          <div className={cn("mt-0.5 shrink-0 rounded-full p-0.5", urgencyClass)}>
+            <User className="h-4 w-4" />
           </div>
-        )}
-      </SidebarMenuButton>
-    </SidebarMenuItem>
-  );
+          {!collapsed && (
+            <div className="min-w-0 text-left">
+              <p className="text-sm font-medium truncate">{p.name}</p>
+              <p className="text-[11px] text-muted-foreground truncate">
+                {p.primaryInsurance || "—"} · {p.serving || "—"}
+              </p>
+              {isAuthOutstanding && p.daysSinceStage && (
+                <p className={cn(
+                  "text-[10px] font-medium truncate mt-0.5",
+                  (p.daysSinceStageIndex ?? 0) >= 3 ? "text-destructive" :
+                  (p.daysSinceStageIndex ?? 0) >= 2 ? "text-amber-400" :
+                  "text-muted-foreground",
+                )}>
+                  {p.daysSinceStage}
+                </p>
+              )}
+            </div>
+          )}
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+    );
+  };
 
   return (
     <Sidebar collapsible="icon">

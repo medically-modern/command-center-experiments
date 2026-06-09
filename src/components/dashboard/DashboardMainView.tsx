@@ -53,6 +53,21 @@ export function DashboardMainView({ selectedUser, assignments, getRolesForUser, 
         {countsLoading && <Loader2 className="w-4 h-4 animate-spin text-muted-foreground ml-auto" />}
       </div>
 
+      {/* Total patient count summary */}
+      {assignedRoles.length > 0 && (
+        <div className="px-8 pt-6 pb-0">
+          <div className="flex items-center gap-4 px-4 py-3 rounded-xl bg-gradient-to-r from-primary/5 to-transparent border border-primary/10">
+            <div className="text-2xl font-bold text-primary tabular-nums">
+              {countsLoading ? "..." : roleIds.reduce((sum, id) => sum + (roleCounts[id] ?? 0), 0)}
+            </div>
+            <div>
+              <p className="text-sm font-medium text-foreground">Total Patients</p>
+              <p className="text-[11px] text-muted-foreground">Across {assignedRoles.length} assigned role{assignedRoles.length !== 1 ? "s" : ""}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Content */}
       <div className="flex-1 p-8">
         {assignedRoles.length === 0 ? (

@@ -13,8 +13,12 @@ import { SendToMondayButton } from "@/components/subscription/SendToMondayButton
 import { EscalateButton } from "@/components/subscription/EscalateButton";
 import { NotesPanel } from "@/components/subscription/NotesPanel";
 import { Button } from "@/components/ui/button";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { RotateCcw, RefreshCw, ArrowLeft, Save } from "lucide-react";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { RotateCcw, RefreshCw, Save, User } from "lucide-react";
+import { PageHeader } from "@/components/shared/PageHeader";
+import { HighlightsStrip } from "@/components/shared/HighlightsStrip";
+import { CollapsibleSection } from "@/components/shared/CollapsibleSection";
+import { StickyActionBar } from "@/components/shared/StickyActionBar";
 import { toast } from "sonner";
 import { sendPatientToMonday, sendNotesToMonday } from "@/lib/subscription/mondayWrite";
 import { validatePatientForSend } from "@/lib/subscription/workflow";
@@ -89,40 +93,41 @@ const SubscriptionPage = () => {
         />
 
         <div className="flex-1 flex flex-col min-w-0">
-          <header className={`${isEscalated ? "bg-red-700" : "bg-gradient-navy"} text-navy-foreground border-b border-sidebar-border`}>
-            <div className="px-6 py-5 flex items-center justify-between gap-4 flex-wrap">
-              <div className="flex items-center gap-3">
-                <SidebarTrigger className="text-navy-foreground hover:bg-white/10" />
-                <button onClick={() => navigate("/?tab=dashboard")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors">
-                  <ArrowLeft className="h-5 w-5" />
-                </button>
-                <div className="h-10 w-10 rounded-lg bg-gradient-primary flex items-center justify-center shadow-elevate">
-                  <RefreshCw className="h-5 w-5 text-primary-foreground" />
-                </div>
-                <div>
-                  <p className="text-[10px] uppercase tracking-[0.2em] opacity-70">Medically Modern</p>
-                  <h1 className="text-2xl font-bold">Subscription Management</h1>
-                  {selected && <p className="text-sm opacity-80 mt-0.5">{selected.name}</p>}
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <Button
-                  onClick={() => {
-                    if (!selected) return;
-                    saveOverlay(selected.id);
-                    toast.success("Progress saved — you can leave and come back");
-                  }}
-                  disabled={!selected || !hasOverlay(selected.id)}
-                  className="gap-2 bg-emerald-600 text-white hover:bg-emerald-700 shadow-elevate"
-                >
-                  <Save className="h-4 w-4" /> Save
-                </Button>
-                <Button onClick={resetForNewPatient} disabled={!selected} className="gap-2 bg-white text-navy hover:bg-white/90 shadow-elevate">
-                  <RotateCcw className="h-4 w-4" /> Reset
-                </Button>
-              </div>
-            </div>
-          </header>
+          <PageHeader
+            title="Subscription Management"
+            subtitle={selected?.name}
+            icon={<RefreshCw className="h-5 w-5 text-primary-foreground" />}
+            variant={isEscalated ? "escalated" : "default"}
+            onBack={() => navigate("/?tab=dashboard")}
+          >
+            <Button
+              onClick={() => {
+                if (!selected) return;
+                saveOverlay(selected.id);
+                toast.success("Progress saved — you can leave and come back");
+              }}
+              disabled={!selected || !hasOverlay(selected.id)}
+              className="gap-2 bg-emerald-600 text-white hover:bg-emerald-700 shadow-elevate"
+            >
+              <Save className="h-4 w-4" /> Save
+            </Button>
+            <Button onClick={resetForNewPatient} disabled={!selected} className="gap-2 bg-white text-navy hover:bg-white/90 shadow-elevate">
+              <RotateCcw className="h-4 w-4" /> Reset
+            </Button>
+          </PageHeader>
+
+          {selected && (
+            <HighlightsStrip
+              items={[
+                { label: "Patient", value: selected.name },
+                { label: "DOB", value: selected.dob || "—" },
+                { label: "Status", value: selected.status || "—", valueColor: selected.status === "Active" ? "text-green-600" : selected.status === "Paused" ? "text-amber-600" : "text-foreground" },
+                { label: "Subscription", value: selected.subscription || "—" },
+                { label: "Days to Order", value: selected.daysToOrder || "—" },
+                { label: "Insurance", value: selected.primaryInsurance || "—" },
+              ]}
+            />
+          )}
 
           <main className="flex-1 px-6 py-6 overflow-y-auto">
             <section className="max-w-6xl mx-auto space-y-5">
@@ -136,19 +141,41 @@ const SubscriptionPage = () => {
 
               {selected && (
                 <>
-                  <PatientInfoCard patient={selected} onFieldChange={handleFieldChange} />
-                  <SubscriptionForm patient={selected} onFieldChange={handleFieldChange} />
-                  <NotesPanel
-                    notes={selected.notes}
-                    onNotesChange={(v) => update(selected.id, { notes: v })}
-                    onSaveToMonday={(v) => sendNotesToMonday(selected.id, v)}
-                  />
+                  <CollapsibleSection
+                    title="Patient Information"
+                    icon={<User className="h-4 w-4" />}
+                    defaultOpen={false}
+                    className="opacity-80"
+                  >
+                    <PatientInfoCard patient={selected} onFieldChange={handleFieldChange} />
+                  </CollapsibleSection>
+
+                  <CollapsibleSection title="Subscription Details" forceOpen>
+                    <SubscriptionForm patient={selected} onFieldChange={handleFieldChange} />
+                  </CollapsibleSection>
+
+                  <CollapsibleSection title="Notes" defaultOpen>
+                    <NotesPanel
+                      notes={selected.notes}
+                      onNotesChange={(v) => update(selected.id, { notes: v })}
+                      onSaveToMonday={(v) => sendNotesToMonday(selected.id, v)}
+                    />
+                  </CollapsibleSection>
+
                   <EscalateButton escalated={selected.escalated} onToggle={toggleEscalate} disabled={!selected} />
-                  <SendToMondayButton onSend={handleSend} disabled={!selected || !validation.valid} validationErrors={validation.errors} />
                 </>
               )}
             </section>
           </main>
+
+          {selected && (
+            <StickyActionBar
+              stepLabel="Subscription Management"
+              hint={validation.valid ? "Ready to send to Monday" : validation.errors.join(", ")}
+            >
+              <SendToMondayButton onSend={handleSend} disabled={!selected || !validation.valid} validationErrors={validation.errors} />
+            </StickyActionBar>
+          )}
         </div>
       </div>
     </SidebarProvider>
