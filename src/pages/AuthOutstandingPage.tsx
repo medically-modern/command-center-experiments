@@ -15,8 +15,8 @@ import { PatientProfileCard } from "@/components/samantha/PatientProfileCard";
 import { SendToMondayButton } from "@/components/samantha/SendToMondayButton";
 import { Button } from "@/components/ui/button";
 import { EscalateButton } from "@/components/samantha/EscalateButton";
-import { SidebarProvider } from "@/components/ui/sidebar";
-import { RotateCcw, Stethoscope, Clock, Save, Zap, CheckCircle2, User, ClipboardList, Activity } from "lucide-react";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { RotateCcw, Stethoscope, ArrowLeft, Clock, Save, Zap, CheckCircle2 } from "lucide-react";
 import { resolveHcpcs } from "@/lib/samantha/hcpcRules";
 import { toast } from "sonner";
 import { sendPatientToMonday } from "@/lib/samantha/mondayWrite";
@@ -26,10 +26,6 @@ import { ESCALATION_INDEX } from "@/lib/samantha/mondayMapping";
 import { FollowUpModal } from "@/components/samantha/FollowUpModal";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useBackNavigation } from "@/hooks/useBackNavigation";
-import { PageHeader } from "@/components/shared/PageHeader";
-import { HighlightsStrip } from "@/components/shared/HighlightsStrip";
-import { CollapsibleSection } from "@/components/shared/CollapsibleSection";
-import { StickyActionBar } from "@/components/shared/StickyActionBar";
 
 
 /* ── DVS + Claims Status Visual ─────────────────────────────────── */
@@ -185,43 +181,42 @@ const AuthOutstandingPage = () => {
       <div className="min-h-screen flex w-full bg-gradient-subtle">
         <PatientsSidebar patients={patients} selectedId={selectedId} onSelect={setSelectedId} loading={loading} error={error} onRefresh={refetch} activeGroup="authOutstanding" />
         <div className="flex-1 flex flex-col min-w-0">
-          <PageHeader
-            title="Auth Outstanding"
-            subtitle={selected?.name}
-            icon={<Stethoscope className="h-5 w-5 text-primary-foreground" />}
-            variant={isEscalated ? "escalated" : "default"}
-            onBack={() => goBack()}
-          >
-            <Button onClick={() => setFollowUpOpen(true)} disabled={!selected} className="gap-2 bg-white/90 text-blue-700 hover:bg-white shadow-elevate">
-              <Clock className="h-4 w-4" /> Follow Up
-            </Button>
-            <Button
-              onClick={() => {
-                if (!selected) return;
-                saveOverlay(selected.id);
-                toast.success("Progress saved — you can leave and come back");
-              }}
-              disabled={!selected || !hasOverlay(selected.id)}
-              className="gap-2 bg-emerald-600 text-white hover:bg-emerald-700 shadow-elevate"
-            >
-              <Save className="h-4 w-4" /> Save
-            </Button>
-            <Button onClick={resetForNewPatient} disabled={!selected} className="gap-2 bg-white text-navy hover:bg-white/90 shadow-elevate">
-              <RotateCcw className="h-4 w-4" /> Reset
-            </Button>
-          </PageHeader>
-
-          {selected && (
-            <HighlightsStrip
-              items={[
-                { label: "Patient", value: selected.name },
-                { label: "Insurance", value: selected.primaryInsurance || "—" },
-                { label: "Serving", value: selected.serving || "—" },
-                { label: "Days in Stage", value: selected.daysSinceStage || "—", valueColor: (selected.daysSinceStageIndex ?? 0) >= 3 ? "text-destructive" : undefined },
-                { label: "Diagnosis", value: selected.diagnosis || "—" },
-              ]}
-            />
-          )}
+          <header className={`${isEscalated ? "bg-red-700" : "bg-gradient-navy"} text-navy-foreground border-b border-sidebar-border`}>
+            <div className="px-3 sm:px-6 py-5 flex items-center justify-between gap-4 flex-wrap">
+              <div className="flex items-center gap-3">
+                <SidebarTrigger className="text-navy-foreground hover:bg-white/10" />
+                <button onClick={() => goBack()} className="p-1.5 rounded-md hover:bg-white/10 transition-colors">
+                  <ArrowLeft className="h-5 w-5" />
+                </button>
+                <div className="h-10 w-10 rounded-lg bg-gradient-primary flex items-center justify-center shadow-elevate">
+                  <Stethoscope className="h-5 w-5 text-primary-foreground" />
+                </div>
+                <div>
+                  <p className="text-[10px] uppercase tracking-[0.2em] opacity-70">Medically Modern</p>
+                  <h1 className="text-2xl font-bold">Auth Outstanding</h1>{selected && <p className="text-sm opacity-80 mt-0.5">{selected.name}</p>}
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button onClick={() => setFollowUpOpen(true)} disabled={!selected} className="gap-2 bg-white/90 text-blue-700 hover:bg-white shadow-elevate">
+                  <Clock className="h-4 w-4" /> Follow Up
+                </Button>
+                <Button
+                  onClick={() => {
+                    if (!selected) return;
+                    saveOverlay(selected.id);
+                    toast.success("Progress saved — you can leave and come back");
+                  }}
+                  disabled={!selected || !hasOverlay(selected.id)}
+                  className="gap-2 bg-emerald-600 text-white hover:bg-emerald-700 shadow-elevate"
+                >
+                  <Save className="h-4 w-4" /> Save
+                </Button>
+                <Button onClick={resetForNewPatient} disabled={!selected} className="gap-2 bg-white text-navy hover:bg-white/90 shadow-elevate">
+                  <RotateCcw className="h-4 w-4" /> Reset
+                </Button>
+              </div>
+            </div>
+          </header>
 
           <main className="flex-1 px-3 sm:px-6 py-6">
             <section className="max-w-5xl xl:max-w-7xl 2xl:max-w-[1800px] mx-auto space-y-5">
@@ -232,33 +227,9 @@ const AuthOutstandingPage = () => {
               )}
               {selected && (
                 <>
-                  <CollapsibleSection
-                    title="Patient Profile"
-                    icon={<User className="h-4 w-4" />}
-                    defaultOpen={false}
-                  >
-                    <div className="opacity-80">
-                      <PatientProfileCard patient={selected} onUpdate={(p) => update(selected.id, p)} />
-                    </div>
-                  </CollapsibleSection>
-
-                  <CollapsibleSection
-                    title="Verification Status"
-                    icon={<Activity className="h-4 w-4" />}
-                    defaultOpen={false}
-                  >
-                    <DvsClaimsVisual dvsStatus={selected.dvsStatus} claimsStatus={selected.claimsStatus} />
-                  </CollapsibleSection>
-
-                  <CollapsibleSection
-                    title="Auth Outstanding"
-                    icon={<ClipboardList className="h-4 w-4" />}
-                    forceOpen={true}
-                    accentColor="hsl(var(--primary))"
-                  >
-                    <AuthOutstandingPanel patient={selected} onCodeChange={updateCode} onNotesChange={(v) => update(selected.id, { notes: v })} onSaveNotesToMonday={(v) => writeLongText(selected.id, COL.callReferenceNotes, v)} />
-                  </CollapsibleSection>
-
+                  <PatientProfileCard patient={selected} onUpdate={(p) => update(selected.id, p)} />
+                  <DvsClaimsVisual dvsStatus={selected.dvsStatus} claimsStatus={selected.claimsStatus} />
+                  <AuthOutstandingPanel patient={selected} onCodeChange={updateCode} onNotesChange={(v) => update(selected.id, { notes: v })} onSaveNotesToMonday={(v) => writeLongText(selected.id, COL.callReferenceNotes, v)} />
                   <EscalateButton
                     escalated={!!selected.escalated}
                     onToggle={() => update(selected.id, { escalated: !selected.escalated })}
@@ -322,24 +293,12 @@ const AuthOutstandingPage = () => {
                       )}
                     </div>
                   )}
+
+                  <SendToMondayButton onSend={handleSend} disabled={!selected} />
                 </>
               )}
             </section>
           </main>
-
-          {selected && (
-            <StickyActionBar
-              stepLabel="Auth Outstanding"
-              hint="Select auth result and enter dates, then send to Monday"
-            >
-              <EscalateButton
-                escalated={!!selected.escalated}
-                onToggle={() => update(selected.id, { escalated: !selected.escalated })}
-                onOpenForm={() => setEscalationModalOpen(true)}
-              />
-              <SendToMondayButton onSend={handleSend} disabled={!selected} />
-            </StickyActionBar>
-          )}
         </div>
       </div>
 

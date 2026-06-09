@@ -19,12 +19,8 @@ import { SplitOrderButton } from "@/components/finalConfirm/SplitOrderButton";
 import { EscalateButton } from "@/components/finalConfirm/EscalateButton";
 import { ClinicalsDownloadButton } from "@/components/finalConfirm/ClinicalsDownloadButton";
 import { Button } from "@/components/ui/button";
-import { SidebarProvider } from "@/components/ui/sidebar";
-import { RotateCcw, ShieldCheck, AlertTriangle, Save, User } from "lucide-react";
-import { PageHeader } from "@/components/shared/PageHeader";
-import { HighlightsStrip } from "@/components/shared/HighlightsStrip";
-import { CollapsibleSection } from "@/components/shared/CollapsibleSection";
-import { StickyActionBar } from "@/components/shared/StickyActionBar";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { RotateCcw, ShieldCheck, ArrowLeft, AlertTriangle, Save } from "lucide-react";
 import { toast } from "sonner";
 import { sendPatientToMonday } from "@/lib/finalConfirm/mondayWrite";
 import { duplicateItem, writeStatusIndex, writeDate, writeLongText, COL } from "@/lib/finalConfirm/mondayApi";
@@ -233,45 +229,48 @@ const FinalConfirmPage = () => {
         />
 
         <div className="flex-1 flex flex-col min-w-0">
-          <PageHeader
-            title="Final Profile Confirmation"
-            subtitle={selected?.name}
-            icon={<ShieldCheck className="h-5 w-5 text-primary-foreground" />}
-            variant={isEscalated ? "escalated" : "default"}
-            onBack={() => goBack()}
-          >
-            {selected && <ClinicalsDownloadButton itemId={selected.id} />}
-            <Button
-              onClick={() => {
-                if (!selected) return;
-                saveOverlay(selected.id);
-                toast.success("Progress saved — you can leave and come back");
-              }}
-              disabled={!selected || !hasOverlay(selected.id)}
-              className="gap-2 bg-emerald-600 text-white hover:bg-emerald-700 shadow-elevate"
-            >
-              <Save className="h-4 w-4" /> Save
-            </Button>
-            <Button
-              onClick={resetForNewPatient}
-              disabled={!selected}
-              className="gap-2 bg-white text-navy hover:bg-white/90 shadow-elevate"
-            >
-              <RotateCcw className="h-4 w-4" /> Reset
-            </Button>
-          </PageHeader>
-
-          {selected && (
-            <HighlightsStrip
-              items={[
-                { label: "Patient", value: selected.name },
-                { label: "DOB", value: selected.dob || "—" },
-                { label: "Insurance", value: selected.primaryInsurance || "—" },
-                { label: "Serving", value: selected.serving || "—" },
-                { label: "Doctor", value: selected.doctorName || "—" },
-              ]}
-            />
-          )}
+          <header className={`${isEscalated ? "bg-red-700" : "bg-gradient-navy"} text-navy-foreground border-b border-sidebar-border`}>
+            <div className="px-6 py-5 flex items-center justify-between gap-4 flex-wrap">
+              <div className="flex items-center gap-3">
+                <SidebarTrigger className="text-navy-foreground hover:bg-white/10" />
+                <button
+                  onClick={() => goBack()}
+                  className="p-1.5 rounded-md hover:bg-white/10 transition-colors"
+                >
+                  <ArrowLeft className="h-5 w-5" />
+                </button>
+                <div className="h-10 w-10 rounded-lg bg-gradient-primary flex items-center justify-center shadow-elevate">
+                  <ShieldCheck className="h-5 w-5 text-primary-foreground" />
+                </div>
+                <div>
+                  <p className="text-[10px] uppercase tracking-[0.2em] opacity-70">Medically Modern</p>
+                  <h1 className="text-2xl font-bold">Final Profile Confirmation</h1>
+                  {selected && <p className="text-sm opacity-80 mt-0.5">{selected.name}</p>}
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                {selected && <ClinicalsDownloadButton itemId={selected.id} />}
+                <Button
+                  onClick={() => {
+                    if (!selected) return;
+                    saveOverlay(selected.id);
+                    toast.success("Progress saved — you can leave and come back");
+                  }}
+                  disabled={!selected || !hasOverlay(selected.id)}
+                  className="gap-2 bg-emerald-600 text-white hover:bg-emerald-700 shadow-elevate"
+                >
+                  <Save className="h-4 w-4" /> Save
+                </Button>
+                <Button
+                  onClick={resetForNewPatient}
+                  disabled={!selected}
+                  className="gap-2 bg-white text-navy hover:bg-white/90 shadow-elevate"
+                >
+                  <RotateCcw className="h-4 w-4" /> Reset
+                </Button>
+              </div>
+            </div>
+          </header>
 
           {unsubmittedSplits.length > 0 && (
             <div className="sticky top-0 z-30 bg-amber-100 border-b-2 border-amber-400 px-6 py-2.5 flex items-center gap-3 shadow-sm">
@@ -302,50 +301,28 @@ const FinalConfirmPage = () => {
 
               {selected && (
                 <>
-                  <CollapsibleSection
-                    title="Patient Information"
-                    icon={<User className="h-4 w-4" />}
-                    defaultOpen={false}
-                    className="opacity-80"
-                  >
-                    <PatientInfoCard patient={selected} onFieldChange={handleFieldChange} />
-                  </CollapsibleSection>
-
-                  <CollapsibleSection title="Split Order" forceOpen>
-                    <SplitOrderButton patient={selected} onSplit={handleSplit} />
-                  </CollapsibleSection>
-
-                  <CollapsibleSection title="Notes" defaultOpen>
-                    <NotesPanel
-                      notes={selected.notes}
-                      onNotesChange={(v) => update(selected.id, { notes: v })}
-                      onSaveToMonday={(v) => writeLongText(selected.id, COL.notes, v)}
-                    />
-                  </CollapsibleSection>
-
+                  <PatientInfoCard patient={selected} onFieldChange={handleFieldChange} />
+                  <SplitOrderButton patient={selected} onSplit={handleSplit} />
+                  <NotesPanel
+                    notes={selected.notes}
+                    onNotesChange={(v) => update(selected.id, { notes: v })}
+                    onSaveToMonday={(v) => writeLongText(selected.id, COL.notes, v)}
+                  />
                   <EscalateButton
                     escalated={selected.escalated}
                     onToggle={toggleEscalate}
                     disabled={!selected}
                     onOpenForm={() => setEscalationModalOpen(true)}
                   />
+                  <SendToMondayButton
+                    onSend={handleSend}
+                    disabled={!selected || !validation.valid}
+                    validationErrors={validation.errors}
+                  />
                 </>
               )}
             </section>
           </main>
-
-          {selected && (
-            <StickyActionBar
-              stepLabel="Final Profile Confirmation"
-              hint={validation.valid ? "Ready to confirm and send" : validation.errors.join(", ")}
-            >
-              <SendToMondayButton
-                onSend={handleSend}
-                disabled={!selected || !validation.valid}
-                validationErrors={validation.errors}
-              />
-            </StickyActionBar>
-          )}
         </div>
       </div>
     {selected && (

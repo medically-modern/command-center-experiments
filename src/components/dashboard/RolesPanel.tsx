@@ -80,11 +80,11 @@ function RoleRow({
   const Icon = ICON_MAP[role.icon] ?? UserCircle;
 
   return (
-    <div className="rounded-lg border border-border bg-card overflow-hidden shadow-sm hover:shadow-md hover:border-primary/20 transition-all duration-200 group/card">
+    <div className="rounded-lg border border-border bg-card overflow-hidden shadow-sm">
       {/* Role header */}
       <button
         onClick={onExpand}
-        className="w-full flex items-center gap-3 px-4 py-3 hover:bg-muted/50 transition-colors cursor-pointer"
+        className="w-full flex items-center gap-3 px-4 py-3 hover:bg-muted/50 transition-colors"
       >
         <div
           className={cn(

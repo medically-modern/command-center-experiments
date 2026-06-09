@@ -32,19 +32,6 @@ function StatusBadge({ status }: { status: string }) {
   return null;
 }
 
-/** Return an urgency-ring CSS class based on daysToOrder label text */
-function urgencyClassFromDaysToOrder(label: string | undefined): string {
-  if (!label) return "";
-  if (label === "Order Day Passed" || label === "Very Late") return "urgency-ring-red";
-  const match = label.match(/(\d+)/);
-  if (!match) return "";
-  const days = parseInt(match[1], 10);
-  if (days <= 10) return "urgency-ring-red";
-  if (days <= 20) return "urgency-ring-orange";
-  if (days <= 40) return "urgency-ring-green";
-  return "urgency-ring-blue";
-}
-
 export function PatientsSidebar({ patients, selectedId, onSelect, loading, error, onRefresh }: Props) {
   const { state } = useSidebar();
   const [searchQuery, setSearchQuery] = useState("");
@@ -81,7 +68,6 @@ export function PatientsSidebar({ patients, selectedId, onSelect, loading, error
                   onClick={() => onSelect(p.id)}
                   className={cn(
                     "flex items-start gap-2 py-2 h-auto",
-                    urgencyClassFromDaysToOrder(p.daysToOrder),
                     selectedId === p.id && "bg-sidebar-accent",
                   )}
                 >

@@ -17,12 +17,8 @@ import { ReferralEmailPanel } from "@/components/profile/ReferralEmailPanel";
 import { NotesPanel } from "@/components/profile/NotesPanel";
 import { FollowUpModal } from "@/components/profile/FollowUpModal";
 import { Button } from "@/components/ui/button";
-import { SidebarProvider } from "@/components/ui/sidebar";
-import { ClipboardCheck, Send, AlertTriangle, Loader2, Clock, Save, Ban, User } from "lucide-react";
-import { PageHeader } from "@/components/shared/PageHeader";
-import { HighlightsStrip } from "@/components/shared/HighlightsStrip";
-import { CollapsibleSection } from "@/components/shared/CollapsibleSection";
-import { StickyActionBar } from "@/components/shared/StickyActionBar";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { ClipboardCheck, Send, AlertTriangle, Loader2, ArrowLeft, Clock, Save, Ban } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useBackNavigation } from "@/hooks/useBackNavigation";
@@ -159,46 +155,52 @@ const ProfilePage = () => {
         />
 
         <div className="flex-1 flex flex-col min-w-0">
-          <PageHeader
-            breadcrumb="Medically Modern · Profile Tool"
-            title={selected ? selected.name : "Profile Send Off"}
-            subtitle={selected?.alreadyInSystem?.toLowerCase() === "yes" ? "Already In System" : undefined}
-            icon={<ClipboardCheck className="h-5 w-5 text-primary-foreground" />}
-            variant={isEscalated ? "escalated" : "default"}
-            onBack={() => goBack()}
-          >
-            {selected && (
-              <>
-                <Button
-                  onClick={() => setFollowUpOpen(true)}
-                  variant="ghost"
-                  className="gap-2 text-white/80 hover:text-white hover:bg-white/10"
-                >
-                  <Clock className="h-4 w-4" /> Follow Up
-                </Button>
-                <Button
-                  onClick={handleSave}
-                  disabled={saving || !hasOverlay(selected.id)}
-                  className="gap-2 bg-emerald-600 text-white hover:bg-emerald-700 shadow-elevate"
-                >
-                  {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-                  Save
-                </Button>
-              </>
-            )}
-          </PageHeader>
-
-          {selected && (
-            <HighlightsStrip
-              items={[
-                { label: "Patient", value: selected.name },
-                { label: "DOB", value: selected.dob || "—" },
-                { label: "Phone", value: selected.ptPhone || "—" },
-                { label: "Gender", value: selected.gender || "—" },
-                { label: "Intake", value: selected.dateOfIntake || "—" },
-              ]}
-            />
-          )}
+          <header className={`${isEscalated ? "bg-red-700" : "bg-gradient-navy"} text-navy-foreground border-b border-sidebar-border`}>
+            <div className="px-3 sm:px-6 py-5 flex items-center justify-between gap-4 flex-wrap">
+              <div className="flex items-center gap-3">
+                <SidebarTrigger className="text-navy-foreground hover:bg-white/10" />
+                <button onClick={() => goBack()} className="p-1.5 rounded-md hover:bg-white/10 transition-colors">
+                  <ArrowLeft className="h-5 w-5" />
+                </button>
+                <div className="h-10 w-10 rounded-lg bg-gradient-primary flex items-center justify-center shadow-elevate">
+                  <ClipboardCheck className="h-5 w-5 text-primary-foreground" />
+                </div>
+                <div>
+                  <p className="text-[10px] uppercase tracking-[0.2em] opacity-70">Medically Modern · Profile Tool</p>
+                  <div className="flex items-center gap-3">
+                    <h1 className="text-xl font-semibold">
+                      {selected ? selected.name : "Profile Send Off"}
+                    </h1>
+                    {selected?.alreadyInSystem?.toLowerCase() === "yes" && (
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-red-600 text-white text-xs font-semibold uppercase tracking-wide shadow-sm">
+                        <AlertTriangle className="h-3.5 w-3.5" />
+                        Already In System
+                      </span>
+                    )}
+                  </div>
+                </div>
+                {selected && (
+                  <>
+                    <Button
+                      onClick={() => setFollowUpOpen(true)}
+                      variant="ghost"
+                      className="gap-2 text-navy-foreground hover:bg-white/10"
+                    >
+                      <Clock className="h-4 w-4" /> Follow Up
+                    </Button>
+                    <Button
+                      onClick={handleSave}
+                      disabled={saving || !hasOverlay(selected.id)}
+                      className="gap-2 bg-emerald-600 text-white hover:bg-emerald-700 shadow-elevate"
+                    >
+                      {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                      Save
+                    </Button>
+                  </>
+                )}
+              </div>
+            </div>
+          </header>
 
           <main className="flex-1 px-3 sm:px-6 py-6">
             <section className="max-w-5xl xl:max-w-7xl 2xl:max-w-[1800px] mx-auto space-y-5">
@@ -213,61 +215,44 @@ const ProfilePage = () => {
               {selected && (
                 <>
                   {/* 1. Patient Demographics */}
-                  <CollapsibleSection
-                    title="Patient Profile"
-                    icon={<User className="h-4 w-4" />}
-                    defaultOpen={false}
-                    className="opacity-80"
-                  >
-                    <PatientProfileCard
-                      patient={selected}
-                      onUpdate={handleUpdate}
-                      referralEmailOpen={referralEmailOpen}
-                      onToggleReferralEmail={() => setReferralEmailOpen((o) => !o)}
-                    />
-                  </CollapsibleSection>
+                  <PatientProfileCard
+                    patient={selected}
+                    onUpdate={handleUpdate}
+                    referralEmailOpen={referralEmailOpen}
+                    onToggleReferralEmail={() => setReferralEmailOpen((o) => !o)}
+                  />
 
                   {/* 2. Referral — rendered via ServingPanel (referral-only mode) */}
-                  <CollapsibleSection title="Referral" forceOpen>
-                    <ServingPanel patient={selected} onUpdate={handleUpdate} hideReferral={false} referralOnly />
-                  </CollapsibleSection>
+                  <ServingPanel patient={selected} onUpdate={handleUpdate} hideReferral={false} referralOnly />
 
                   {/* 3. Benefits — Stedi */}
-                  <CollapsibleSection title="Benefits (Stedi)" forceOpen>
-                    <StediPanel
-                      patient={selected}
-                      onRefresh={refetch}
-                      onUpdate={handleUpdate}
-                      onRemoveOverlayKeys={(keys) =>
-                        selected && removeOverlayKeys(selected.id, keys)
-                      }
-                    />
-                  </CollapsibleSection>
+                  <StediPanel
+                    patient={selected}
+                    onRefresh={refetch}
+                    onUpdate={handleUpdate}
+                    onRemoveOverlayKeys={(keys) =>
+                      selected && removeOverlayKeys(selected.id, keys)
+                    }
+                  />
 
                   {/* 4. Request, Cross-Sell, Serving, Coverage (no referral) */}
-                  <CollapsibleSection title="Serving & Coverage" forceOpen>
-                    <ServingPanel patient={selected} onUpdate={handleUpdate} hideReferral />
-                  </CollapsibleSection>
+                  <ServingPanel patient={selected} onUpdate={handleUpdate} hideReferral />
 
                   {/* 5. Doctor */}
-                  <CollapsibleSection title="Doctor Information" forceOpen>
-                    <DoctorPanel
-                      patient={selected}
-                      onUpdate={handleUpdate}
-                      clinicLabels={clinicLabels}
-                      onClinicSelect={handleClinicSelect}
-                      onClinicCreate={handleClinicCreate}
-                    />
-                  </CollapsibleSection>
+                  <DoctorPanel
+                    patient={selected}
+                    onUpdate={handleUpdate}
+                    clinicLabels={clinicLabels}
+                    onClinicSelect={handleClinicSelect}
+                    onClinicCreate={handleClinicCreate}
+                  />
 
-                  {/* 6. Notes */}
-                  <CollapsibleSection title="Notes" defaultOpen>
-                    <NotesPanel
-                      notes={selected.notes}
-                      onNotesChange={(v) => updateLocal(selected.id, { notes: v })}
-                      onSaveToMonday={(v) => writeText(selected.id, COL.notes, v)}
-                    />
-                  </CollapsibleSection>
+                  {/* 5. Notes */}
+                  <NotesPanel
+                    notes={selected.notes}
+                    onNotesChange={(v) => updateLocal(selected.id, { notes: v })}
+                    onSaveToMonday={(v) => writeText(selected.id, COL.notes, v)}
+                  />
 
                   {/* Follow Up Modal */}
                   <FollowUpModal
@@ -277,44 +262,48 @@ const ProfilePage = () => {
                     patientName={selected.name}
                     onSuccess={refetch}
                   />
+
+                  {/* Submit */}
+                  <div className="rounded-xl bg-card border shadow-card p-5">
+                    <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                      <div className="text-sm text-muted-foreground">
+                        <p className="font-medium text-foreground">Ready to send off?</p>
+                        <p className="text-xs">All edits will be saved to Monday when you submit.</p>
+                      </div>
+                      <div className="flex gap-3">
+                        <Button
+                          variant="outline"
+                          onClick={handleStuck}
+                          disabled={stuckSending || submitting}
+                          className="gap-2 border-orange-300 text-orange-700 hover:bg-orange-100 hover:text-orange-800"
+                        >
+                          {stuckSending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Ban className="h-4 w-4" />}
+                          Stuck
+                        </Button>
+                        <Button
+                          variant="outline"
+                          onClick={() => handleSubmit("needsInfo")}
+                          disabled={submitting || stuckSending}
+                          className="gap-2 border-blue-300 text-blue-700 hover:bg-purple-100 hover:text-blue-700"
+                        >
+                          {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <AlertTriangle className="h-4 w-4" />}
+                          Need More Info
+                        </Button>
+                        <Button
+                          onClick={() => handleSubmit("advance")}
+                          disabled={submitting || stuckSending}
+                          className="gap-2 bg-green-600 hover:bg-green-700 text-white shadow-elevate"
+                        >
+                          {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                          Advance to MN
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
                 </>
               )}
             </section>
           </main>
-
-          {selected && (
-            <StickyActionBar
-              stepLabel="Profile Send Off"
-              hint="All edits will be saved to Monday when you submit."
-            >
-              <Button
-                variant="outline"
-                onClick={handleStuck}
-                disabled={stuckSending || submitting}
-                className="gap-2 border-orange-300 text-orange-700 hover:bg-orange-100 hover:text-orange-800"
-              >
-                {stuckSending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Ban className="h-4 w-4" />}
-                Stuck
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => handleSubmit("needsInfo")}
-                disabled={submitting || stuckSending}
-                className="gap-2 border-blue-300 text-blue-700 hover:bg-purple-100 hover:text-blue-700"
-              >
-                {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <AlertTriangle className="h-4 w-4" />}
-                Need More Info
-              </Button>
-              <Button
-                onClick={() => handleSubmit("advance")}
-                disabled={submitting || stuckSending}
-                className="gap-2 bg-green-600 hover:bg-green-700 text-white shadow-elevate"
-              >
-                {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-                Advance to MN
-              </Button>
-            </StickyActionBar>
-          )}
         </div>
 
         {/* Side-by-side referral email panel — sibling of the main

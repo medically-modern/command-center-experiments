@@ -17,7 +17,7 @@ import { ClinicalsDownloadButton } from "@/components/welcomeCall/ClinicalsDownl
 import { CallAttemptsCounter } from "@/components/welcomeCall/CallAttemptsCounter";
 import { FollowUpModal } from "@/components/welcomeCall/FollowUpModal";
 import { Button } from "@/components/ui/button";
-import { SidebarProvider } from "@/components/ui/sidebar";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -28,7 +28,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { RotateCcw, ClipboardCheck, Save, Clock, OctagonX, User, Phone, FileText, DollarSign, CalendarDays, CheckSquare } from "lucide-react";
+import { RotateCcw, ClipboardCheck, ArrowLeft, Save, Clock, OctagonX } from "lucide-react";
 import { toast } from "sonner";
 import { sendPatientToMonday, sendWelcomeCallTextToMonday, sendNotesToMonday, sendPhoneToMonday, sendSecondaryInsuranceToMonday } from "@/lib/welcomeCall/mondayWrite";
 import { writeStatusIndex, writeLongText, COL } from "@/lib/welcomeCall/mondayApi";
@@ -36,10 +36,6 @@ import { EscalationFormModal } from "@/components/shared/EscalationFormModal";
 import { validatePatientForSend } from "@/lib/welcomeCall/workflow";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useBackNavigation } from "@/hooks/useBackNavigation";
-import { PageHeader } from "@/components/shared/PageHeader";
-import { HighlightsStrip } from "@/components/shared/HighlightsStrip";
-import { CollapsibleSection } from "@/components/shared/CollapsibleSection";
-import { StickyActionBar } from "@/components/shared/StickyActionBar";
 
 const WelcomeCallPage = () => {
   const navigate = useNavigate();
@@ -185,55 +181,54 @@ const WelcomeCallPage = () => {
         />
 
         <div className="flex-1 flex flex-col min-w-0">
-          <PageHeader
-            title="Welcome Call"
-            subtitle={selected?.name}
-            icon={<ClipboardCheck className="h-5 w-5 text-primary-foreground" />}
-            variant={isEscalated ? "escalated" : "default"}
-            onBack={() => goBack()}
-          >
-            {selected && (
-              <CallAttemptsCounter
-                itemId={selected.id}
-                callAttempts={selected.callAttempts}
-                onUpdate={(v) => update(selected.id, { callAttempts: v })}
-                onFollowUp={refetch}
-              />
-            )}
-            {selected && <ClinicalsDownloadButton itemId={selected.id} />}
-            <Button onClick={() => setStuckOpen(true)} disabled={!selected} className="gap-2 bg-red-600 text-white hover:bg-red-700 shadow-elevate">
-              <OctagonX className="h-4 w-4" /> Stuck
-            </Button>
-            <Button onClick={() => setFollowUpOpen(true)} disabled={!selected} className="gap-2 bg-white/90 text-blue-700 hover:bg-white shadow-elevate">
-              <Clock className="h-4 w-4" /> Follow Up
-            </Button>
-            <Button
-              onClick={() => {
-                if (!selected) return;
-                saveOverlay(selected.id);
-                toast.success("Progress saved — you can leave and come back");
-              }}
-              disabled={!selected || !hasOverlay(selected.id)}
-              className="gap-2 bg-emerald-600 text-white hover:bg-emerald-700 shadow-elevate"
-            >
-              <Save className="h-4 w-4" /> Save
-            </Button>
-            <Button onClick={resetForNewPatient} disabled={!selected} className="gap-2 bg-white text-navy hover:bg-white/90 shadow-elevate">
-              <RotateCcw className="h-4 w-4" /> Reset
-            </Button>
-          </PageHeader>
-
-          {selected && (
-            <HighlightsStrip
-              items={[
-                { label: "Patient", value: selected.name },
-                { label: "Insurance", value: selected.primaryInsurance || "—" },
-                { label: "Serving", value: selected.serving || "—" },
-                { label: "Referral", value: selected.referralSource || "—" },
-                { label: "Diagnosis", value: selected.diagnosis || "—" },
-              ]}
-            />
-          )}
+          <header className={`${isEscalated ? "bg-red-700" : "bg-gradient-navy"} text-navy-foreground border-b border-sidebar-border`}>
+            <div className="px-3 sm:px-6 py-5 flex items-center justify-between gap-4 flex-wrap">
+              <div className="flex items-center gap-3">
+                <SidebarTrigger className="text-navy-foreground hover:bg-white/10" />
+                <button onClick={() => goBack()} className="p-1.5 rounded-md hover:bg-white/10 transition-colors">
+                  <ArrowLeft className="h-5 w-5" />
+                </button>
+                <div className="h-10 w-10 rounded-lg bg-gradient-primary flex items-center justify-center shadow-elevate">
+                  <ClipboardCheck className="h-5 w-5 text-primary-foreground" />
+                </div>
+                <div>
+                  <p className="text-[10px] uppercase tracking-[0.2em] opacity-70">Medically Modern</p>
+                  <h1 className="text-2xl font-bold">Welcome Call</h1>{selected && <p className="text-sm opacity-80 mt-0.5">{selected.name}</p>}
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                {selected && (
+                  <CallAttemptsCounter
+                    itemId={selected.id}
+                    callAttempts={selected.callAttempts}
+                    onUpdate={(v) => update(selected.id, { callAttempts: v })}
+                    onFollowUp={refetch}
+                  />
+                )}
+                {selected && <ClinicalsDownloadButton itemId={selected.id} />}
+                <Button onClick={() => setStuckOpen(true)} disabled={!selected} className="gap-2 bg-red-600 text-white hover:bg-red-700 shadow-elevate">
+                  <OctagonX className="h-4 w-4" /> Stuck
+                </Button>
+                <Button onClick={() => setFollowUpOpen(true)} disabled={!selected} className="gap-2 bg-white/90 text-blue-700 hover:bg-white shadow-elevate">
+                  <Clock className="h-4 w-4" /> Follow Up
+                </Button>
+                <Button
+                  onClick={() => {
+                    if (!selected) return;
+                    saveOverlay(selected.id);
+                    toast.success("Progress saved — you can leave and come back");
+                  }}
+                  disabled={!selected || !hasOverlay(selected.id)}
+                  className="gap-2 bg-emerald-600 text-white hover:bg-emerald-700 shadow-elevate"
+                >
+                  <Save className="h-4 w-4" /> Save
+                </Button>
+                <Button onClick={resetForNewPatient} disabled={!selected} className="gap-2 bg-white text-navy hover:bg-white/90 shadow-elevate">
+                  <RotateCcw className="h-4 w-4" /> Reset
+                </Button>
+              </div>
+            </div>
+          </header>
 
           <main className="flex-1 px-3 sm:px-6 py-6 overflow-y-auto">
             <section className="max-w-5xl xl:max-w-7xl 2xl:max-w-[1800px] mx-auto space-y-5">
@@ -247,79 +242,27 @@ const WelcomeCallPage = () => {
 
               {selected && (
                 <>
-                  <CollapsibleSection
-                    title="Patient Profile"
-                    icon={<User className="h-4 w-4" />}
-                    defaultOpen={false}
-                  >
-                    <div className="opacity-80">
-                      <PatientInfoCard
-                        patient={selected}
-                        onFieldChange={handleFieldChange}
-                        onSavePhone={(phone) => sendPhoneToMonday(selected.id, phone)}
-                        onSaveSecondaryInsurance={(_label, index) => sendSecondaryInsuranceToMonday(selected.id, index)}
-                      />
-                    </div>
-                  </CollapsibleSection>
-
-                  <CollapsibleSection
-                    title="OOP Estimate"
-                    icon={<DollarSign className="h-4 w-4" />}
-                    defaultOpen={false}
-                  >
-                    <OopEstimateCard patient={selected} />
-                  </CollapsibleSection>
-
-                  <CollapsibleSection
-                    title="Welcome Call Form"
-                    icon={<Phone className="h-4 w-4" />}
-                    forceOpen={true}
-                    accentColor="hsl(var(--primary))"
-                  >
-                    <WelcomeCallForm patient={selected} onFieldChange={handleFieldChange} onSendWelcomeCallText={handleSendWelcomeCallText} />
-                  </CollapsibleSection>
-
-                  <CollapsibleSection
-                    title="Next Order Dates"
-                    icon={<CalendarDays className="h-4 w-4" />}
-                    defaultOpen={false}
-                  >
-                    <NextOrderDatesCard patient={selected} onFieldChange={handleFieldChange} />
-                  </CollapsibleSection>
-
-                  <CollapsibleSection
-                    title="Notes"
-                    icon={<FileText className="h-4 w-4" />}
-                    defaultOpen={false}
-                  >
-                    <NotesPanel
-                      notes={selected.notes}
-                      onNotesChange={(v) => update(selected.id, { notes: v })}
-                      onSaveToMonday={(v) => sendNotesToMonday(selected.id, v)}
-                    />
-                  </CollapsibleSection>
-
-                  <CollapsibleSection
-                    title="Review"
-                    icon={<CheckSquare className="h-4 w-4" />}
-                    defaultOpen={false}
-                  >
-                    <ReviewPanel patient={selected} />
-                  </CollapsibleSection>
+                  <PatientInfoCard
+                    patient={selected}
+                    onFieldChange={handleFieldChange}
+                    onSavePhone={(phone) => sendPhoneToMonday(selected.id, phone)}
+                    onSaveSecondaryInsurance={(_label, index) => sendSecondaryInsuranceToMonday(selected.id, index)}
+                  />
+                  <OopEstimateCard patient={selected} />
+                  <WelcomeCallForm patient={selected} onFieldChange={handleFieldChange} onSendWelcomeCallText={handleSendWelcomeCallText} />
+                  <NextOrderDatesCard patient={selected} onFieldChange={handleFieldChange} />
+                  <NotesPanel
+                    notes={selected.notes}
+                    onNotesChange={(v) => update(selected.id, { notes: v })}
+                    onSaveToMonday={(v) => sendNotesToMonday(selected.id, v)}
+                  />
+                  <ReviewPanel patient={selected} />
+                  <EscalateButton escalated={selected.escalated} onToggle={toggleEscalate} disabled={!selected} onOpenForm={() => setEscalationModalOpen(true)} />
+                  <SendToMondayButton onSend={handleSend} disabled={!selected || !validation.valid} validationErrors={validation.errors} />
                 </>
               )}
             </section>
           </main>
-
-          {selected && (
-            <StickyActionBar
-              stepLabel="Welcome Call"
-              hint="Complete the welcome call form, then send to Monday"
-            >
-              <EscalateButton escalated={selected.escalated} onToggle={toggleEscalate} disabled={!selected} onOpenForm={() => setEscalationModalOpen(true)} />
-              <SendToMondayButton onSend={handleSend} disabled={!selected || !validation.valid} validationErrors={validation.errors} />
-            </StickyActionBar>
-          )}
         </div>
       </div>
       {selected && (

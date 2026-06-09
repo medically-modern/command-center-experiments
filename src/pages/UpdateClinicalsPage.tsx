@@ -10,7 +10,7 @@ import { formatDateMDY } from "@/lib/subscription/workflow";
 import { MnDocsPanel } from "@/components/subscription/MnDocsPanel";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { SidebarProvider } from "@/components/ui/sidebar";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import {
   Sidebar,
   SidebarContent,
@@ -23,11 +23,9 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { FileUp, Loader2, RefreshCw, Search, User, X } from "lucide-react";
+import { ArrowLeft, FileUp, Loader2, RefreshCw, Search, User, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { PageHeader } from "@/components/shared/PageHeader";
-import { HighlightsStrip } from "@/components/shared/HighlightsStrip";
 
 /* ── Simplified Sidebar ─────────────────────────────────────── */
 
@@ -237,23 +235,29 @@ const UpdateClinicalsPage = () => {
         />
 
         <div className="flex-1 flex flex-col min-w-0">
-          <PageHeader
-            title="Update Clinicals"
-            subtitle={selected?.name}
-            icon={<FileUp className="h-5 w-5 text-primary-foreground" />}
-            onBack={() => navigate("/?tab=dashboard")}
-          />
-
-          {selected && (
-            <HighlightsStrip
-              items={[
-                { label: "Patient", value: selected.name },
-                { label: "DOB", value: selected.dob || "—" },
-                { label: "Medical Records", value: selected.mr || "—", valueColor: selected.mr === "MR Valid" ? "text-green-600" : selected.mr === "MR Expired" || selected.mr === "MR Invalid" ? "text-red-600" : "text-amber-600" },
-                { label: "MN Expiry", value: selected.mnExpiry ? formatDateMDY(selected.mnExpiry) : "—" },
-              ]}
-            />
-          )}
+          <header className="bg-gradient-navy text-navy-foreground border-b border-sidebar-border">
+            <div className="px-6 py-5 flex items-center gap-3">
+              <SidebarTrigger className="text-navy-foreground hover:bg-white/10" />
+              <button
+                onClick={() => navigate("/?tab=dashboard")}
+                className="p-1.5 rounded-md hover:bg-white/10 transition-colors"
+              >
+                <ArrowLeft className="h-5 w-5" />
+              </button>
+              <div className="h-10 w-10 rounded-lg bg-gradient-primary flex items-center justify-center shadow-elevate">
+                <FileUp className="h-5 w-5 text-primary-foreground" />
+              </div>
+              <div>
+                <p className="text-[10px] uppercase tracking-[0.2em] opacity-70">
+                  Medically Modern
+                </p>
+                <h1 className="text-2xl font-bold">Update Clinicals</h1>
+                {selected && (
+                  <p className="text-sm opacity-80 mt-0.5">{selected.name}</p>
+                )}
+              </div>
+            </div>
+          </header>
 
           <main className="flex-1 px-6 py-6 overflow-y-auto">
             <section className="max-w-3xl mx-auto space-y-5">
