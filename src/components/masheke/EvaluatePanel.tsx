@@ -483,7 +483,7 @@ export function EvaluatePanel({ patient, resetVersion = 0, onUpdate, onOpenForm 
           {showCgm && (
             <div className="flex items-center gap-4 px-5 py-4 hover:bg-muted/30 transition-colors">
               <div className="shrink-0">
-                {state.cgmScriptReceived === "Yes" && state.cgmScriptValid === "Valid" ? (
+                {state.cgmScriptReceived === "Yes" ? (
                   <CheckCircle2 className="h-6 w-6 text-emerald-500" />
                 ) : state.cgmScriptReceived === "No" ? (
                   <XCircle className="h-6 w-6 text-red-400" />
@@ -494,7 +494,7 @@ export function EvaluatePanel({ patient, resetVersion = 0, onUpdate, onOpenForm 
               <span className="text-sm font-medium text-foreground min-w-[140px]">CGM Script</span>
               <div className="flex items-center gap-2 ml-auto">
                 <button
-                  onClick={() => { update("cgmScriptReceived", "Yes" as YesNo); }}
+                  onClick={() => { if (state.cgmScriptReceived === "Yes") { update("cgmScriptReceived", undefined); update("cgmScriptValid", undefined); } else { update("cgmScriptReceived", "Yes" as YesNo); } }}
                   className={cn(
                     "px-3 py-1.5 rounded-full text-xs font-medium border transition-all",
                     state.cgmScriptReceived === "Yes"
@@ -505,7 +505,7 @@ export function EvaluatePanel({ patient, resetVersion = 0, onUpdate, onOpenForm 
                   Received
                 </button>
                 <button
-                  onClick={() => { update("cgmScriptReceived", "No" as YesNo); update("cgmScriptValid", undefined); }}
+                  onClick={() => { if (state.cgmScriptReceived === "No") { update("cgmScriptReceived", undefined); } else { update("cgmScriptReceived", "No" as YesNo); update("cgmScriptValid", undefined); } }}
                   className={cn(
                     "px-3 py-1.5 rounded-full text-xs font-medium border transition-all",
                     state.cgmScriptReceived === "No"
@@ -519,7 +519,7 @@ export function EvaluatePanel({ patient, resetVersion = 0, onUpdate, onOpenForm 
                   <>
                     <div className="w-px h-5 bg-border mx-1" />
                     <button
-                      onClick={() => update("cgmScriptValid", "Valid" as ValidInvalid)}
+                      onClick={() => update("cgmScriptValid", state.cgmScriptValid === "Valid" ? undefined : "Valid" as ValidInvalid)}
                       className={cn(
                         "px-3 py-1.5 rounded-full text-xs font-medium border transition-all",
                         state.cgmScriptValid === "Valid"
@@ -530,7 +530,7 @@ export function EvaluatePanel({ patient, resetVersion = 0, onUpdate, onOpenForm 
                       Valid
                     </button>
                     <button
-                      onClick={() => update("cgmScriptValid", "Invalid" as ValidInvalid)}
+                      onClick={() => update("cgmScriptValid", state.cgmScriptValid === "Invalid" ? undefined : "Invalid" as ValidInvalid)}
                       className={cn(
                         "px-3 py-1.5 rounded-full text-xs font-medium border transition-all",
                         state.cgmScriptValid === "Invalid"
@@ -550,7 +550,7 @@ export function EvaluatePanel({ patient, resetVersion = 0, onUpdate, onOpenForm 
           {showIp && (
             <div className="flex items-center gap-4 px-5 py-4 hover:bg-muted/30 transition-colors">
               <div className="shrink-0">
-                {state.ipScriptReceived === "Yes" && state.ipScriptValid === "Valid" ? (
+                {state.ipScriptReceived === "Yes" ? (
                   <CheckCircle2 className="h-6 w-6 text-emerald-500" />
                 ) : state.ipScriptReceived === "No" ? (
                   <XCircle className="h-6 w-6 text-red-400" />
@@ -561,7 +561,7 @@ export function EvaluatePanel({ patient, resetVersion = 0, onUpdate, onOpenForm 
               <span className="text-sm font-medium text-foreground min-w-[140px]">IP Script</span>
               <div className="flex items-center gap-2 ml-auto">
                 <button
-                  onClick={() => { update("ipScriptReceived", "Yes" as YesNo); }}
+                  onClick={() => { if (state.ipScriptReceived === "Yes") { update("ipScriptReceived", undefined); update("ipScriptValid", undefined); } else { update("ipScriptReceived", "Yes" as YesNo); } }}
                   className={cn(
                     "px-3 py-1.5 rounded-full text-xs font-medium border transition-all",
                     state.ipScriptReceived === "Yes"
@@ -572,7 +572,7 @@ export function EvaluatePanel({ patient, resetVersion = 0, onUpdate, onOpenForm 
                   Received
                 </button>
                 <button
-                  onClick={() => { update("ipScriptReceived", "No" as YesNo); update("ipScriptValid", undefined); }}
+                  onClick={() => { if (state.ipScriptReceived === "No") { update("ipScriptReceived", undefined); } else { update("ipScriptReceived", "No" as YesNo); update("ipScriptValid", undefined); } }}
                   className={cn(
                     "px-3 py-1.5 rounded-full text-xs font-medium border transition-all",
                     state.ipScriptReceived === "No"
@@ -586,7 +586,7 @@ export function EvaluatePanel({ patient, resetVersion = 0, onUpdate, onOpenForm 
                   <>
                     <div className="w-px h-5 bg-border mx-1" />
                     <button
-                      onClick={() => update("ipScriptValid", "Valid" as ValidInvalid)}
+                      onClick={() => update("ipScriptValid", state.ipScriptValid === "Valid" ? undefined : "Valid" as ValidInvalid)}
                       className={cn(
                         "px-3 py-1.5 rounded-full text-xs font-medium border transition-all",
                         state.ipScriptValid === "Valid"
@@ -597,7 +597,7 @@ export function EvaluatePanel({ patient, resetVersion = 0, onUpdate, onOpenForm 
                       Valid
                     </button>
                     <button
-                      onClick={() => update("ipScriptValid", "Invalid" as ValidInvalid)}
+                      onClick={() => update("ipScriptValid", state.ipScriptValid === "Invalid" ? undefined : "Invalid" as ValidInvalid)}
                       className={cn(
                         "px-3 py-1.5 rounded-full text-xs font-medium border transition-all",
                         state.ipScriptValid === "Invalid"
@@ -627,7 +627,7 @@ export function EvaluatePanel({ patient, resetVersion = 0, onUpdate, onOpenForm 
             <span className="text-sm font-medium text-foreground min-w-[140px]">Clinicals</span>
             <div className="flex items-center gap-2 ml-auto">
               <button
-                onClick={() => setMrReceived("Yes" as YesNo)}
+                onClick={() => setMrReceived(state.mrReceived === "Yes" ? undefined as unknown as YesNo : "Yes" as YesNo)}
                 className={cn(
                   "px-3 py-1.5 rounded-full text-xs font-medium border transition-all",
                   state.mrReceived === "Yes"
@@ -638,7 +638,7 @@ export function EvaluatePanel({ patient, resetVersion = 0, onUpdate, onOpenForm 
                 Received
               </button>
               <button
-                onClick={() => setMrReceived("No" as YesNo)}
+                onClick={() => setMrReceived(state.mrReceived === "No" ? undefined as unknown as YesNo : "No" as YesNo)}
                 className={cn(
                   "px-3 py-1.5 rounded-full text-xs font-medium border transition-all",
                   state.mrReceived === "No"
@@ -870,61 +870,78 @@ function IpCriteria({ state, patient, update }: IpCriteriaProps) {
 
   const oowCheck = isOowDateValid(state.oowDate, patient.primaryInsurance);
 
+  const yesNoRows: { key: keyof EvalState; label: string; show: boolean }[] = [
+    { key: "diabetesEducation", label: "Diabetes Education", show: cfg.showEducation },
+    { key: "threeInjections", label: "3+ Injections / day", show: cfg.show3Injections },
+    { key: "cgmUse", label: "CGM Use", show: cfg.showCgmUse },
+    { key: "bloodSugarIssues", label: "Blood Sugar Issues", show: cfg.showBsIssues },
+    { key: "malfunction", label: "Malfunction", show: cfg.showMalfunction },
+  ].filter((r) => r.show);
+
   return (
     <div className="mt-3 pt-3 border-t border-dashed">
       <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">
         Criteria for {state.ipCoveragePath}
       </p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6">
-        {cfg.showEducation && (
-          <StatusSelect
-            label="Diabetes Education"
-            value={state.diabetesEducation}
-            options={YES_NO_OPTS}
-            onChange={(v) => update("diabetesEducation", v as YesNo)}
-          />
-        )}
-        {cfg.show3Injections && (
-          <StatusSelect
-            label="3+ Injections / day"
-            value={state.threeInjections}
-            options={YES_NO_OPTS}
-            onChange={(v) => update("threeInjections", v as YesNo)}
-          />
-        )}
-        {cfg.showCgmUse && (
-          <StatusSelect
-            label="CGM Use"
-            value={state.cgmUse}
-            options={YES_NO_OPTS}
-            onChange={(v) => update("cgmUse", v as YesNo)}
-          />
-        )}
-        {cfg.showBsIssues && (
-          <StatusSelect
-            label="Blood Sugar Issues"
-            value={state.bloodSugarIssues}
-            options={YES_NO_OPTS}
-            onChange={(v) => update("bloodSugarIssues", v as YesNo)}
-          />
-        )}
-        {cfg.showLmn && (
+
+      {/* Checklist rows for Yes/No criteria */}
+      {yesNoRows.length > 0 && (
+        <div className="divide-y divide-border rounded-xl border border-border bg-card overflow-hidden mb-3">
+          {yesNoRows.map(({ key, label }) => {
+            const val = state[key] as string | undefined;
+            return (
+              <div key={key} className="flex items-center gap-4 px-5 py-3.5 hover:bg-muted/30 transition-colors">
+                <div className="shrink-0">
+                  {val === "Yes" ? (
+                    <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+                  ) : val === "No" ? (
+                    <XCircle className="h-5 w-5 text-red-400" />
+                  ) : (
+                    <Circle className="h-5 w-5 text-muted-foreground/40" />
+                  )}
+                </div>
+                <span className="text-sm font-medium text-foreground min-w-[140px]">{label}</span>
+                <div className="flex items-center gap-2 ml-auto">
+                  <button
+                    onClick={() => update(key, (val === "Yes" ? undefined : "Yes") as EvalState[typeof key])}
+                    className={cn(
+                      "px-3 py-1.5 rounded-full text-xs font-medium border transition-all",
+                      val === "Yes"
+                        ? "bg-emerald-100 text-emerald-700 border-emerald-300"
+                        : "bg-muted/50 text-muted-foreground border-border hover:border-emerald-300 hover:text-emerald-600"
+                    )}
+                  >
+                    Yes
+                  </button>
+                  <button
+                    onClick={() => update(key, (val === "No" ? undefined : "No") as EvalState[typeof key])}
+                    className={cn(
+                      "px-3 py-1.5 rounded-full text-xs font-medium border transition-all",
+                      val === "No"
+                        ? "bg-red-100 text-red-700 border-red-300"
+                        : "bg-muted/50 text-muted-foreground border-border hover:border-red-300 hover:text-red-600"
+                    )}
+                  >
+                    No
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* LMN stays as dropdown — it has more than Yes/No options */}
+      {cfg.showLmn && (
+        <div className="mb-3">
           <StatusSelect
             label="Letter of MN on file"
             value={state.lmn}
             options={LMN_OPTS}
             onChange={(v) => update("lmn", v as LmnStatus)}
           />
-        )}
-        {cfg.showMalfunction && (
-          <StatusSelect
-            label="Malfunction"
-            value={state.malfunction}
-            options={YES_NO_OPTS}
-            onChange={(v) => update("malfunction", v as YesNo)}
-          />
-        )}
-      </div>
+        </div>
+      )}
 
       {cfg.showOow && (
         <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 items-end">
@@ -971,13 +988,43 @@ function IpCriteria({ state, patient, update }: IpCriteriaProps) {
       )}
 
       {cfg.showOowOnScript && (
-        <div className="mt-1 grid grid-cols-1 sm:grid-cols-2 gap-x-6">
-          <StatusSelect
-            label="OOW Date on Script?"
-            value={state.oowDateOnScript}
-            options={YES_NO_OPTS}
-            onChange={(v) => update("oowDateOnScript", v as YesNo)}
-          />
+        <div className="divide-y divide-border rounded-xl border border-border bg-card overflow-hidden mt-3">
+          <div className="flex items-center gap-4 px-5 py-3.5 hover:bg-muted/30 transition-colors">
+            <div className="shrink-0">
+              {state.oowDateOnScript === "Yes" ? (
+                <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+              ) : state.oowDateOnScript === "No" ? (
+                <XCircle className="h-5 w-5 text-red-400" />
+              ) : (
+                <Circle className="h-5 w-5 text-muted-foreground/40" />
+              )}
+            </div>
+            <span className="text-sm font-medium text-foreground min-w-[140px]">OOW Date on Script?</span>
+            <div className="flex items-center gap-2 ml-auto">
+              <button
+                onClick={() => update("oowDateOnScript", (state.oowDateOnScript === "Yes" ? undefined : "Yes") as YesNo)}
+                className={cn(
+                  "px-3 py-1.5 rounded-full text-xs font-medium border transition-all",
+                  state.oowDateOnScript === "Yes"
+                    ? "bg-emerald-100 text-emerald-700 border-emerald-300"
+                    : "bg-muted/50 text-muted-foreground border-border hover:border-emerald-300 hover:text-emerald-600"
+                )}
+              >
+                Yes
+              </button>
+              <button
+                onClick={() => update("oowDateOnScript", (state.oowDateOnScript === "No" ? undefined : "No") as YesNo)}
+                className={cn(
+                  "px-3 py-1.5 rounded-full text-xs font-medium border transition-all",
+                  state.oowDateOnScript === "No"
+                    ? "bg-red-100 text-red-700 border-red-300"
+                    : "bg-muted/50 text-muted-foreground border-border hover:border-red-300 hover:text-red-600"
+                )}
+              >
+                No
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
