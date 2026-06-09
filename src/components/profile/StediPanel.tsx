@@ -326,9 +326,9 @@ export function StediPanel({ patient, onRefresh, onUpdate, onNext, onRemoveOverl
   const isActive = patient.stediEligibilityActive?.toLowerCase() === "yes";
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-8">
       <StepSection step={1} title="Insurance Inputs" hint="Set insurance, member IDs, then run Stedi" rightAccessory={<ClinicalsDownloadButton itemId={patient.id} />}>
-        <div className="space-y-5">
+        <div className="space-y-8">
           {/* General Insurance + Member IDs + Stedi button */}
           <div className="grid grid-cols-1 md:grid-cols-[1fr_140px_140px_auto] gap-4 items-end">
             <div className="space-y-1.5">
@@ -605,7 +605,7 @@ export function StediPanel({ patient, onRefresh, onUpdate, onNext, onRemoveOverl
             <ToggleGroupItem value="family" className="h-8 px-3 text-xs">Use Family</ToggleGroupItem>
           </ToggleGroup>
         }>
-        <div className="space-y-5">
+        <div className="space-y-8">
           {/* Editable working values — default source switches with the toggle */}
           {(() => {
             const isFamily = costSharingMode === "family";
@@ -614,7 +614,7 @@ export function StediPanel({ patient, onRefresh, onUpdate, onNext, onRemoveOverl
             const defaultOopMax = isFamily ? patient.stediFamilyOopMax : patient.stediIndividualOopMax;
             const defaultOopMaxRem = isFamily ? patient.stediFamilyOopMaxRemaining : patient.stediIndividualOopMaxRemaining;
             return (
-              <div className="space-y-5">
+              <div className="space-y-8">
                 {/* Pair 1: Co-insurance + Co-pay */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-1.5">

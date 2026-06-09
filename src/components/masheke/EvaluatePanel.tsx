@@ -569,7 +569,7 @@ export function EvaluatePanel({ patient, resetVersion = 0, onUpdate, onOpenForm 
               title="Insulin Pump"
               status={validity.sections.ip.shown ? validity.sections.ip.valid : null}
             >
-              <div className="space-y-4">
+              <div className="space-y-6">
                 <StatusSelect
                   label="Insulin Pump Coverage Path"
                   value={state.ipCoveragePath}
@@ -637,7 +637,7 @@ export function EvaluatePanel({ patient, resetVersion = 0, onUpdate, onOpenForm 
       </StepSection>
 
       <StepSection step={5} title="Review & Send" hint="Monday preview and send to Monday">
-        <div className="space-y-4">
+        <div className="space-y-6">
           {/* Notes */}
           <NotesPanel
             notes={patient.mnEvalNotes ?? ""}
@@ -1562,7 +1562,7 @@ function ValiditySummary({
   const missingFields = getMissingRequiredFields(state, showCgm, showIp);
   const blocked = missingFields.length > 0;
   return (
-    <section className="rounded-xl bg-card border shadow-card p-5 space-y-4">
+    <section className="rounded-xl bg-card border shadow-card p-5 space-y-6">
 
       {/* Section pills + MN status */}
       <div className="flex items-center gap-2 flex-wrap">

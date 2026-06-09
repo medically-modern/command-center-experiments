@@ -171,7 +171,7 @@ export function ChaseClinicalsPanel({ patient, onUpdate, onOpenForm }: Props) {
   return (
     <div className="space-y-6">
       <StepSection step={1} title="Review Status" hint="Banners, files, and attempt history">
-        <div className="space-y-4">
+        <div className="space-y-6">
           <MethodBanner patient={patient} />
           <ReceiptConfirmedBanner patient={patient} />
           <WhatsNeededCard patient={patient} />
@@ -199,7 +199,7 @@ export function ChaseClinicalsPanel({ patient, onUpdate, onOpenForm }: Props) {
       </StepSection>
 
       <StepSection step={3} title="Notes & Save" hint="Add notes and submit">
-        <div className="space-y-4">
+        <div className="space-y-6">
           <NotesPanel
             notes={patient.mnEvalNotes ?? ""}
             onNotesChange={(v) => onUpdate({ mnEvalNotes: v })}
@@ -474,7 +474,7 @@ function ActiveAttemptCard({
         )}
       </div>
 
-      <div className="p-5 space-y-4">
+      <div className="p-5 space-y-6">
         {/* Parachute mode shows BOTH options — agents either send a
             message via the portal OR call the office. The Parachute
             button is its own selectable mode (no name input); call

@@ -73,7 +73,7 @@ const Index = () => {
           <div className="flex-1 overflow-y-auto p-8">
             <div className="max-w-3xl xl:max-w-5xl 2xl:max-w-6xl mx-auto space-y-6">
               <div>
-                <h2 className="text-xl font-semibold text-foreground">Managers</h2>
+                <h2 className="text-2xl font-bold text-foreground">Managers</h2>
                 <p className="text-sm text-muted-foreground mt-1">
                   Assign team members to each role. Changes sync across all devices.
                 </p>

@@ -60,7 +60,7 @@ function ClinicalsSidebar({
         <div className="flex items-center justify-between gap-2">
           {!collapsed && (
             <div className="min-w-0">
-              <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+              <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
                 Monday · Clinicals
               </p>
               <p className="text-sm font-semibold truncate">
@@ -111,7 +111,7 @@ function ClinicalsSidebar({
 
         <SidebarGroup>
           {!collapsed && (
-            <SidebarGroupLabel className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
+            <SidebarGroupLabel className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">
               All Patients ({filtered.length})
             </SidebarGroupLabel>
           )}
@@ -166,18 +166,18 @@ function PatientClinicalsCard({ patient }: { patient: Patient }) {
       : "text-amber-600";
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* Patient identity */}
       <Card className="p-4 flex items-center justify-between gap-4 flex-wrap">
         <div>
-          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">
+          <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-1">
             Patient Name
           </p>
           <p className="text-lg font-semibold">{patient.name}</p>
         </div>
         {patient.dob && (
           <div className="text-center">
-            <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">
+            <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-1">
               DOB
             </p>
             <p className="text-lg font-semibold">{patient.dob}</p>
@@ -185,7 +185,7 @@ function PatientClinicalsCard({ patient }: { patient: Patient }) {
         )}
         {patient.mr && (
           <div className="text-center">
-            <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">
+            <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-1">
               Medical Records
             </p>
             <p className={`text-sm font-semibold ${mrColor}`}>{patient.mr}</p>
@@ -236,7 +236,7 @@ const UpdateClinicalsPage = () => {
 
         <div className="flex-1 flex flex-col min-w-0">
           <header className="bg-gradient-navy text-navy-foreground border-b border-sidebar-border">
-            <div className="px-6 py-5 flex items-center gap-3">
+            <div className="px-6 py-6 flex items-center gap-3">
               <SidebarTrigger className="text-navy-foreground hover:bg-white/10" />
               <button
                 onClick={() => navigate("/?tab=dashboard")}
@@ -244,11 +244,11 @@ const UpdateClinicalsPage = () => {
               >
                 <ArrowLeft className="h-5 w-5" />
               </button>
-              <div className="h-10 w-10 rounded-lg bg-gradient-primary flex items-center justify-center shadow-elevate">
+              <div className="h-12 w-12 rounded-lg bg-gradient-primary flex items-center justify-center shadow-elevate">
                 <FileUp className="h-5 w-5 text-primary-foreground" />
               </div>
               <div>
-                <p className="text-[10px] uppercase tracking-[0.2em] opacity-70">
+                <p className="text-xs uppercase tracking-[0.2em] opacity-70">
                   Medically Modern
                 </p>
                 <h1 className="text-2xl font-bold">Update Clinicals</h1>
@@ -260,7 +260,7 @@ const UpdateClinicalsPage = () => {
           </header>
 
           <main className="flex-1 px-6 py-6 overflow-y-auto">
-            <section className="max-w-3xl mx-auto space-y-5">
+            <section className="max-w-3xl mx-auto space-y-8">
               {!selected && (
                 <div className="rounded-xl bg-card border shadow-card p-10 text-center">
                   <p className="text-sm text-muted-foreground">

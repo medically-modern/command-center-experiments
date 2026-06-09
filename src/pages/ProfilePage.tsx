@@ -156,19 +156,19 @@ const ProfilePage = () => {
 
         <div className="flex-1 flex flex-col min-w-0">
           <header className={`${isEscalated ? "bg-red-700" : "bg-gradient-navy"} text-navy-foreground border-b border-sidebar-border`}>
-            <div className="px-3 sm:px-6 py-5 flex items-center justify-between gap-4 flex-wrap">
+            <div className="px-4 sm:px-8 py-6 flex items-center justify-between gap-4 flex-wrap">
               <div className="flex items-center gap-3">
                 <SidebarTrigger className="text-navy-foreground hover:bg-white/10" />
                 <button onClick={() => goBack()} className="p-1.5 rounded-md hover:bg-white/10 transition-colors">
                   <ArrowLeft className="h-5 w-5" />
                 </button>
-                <div className="h-10 w-10 rounded-lg bg-gradient-primary flex items-center justify-center shadow-elevate">
+                <div className="h-12 w-12 rounded-lg bg-gradient-primary flex items-center justify-center shadow-elevate">
                   <ClipboardCheck className="h-5 w-5 text-primary-foreground" />
                 </div>
                 <div>
-                  <p className="text-[10px] uppercase tracking-[0.2em] opacity-70">Medically Modern · Profile Tool</p>
+                  <p className="text-xs uppercase tracking-[0.2em] opacity-70">Medically Modern · Profile Tool</p>
                   <div className="flex items-center gap-3">
-                    <h1 className="text-xl font-semibold">
+                    <h1 className="text-2xl font-bold">
                       {selected ? selected.name : "Profile Send Off"}
                     </h1>
                     {selected?.alreadyInSystem?.toLowerCase() === "yes" && (
@@ -202,8 +202,8 @@ const ProfilePage = () => {
             </div>
           </header>
 
-          <main className="flex-1 px-3 sm:px-6 py-6">
-            <section className="max-w-5xl xl:max-w-7xl 2xl:max-w-[1800px] mx-auto space-y-5">
+          <main className="flex-1 px-4 sm:px-8 py-8">
+            <section className="max-w-5xl xl:max-w-7xl 2xl:max-w-[1800px] mx-auto space-y-8">
               {!selected && (
                 <div className="rounded-xl bg-card border shadow-card p-10 text-center">
                   <p className="text-sm text-muted-foreground">

@@ -163,7 +163,7 @@ export function ServingPanel({ patient, onUpdate, onNext, hideReferral, referral
   }
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-8">
       <StepSection step={1} title="Insurance Summary" hint="Read-only — set on Stedi tab">
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
           <Shield className="h-4 w-4 text-blue-600 shrink-0" />
@@ -228,7 +228,7 @@ export function ServingPanel({ patient, onUpdate, onNext, hideReferral, referral
         </div>
 
         {/* Cross-Sell subsection */}
-        <div className="mt-5 pt-4 border-t border-border space-y-4">
+        <div className="mt-5 pt-4 border-t border-border space-y-6">
           <div className="flex items-center justify-between">
             <p className="text-sm font-semibold text-muted-foreground">CGM Cross-Sell</p>
             {crossSellStatus && (

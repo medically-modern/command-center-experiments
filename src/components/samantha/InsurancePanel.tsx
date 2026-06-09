@@ -770,7 +770,7 @@ function MondayOutput({
     : [];
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* Part 1 — main columns */}
       <div className="rounded-lg border bg-muted/20 p-4 space-y-3">
         <div className="flex items-start justify-between gap-3 flex-wrap">

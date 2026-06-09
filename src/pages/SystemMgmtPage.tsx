@@ -167,7 +167,7 @@ const SystemMgmtPage = () => {
       )}
       {/* Header */}
       <header className="bg-gradient-navy text-navy-foreground border-b border-sidebar-border">
-        <div className="px-3 sm:px-6 py-5 flex items-center justify-between gap-4 flex-wrap">
+        <div className="px-4 sm:px-8 py-6 flex items-center justify-between gap-4 flex-wrap">
           <div className="flex items-center gap-3">
             <button
               onClick={() => navigate("/?tab=dashboard")}
@@ -175,11 +175,11 @@ const SystemMgmtPage = () => {
             >
               <ArrowLeft className="h-5 w-5" />
             </button>
-            <div className="h-10 w-10 rounded-lg bg-gradient-primary flex items-center justify-center shadow-elevate">
+            <div className="h-12 w-12 rounded-lg bg-gradient-primary flex items-center justify-center shadow-elevate">
               <Settings2 className="h-5 w-5 text-primary-foreground" />
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-[0.2em] opacity-70">
+              <p className="text-xs uppercase tracking-[0.2em] opacity-70">
                 Medically Modern
               </p>
               <h1 className="text-2xl font-bold">System Management</h1>
@@ -239,7 +239,7 @@ const SystemMgmtPage = () => {
       </header>
 
       {/* Content */}
-      <main className={cn("flex-1 px-3 sm:px-6 py-6 overflow-y-auto transition-[margin] duration-300", notesPatient ? "mr-[400px]" : "mr-0")}>
+      <main className={cn("flex-1 px-4 sm:px-8 py-8 overflow-y-auto transition-[margin] duration-300", notesPatient ? "mr-[400px]" : "mr-0")}>
         <div className={cn("mx-auto", activeTab === "oversight" ? "max-w-full" : "max-w-4xl xl:max-w-6xl 2xl:max-w-7xl")}>
           {loading && patients.length === 0 ? (
             <LoadingState />
@@ -382,7 +382,7 @@ function SearchView({
   onClearStageFilter: () => void;
 }) {
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
@@ -490,7 +490,7 @@ function EscalationView({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {Array.from(escalatedByStage.entries()).map(([stage, pts]) => (
         <div key={stage} className="rounded-xl border bg-card shadow-card overflow-hidden">
           <div className="bg-red-50 dark:bg-red-950/30 px-4 py-3 border-b border-red-200 dark:border-red-900 flex items-center gap-2">
@@ -713,7 +713,7 @@ function StageManagerView({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <div className="rounded-xl bg-card border shadow-card p-5 space-y-1">
         <h2 className="text-sm font-semibold flex items-center gap-2">
           <ArrowRightLeft className="w-4 h-4 text-primary" />
@@ -796,7 +796,7 @@ function StageManagerView({
                 <div className="text-xs text-muted-foreground">{p.phone || "No phone"}</div>
               </div>
               <div className="text-right shrink-0">
-                <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{p.boardName}</div>
+                <div className="text-xs uppercase tracking-wider text-muted-foreground">{p.boardName}</div>
                 <div className="text-xs font-medium text-primary">{p.pipelineStage}</div>
               </div>
               <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
@@ -821,10 +821,10 @@ function StageManagerView({
             </Button>
           </div>
 
-          <div className="p-5 space-y-4">
+          <div className="p-5 space-y-6">
             {/* Current stage */}
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1.5">Current Stage</p>
+              <p className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5">Current Stage</p>
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border bg-muted/30 text-sm font-medium">
                 <Database className="w-3.5 h-3.5 text-muted-foreground" />
                 {selected.pipelineStage}
@@ -833,7 +833,7 @@ function StageManagerView({
 
             {/* Target stage picker */}
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">Move To</p>
+              <p className="text-xs uppercase tracking-wider text-muted-foreground mb-2">Move To</p>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 {stageOptions.map((stage) => {
                   const isCurrent = stage === selected.pipelineStage || stage === selected.stageAdvancerText;
@@ -1088,7 +1088,7 @@ function PatientRow({
 
       {/* Right: stage (clickable) + days */}
       <div className="shrink-0 w-[160px] flex flex-col items-end justify-center px-4 py-3 gap-0.5">
-        <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+        <div className="text-xs uppercase tracking-wider text-muted-foreground">
           {patient.boardName}
         </div>
         <button

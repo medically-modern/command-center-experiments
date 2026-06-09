@@ -60,7 +60,7 @@ export function DoctorPanel({ patient, onUpdate, clinicLabels, onClinicSelect, o
   };
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-8">
       <StepSection step={1} title="Doctor Information" hint="Doctor status, contact details & clinicals method">
         {patient.prescriberRequirements?.trim() && (
           <div className="rounded-md border border-amber-300 bg-amber-50 px-4 py-3 mb-4">

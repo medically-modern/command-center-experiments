@@ -162,7 +162,7 @@ export function WelcomeCallForm({ patient, onFieldChange, onSendWelcomeCallText 
   const showPump = pumpOverride !== null ? pumpOverride : defaultShowPump;
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-8">
       {/* Header */}
       <div className="px-1">
         <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">
@@ -334,7 +334,7 @@ export function WelcomeCallForm({ patient, onFieldChange, onSendWelcomeCallText 
             {/* Infusion Set pairs */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Infusion Set 1 group */}
-              <div className="rounded-lg border border-input bg-muted/20 p-4 space-y-4">
+              <div className="rounded-lg border border-input bg-muted/20 p-4 space-y-6">
                 <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
                   Infusion Set 1
                 </p>
@@ -365,7 +365,7 @@ export function WelcomeCallForm({ patient, onFieldChange, onSendWelcomeCallText 
               </div>
 
               {/* Infusion Set 2 group */}
-              <div className="rounded-lg border border-input bg-muted/20 p-4 space-y-4">
+              <div className="rounded-lg border border-input bg-muted/20 p-4 space-y-6">
                 <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
                   Infusion Set 2
                 </p>

@@ -133,7 +133,7 @@ export function AuthorizationsPanel({ patient, onCodeChange, onNotesChange, onSa
           };
 
           return (
-            <div className="space-y-4">
+            <div className="space-y-6">
               {authRequired.map((r) => {
                 const codeId = PRODUCT_TO_CODE_ID[r.product];
                 const meta = PRODUCT_CODES.find((c) => c.id === codeId);

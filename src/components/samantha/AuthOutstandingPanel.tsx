@@ -121,7 +121,7 @@ export function AuthOutstandingPanel({ patient, onCodeChange, onNotesChange, onS
         )}
 
         {dropdownsReady && authRequired.length > 0 && (
-          <div className="space-y-4">
+          <div className="space-y-6">
             {authRequired.map((r) => {
               const codeId = PRODUCT_TO_CODE_ID[r.product];
               const meta = PRODUCT_CODES.find((c) => c.id === codeId);

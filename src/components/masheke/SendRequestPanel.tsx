@@ -345,7 +345,7 @@ export function SendRequestPanel({ patient, resetVersion = 0, onUpdate, onOpenFo
   return (
     <div className="space-y-6">
       <StepSection step={1} title="Review Documents" hint="Method, what's needed, and clinical files">
-        <div className="space-y-4">
+        <div className="space-y-6">
           <MethodBanner patient={patient} />
 
           <WhatsNeededCard patient={patient} />
@@ -358,7 +358,7 @@ export function SendRequestPanel({ patient, resetVersion = 0, onUpdate, onOpenFo
       </StepSection>
 
       <StepSection step={2} title="Generate Scripts" hint="Trigger DocExport and MN Request Letter">
-        <div className="space-y-4">
+        <div className="space-y-6">
           {/* Parachute: the GenerateScripts / RequestLetter / OptionalFax cards
              live behind a chevron. Mark every card in the group with a left
              indigo accent so it's obvious which boxes are part of the
@@ -417,7 +417,7 @@ export function SendRequestPanel({ patient, resetVersion = 0, onUpdate, onOpenFo
       </StepSection>
 
       <StepSection step={3} title="Send Request" hint="Send via fax/email/parachute, then mark complete">
-        <div className="space-y-4">
+        <div className="space-y-6">
           <NotesPanel
             notes={patient.mnEvalNotes ?? ""}
             onNotesChange={(v) => onUpdate({ mnEvalNotes: v })}
@@ -1077,7 +1077,7 @@ function SendActionCard({
 
       {/* Two numbered step subsections — same visual pattern as the
          Insurance Panel Step 1/2/3 layout, so the eye reads top→bottom. */}
-      <div className="px-6 py-5 space-y-4">
+      <div className="px-6 py-5 space-y-6">
         {isFaxOrEmail && <AttachmentSummary attachments={attachments} />}
 
         <StepBlock

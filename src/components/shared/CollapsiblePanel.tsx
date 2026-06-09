@@ -18,26 +18,29 @@ export function CollapsiblePanel({
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   return (
-    <div className="rounded-xl border bg-card shadow-card overflow-hidden">
+    <div className="rounded-xl border border-sidebar-border bg-card shadow-card overflow-hidden">
+      {/* ── Clickable header ── */}
       <button
         type="button"
         onClick={() => setIsOpen((v) => !v)}
-        className="w-full flex items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-muted/50 cursor-pointer"
+        className="w-full flex items-center gap-4 px-6 py-4 text-left transition-colors hover:bg-muted/40 cursor-pointer bg-muted/20 border-b border-sidebar-border"
       >
-        <span className="text-sm font-semibold flex-1">{title}</span>
-        {badge !== undefined && (
-          <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
-            {badge}
-          </span>
-        )}
         <ChevronDown
           className={cn(
-            "h-4 w-4 text-muted-foreground transition-transform shrink-0",
+            "h-5 w-5 text-muted-foreground transition-transform shrink-0",
             !isOpen && "-rotate-90",
           )}
         />
+        <span className="font-heading text-base font-bold tracking-tight text-foreground flex-1">
+          {title}
+        </span>
+        {badge !== undefined && (
+          <span className="text-xs font-medium px-2.5 py-0.5 rounded-full bg-primary/10 text-primary">
+            {badge}
+          </span>
+        )}
       </button>
-      {isOpen && <div className="px-4 pb-4">{children}</div>}
+      {isOpen && <div className="px-6 py-5">{children}</div>}
     </div>
   );
 }
