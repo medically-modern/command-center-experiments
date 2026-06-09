@@ -8,7 +8,7 @@ Runs every weekday at 9:00 AM ET. Queries all Monday.com boards for patient coun
 
 - `MONDAY_API_TOKEN` — Monday.com API token
 - `GITHUB_PAT` — GitHub PAT with contents:write on this repo
-- `GITHUB_REPO` — `medically-modern/command-center-test`
+- `GITHUB_REPO` — `medically-modern/command-center-experiments`
 
 ## Railway Config
 

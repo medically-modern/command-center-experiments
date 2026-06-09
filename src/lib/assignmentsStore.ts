@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { DEFAULT_ASSIGNMENTS, type RoleAssignments, type UserName } from "./config";
 
-const REPO = "medically-modern/command-center-test";
+const REPO = "medically-modern/command-center-experiments";
 const FILE_PATH = "public/data/assignments.json";
 const BRANCH = "main";
 const PAT = import.meta.env.VITE_GITHUB_PAT as string | undefined;

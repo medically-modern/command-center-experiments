@@ -8,12 +8,12 @@
  * Env vars:
  *   MONDAY_API_TOKEN  — Monday.com API token
  *   GITHUB_PAT        — GitHub personal access token with repo write
- *   GITHUB_REPO       — e.g. "medically-modern/command-center-test"
+ *   GITHUB_REPO       — e.g. "medically-modern/command-center-experiments"
  */
 
 const MONDAY_TOKEN = process.env.MONDAY_API_TOKEN;
 const GITHUB_PAT = process.env.GITHUB_PAT;
-const GITHUB_REPO = process.env.GITHUB_REPO || "medically-modern/command-center-test";
+const GITHUB_REPO = process.env.GITHUB_REPO || "medically-modern/command-center-experiments";
 
 if (!MONDAY_TOKEN) { console.error("MONDAY_API_TOKEN not set"); process.exit(1); }
 if (!GITHUB_PAT) { console.error("GITHUB_PAT not set"); process.exit(1); }
