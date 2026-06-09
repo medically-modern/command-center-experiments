@@ -20,6 +20,7 @@ import { writeStatusIndex, writeLongText, COL } from "@/lib/masheke/mondayApi";
 import { ESCALATION_INDEX } from "@/lib/masheke/mondayMapping";
 import { FollowUpModal } from "@/components/masheke/FollowUpModal";
 import { useBackNavigation } from "@/hooks/useBackNavigation";
+import { CollapsiblePanel } from "@/components/shared/CollapsiblePanel";
 
 const ChaseClinicalsPage = () => {
   const navigate = useNavigate();
@@ -74,7 +75,7 @@ const ChaseClinicalsPage = () => {
                   <Stethoscope className="h-5 w-5 text-primary-foreground" />
                 </div>
                 <div>
-                  <p className="text-[10px] uppercase tracking-[0.2em] opacity-70">Medically Modern</p>
+                  <p className="text-xs uppercase tracking-[0.2em] opacity-70">Medically Modern</p>
                   <h1 className="text-2xl font-bold">Chase Clinicals</h1>{selected && <p className="text-sm opacity-80 mt-0.5">{selected.name}</p>}
                 </div>
               </div>
@@ -120,7 +121,9 @@ const ChaseClinicalsPage = () => {
               )}
               {selected && (
                 <>
+                  <CollapsiblePanel title="Patient Profile" defaultOpen={false}>
                   <PatientProfileCard patient={selected} lockDoctorOpen onDoctorEdit={(patch) => update(selected.id, patch)} />
+                  </CollapsiblePanel>
                   <ChaseClinicalsPanel patient={selected} onUpdate={onUpdate} onOpenForm={() => setEscalationModalOpen(true)} />
                 </>
               )}

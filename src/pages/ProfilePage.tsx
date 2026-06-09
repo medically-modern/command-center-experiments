@@ -16,6 +16,7 @@ import { PatientProfileCard } from "@/components/profile/PatientProfileCard";
 import { ReferralEmailPanel } from "@/components/profile/ReferralEmailPanel";
 import { NotesPanel } from "@/components/profile/NotesPanel";
 import { FollowUpModal } from "@/components/profile/FollowUpModal";
+import { CollapsiblePanel } from "@/components/shared/CollapsiblePanel";
 import { Button } from "@/components/ui/button";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { ClipboardCheck, Send, AlertTriangle, Loader2, ArrowLeft, Clock, Save, Ban } from "lucide-react";
@@ -166,9 +167,9 @@ const ProfilePage = () => {
                   <ClipboardCheck className="h-5 w-5 text-primary-foreground" />
                 </div>
                 <div>
-                  <p className="text-[10px] uppercase tracking-[0.2em] opacity-70">Medically Modern · Profile Tool</p>
+                  <p className="text-xs uppercase tracking-[0.2em] opacity-70">Medically Modern · Profile Tool</p>
                   <div className="flex items-center gap-3">
-                    <h1 className="text-xl font-semibold">
+                    <h1 className="text-2xl font-semibold">
                       {selected ? selected.name : "Profile Send Off"}
                     </h1>
                     {selected?.alreadyInSystem?.toLowerCase() === "yes" && (
@@ -215,12 +216,14 @@ const ProfilePage = () => {
               {selected && (
                 <>
                   {/* 1. Patient Demographics */}
-                  <PatientProfileCard
-                    patient={selected}
-                    onUpdate={handleUpdate}
-                    referralEmailOpen={referralEmailOpen}
-                    onToggleReferralEmail={() => setReferralEmailOpen((o) => !o)}
-                  />
+                  <CollapsiblePanel title="Patient Profile" defaultOpen={false}>
+                    <PatientProfileCard
+                      patient={selected}
+                      onUpdate={handleUpdate}
+                      referralEmailOpen={referralEmailOpen}
+                      onToggleReferralEmail={() => setReferralEmailOpen((o) => !o)}
+                    />
+                  </CollapsiblePanel>
 
                   {/* 2. Referral — rendered via ServingPanel (referral-only mode) */}
                   <ServingPanel patient={selected} onUpdate={handleUpdate} hideReferral={false} referralOnly />
@@ -248,11 +251,13 @@ const ProfilePage = () => {
                   />
 
                   {/* 5. Notes */}
-                  <NotesPanel
-                    notes={selected.notes}
-                    onNotesChange={(v) => updateLocal(selected.id, { notes: v })}
-                    onSaveToMonday={(v) => writeText(selected.id, COL.notes, v)}
-                  />
+                  <CollapsiblePanel title="Notes" defaultOpen={false}>
+                    <NotesPanel
+                      notes={selected.notes}
+                      onNotesChange={(v) => updateLocal(selected.id, { notes: v })}
+                      onSaveToMonday={(v) => writeText(selected.id, COL.notes, v)}
+                    />
+                  </CollapsiblePanel>
 
                   {/* Follow Up Modal */}
                   <FollowUpModal

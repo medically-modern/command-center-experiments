@@ -26,6 +26,7 @@ import {
 import { ArrowLeft, FileUp, Loader2, RefreshCw, Search, User, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { CollapsiblePanel } from "@/components/shared/CollapsiblePanel";
 
 /* ── Simplified Sidebar ─────────────────────────────────────── */
 
@@ -248,7 +249,7 @@ const UpdateClinicalsPage = () => {
                 <FileUp className="h-5 w-5 text-primary-foreground" />
               </div>
               <div>
-                <p className="text-[10px] uppercase tracking-[0.2em] opacity-70">
+                <p className="text-xs uppercase tracking-[0.2em] opacity-70">
                   Medically Modern
                 </p>
                 <h1 className="text-2xl font-bold">Update Clinicals</h1>
@@ -273,7 +274,11 @@ const UpdateClinicalsPage = () => {
                 </div>
               )}
 
-              {selected && <PatientClinicalsCard patient={selected} />}
+              {selected && (
+                <CollapsiblePanel title="Patient Profile" defaultOpen={false}>
+                  <PatientClinicalsCard patient={selected} />
+                </CollapsiblePanel>
+              )}
             </section>
           </main>
         </div>

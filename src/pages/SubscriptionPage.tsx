@@ -18,6 +18,7 @@ import { RotateCcw, RefreshCw, ArrowLeft, Save } from "lucide-react";
 import { toast } from "sonner";
 import { sendPatientToMonday, sendNotesToMonday } from "@/lib/subscription/mondayWrite";
 import { validatePatientForSend } from "@/lib/subscription/workflow";
+import { CollapsiblePanel } from "@/components/shared/CollapsiblePanel";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
 const SubscriptionPage = () => {
@@ -100,7 +101,7 @@ const SubscriptionPage = () => {
                   <RefreshCw className="h-5 w-5 text-primary-foreground" />
                 </div>
                 <div>
-                  <p className="text-[10px] uppercase tracking-[0.2em] opacity-70">Medically Modern</p>
+                  <p className="text-xs uppercase tracking-[0.2em] opacity-70">Medically Modern</p>
                   <h1 className="text-2xl font-bold">Subscription Management</h1>
                   {selected && <p className="text-sm opacity-80 mt-0.5">{selected.name}</p>}
                 </div>
@@ -136,13 +137,17 @@ const SubscriptionPage = () => {
 
               {selected && (
                 <>
-                  <PatientInfoCard patient={selected} onFieldChange={handleFieldChange} />
+                  <CollapsiblePanel title="Patient Profile" defaultOpen={false}>
+                    <PatientInfoCard patient={selected} onFieldChange={handleFieldChange} />
+                  </CollapsiblePanel>
                   <SubscriptionForm patient={selected} onFieldChange={handleFieldChange} />
-                  <NotesPanel
-                    notes={selected.notes}
-                    onNotesChange={(v) => update(selected.id, { notes: v })}
-                    onSaveToMonday={(v) => sendNotesToMonday(selected.id, v)}
-                  />
+                  <CollapsiblePanel title="Notes" defaultOpen={false}>
+                    <NotesPanel
+                      notes={selected.notes}
+                      onNotesChange={(v) => update(selected.id, { notes: v })}
+                      onSaveToMonday={(v) => sendNotesToMonday(selected.id, v)}
+                    />
+                  </CollapsiblePanel>
                   <EscalateButton escalated={selected.escalated} onToggle={toggleEscalate} disabled={!selected} />
                   <SendToMondayButton onSend={handleSend} disabled={!selected || !validation.valid} validationErrors={validation.errors} />
                 </>

@@ -26,6 +26,7 @@ import { ESCALATION_INDEX } from "@/lib/samantha/mondayMapping";
 import { FollowUpModal } from "@/components/samantha/FollowUpModal";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useBackNavigation } from "@/hooks/useBackNavigation";
+import { CollapsiblePanel } from "@/components/shared/CollapsiblePanel";
 
 
 /* ── DVS + Claims Status Visual ─────────────────────────────────── */
@@ -192,7 +193,7 @@ const AuthOutstandingPage = () => {
                   <Stethoscope className="h-5 w-5 text-primary-foreground" />
                 </div>
                 <div>
-                  <p className="text-[10px] uppercase tracking-[0.2em] opacity-70">Medically Modern</p>
+                  <p className="text-xs uppercase tracking-[0.2em] opacity-70">Medically Modern</p>
                   <h1 className="text-2xl font-bold">Auth Outstanding</h1>{selected && <p className="text-sm opacity-80 mt-0.5">{selected.name}</p>}
                 </div>
               </div>
@@ -227,8 +228,12 @@ const AuthOutstandingPage = () => {
               )}
               {selected && (
                 <>
-                  <PatientProfileCard patient={selected} onUpdate={(p) => update(selected.id, p)} />
-                  <DvsClaimsVisual dvsStatus={selected.dvsStatus} claimsStatus={selected.claimsStatus} />
+                  <CollapsiblePanel title="Patient Profile" defaultOpen={false}>
+                    <PatientProfileCard patient={selected} onUpdate={(p) => update(selected.id, p)} />
+                  </CollapsiblePanel>
+                  <CollapsiblePanel title="DVS & Claims Status" defaultOpen={false}>
+                    <DvsClaimsVisual dvsStatus={selected.dvsStatus} claimsStatus={selected.claimsStatus} />
+                  </CollapsiblePanel>
                   <AuthOutstandingPanel patient={selected} onCodeChange={updateCode} onNotesChange={(v) => update(selected.id, { notes: v })} onSaveNotesToMonday={(v) => writeLongText(selected.id, COL.callReferenceNotes, v)} />
                   <EscalateButton
                     escalated={!!selected.escalated}
